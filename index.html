@@ -706,23 +706,7 @@
 const SUPABASE_URL = 'https://jxxhypanwiqigtaptrrp.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4eGh5cGFud2lxaWd0YXB0cnJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY1MTgyMzQsImV4cCI6MjA4MjA5NDIzNH0.IKd0n-abux653kQspkE-uyoQwVXV5hvCzF_SA103auw';
 
-let supabaseClient = null;
-
-// Inicializar Supabase com verificação
-try {
-  if (window.supabase && window.supabase.createClient) {
-    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    console.log('Supabase conectado!');
-  } else {
-    console.error('Supabase não carregou');
-    alert('Erro ao carregar. Recarregue a página.');
-  }
-} catch (e) {
-  console.error('Erro Supabase:', e);
-}
-
-// Alias para manter compatibilidade
-const supabase = supabaseClient;
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // STATE
 let items = [], clients = [], team = [], currentUser = null;
@@ -736,7 +720,6 @@ document.addEventListener('DOMContentLoaded', function() {
   
   if (loginBtn) {
     loginBtn.addEventListener('click', handleLogin);
-    console.log('Botão login configurado');
   }
   
   if (loginEmail) {
@@ -745,7 +728,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Verificar auth ao carregar
+  document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
+  
   checkAuth();
 });
 
@@ -758,7 +742,7 @@ async function handleLogin() {
   btn.disabled = true; btn.textContent = 'Entrando...'; error.classList.remove('show');
   
   try {
-    const { data } = await supabase.from('team_members').select('*').eq('email', email).eq('active', true).maybeSingle();
+    const { data } = await db.from('team_members').select('*').eq('email', email).eq('active', true).maybeSingle();
     if (!data) { error.classList.add('show'); btn.disabled = false; btn.textContent = 'Entrar'; return; }
     currentUser = data;
     localStorage.setItem('smtUser', JSON.stringify(data));
@@ -794,9 +778,9 @@ function isGestor() { return ['supervisor', 'gestor'].includes(currentUser.role)
 async function loadAll() {
   try {
     const [i, c, t] = await Promise.all([
-      supabase.from('items').select('*').order('id'),
-      supabase.from('clients').select('*').order('name'),
-      supabase.from('team_members').select('*').eq('active', true)
+      db.from('items').select('*').order('id'),
+      db.from('clients').select('*').order('name'),
+      db.from('team_members').select('*').eq('active', true)
     ]);
     items = i.data || []; clients = c.data || []; team = t.data || [];
     document.getElementById('syncDot').style.background = 'var(--green)';
@@ -805,7 +789,7 @@ async function loadAll() {
 }
 
 function setupRealtime() {
-  supabase.channel('changes')
+  db.channel('changes')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'items' }, p => {
       if (p.eventType === 'UPDATE') { const idx = items.findIndex(x => x.id === p.new.id); if (idx !== -1) items[idx] = p.new; }
       else if (p.eventType === 'INSERT') items.push(p.new);
@@ -822,7 +806,7 @@ async function updateItem(id, field, value) {
     const upd = { [field]: value, last_updated_by: currentUser.name, last_updated_at: new Date().toISOString() };
     if (field === 'pre_check_status' && value === 'Tudo OK') { upd.pre_check_by = currentUser.name; upd.pre_check_at = new Date().toISOString(); }
     if (field === 'post_check_status' && value === 'Publicado OK') { upd.post_check_by = currentUser.name; upd.post_check_at = new Date().toISOString(); }
-    await supabase.from('items').update(upd).eq('id', id);
+    await db.from('items').update(upd).eq('id', id);
     const item = items.find(x => x.id === id); if (item) Object.assign(item, upd);
     renderAll(); toast('Salvo!');
   } catch (err) { console.error(err); toast('Erro'); }
@@ -843,7 +827,7 @@ async function addClient() {
   if (!name) { toast('Digite o nome'); return; }
   
   try {
-    const { data: nc } = await supabase.from('clients').insert({ name, social_media: sm, gestor, color }).select().single();
+    const { data: nc } = await db.from('clients').insert({ name, social_media: sm, gestor, color }).select().single();
     const newItems = [];
     FEED_DATES.forEach(d => {
       let ct = 'Post Serviço', cp = false;
@@ -858,7 +842,7 @@ async function addClient() {
       if (d === '01/01') { ct = 'Mensagem Motivacional ✨'; cp = true; }
       newItems.push({ client_id: nc.id, client: name, social_media: sm, gestor, type: 'STORY', date: d, content_type: ct, is_checkpoint: cp });
     });
-    await supabase.from('items').insert(newItems);
+    await db.from('items').insert(newItems);
     document.getElementById('newClientName').value = '';
     toast(`"${name}" adicionado!`); loadAll();
   } catch (err) { console.error(err); toast('Erro'); }
@@ -866,7 +850,7 @@ async function addClient() {
 
 async function deleteClient(id, name) {
   if (!confirm(`Excluir "${name}"?`)) return;
-  await supabase.from('clients').delete().eq('id', id);
+  await db.from('clients').delete().eq('id', id);
   toast('Removido'); loadAll();
 }
 
@@ -1177,11 +1161,6 @@ function switchTab(t) {
   document.querySelectorAll('.tab-content').forEach(s => s.style.display = 'none');
   document.getElementById('tab-' + t).style.display = 'block';
 }
-
-// Configurar navegação após DOM carregar
-document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
-});
 
 // INIT
 async function init() { await loadAll(); setupRealtime(); }
