@@ -3,133 +3,187 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📊 ConectMe Tracker</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <title>ConectMe Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
-    :root {
-      --bg: #0f0f0f;
-      --card: #1a1a1a;
-      --card-hover: #222;
-      --border: #333;
-      --text: #fff;
-      --text-muted: #888;
-      
-      --aguardando: #666;
-      --agendado: #3b82f6;
-      --verificado: #06b6d4;
-      --publicar: #f97316;
-      --publicado: #22c55e;
-      --paula: #a855f7;
-      --problema: #ef4444;
-      --especial: #eab308;
-    }
-
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
+    :root {
+      --bg: #09090b;
+      --bg-subtle: #0f0f11;
+      --surface: #18181b;
+      --surface-hover: #1f1f23;
+      --border: #27272a;
+      --border-subtle: #1f1f23;
+      
+      --text: #fafafa;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      
+      --success: #10b981;
+      --success-bg: rgba(16, 185, 129, 0.1);
+      --warning: #f59e0b;
+      --warning-bg: rgba(245, 158, 11, 0.1);
+      --danger: #ef4444;
+      --danger-bg: rgba(239, 68, 68, 0.1);
+      --info: #3b82f6;
+      --info-bg: rgba(59, 130, 246, 0.1);
+      --purple: #a855f7;
+      --purple-bg: rgba(168, 85, 247, 0.1);
+    }
+
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Inter', -apple-system, sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
+      line-height: 1.5;
     }
 
-    /* ========== LOGIN ========== */
-    .login {
+    /* ==================== LOGIN ==================== */
+    .login-screen {
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 1rem;
+      padding: 1.5rem;
     }
-    .login.hidden { display: none; }
-    .login-box {
-      background: var(--card);
-      border-radius: 20px;
+    .login-screen.hidden { display: none; }
+    
+    .login-card {
+      width: 100%;
+      max-width: 380px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
       padding: 2.5rem;
-      width: 100%;
-      max-width: 360px;
-      text-align: center;
     }
-    .login-logo { font-size: 3rem; margin-bottom: 0.5rem; }
-    .login-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.25rem; }
-    .login-sub { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem; }
-    .login-input {
-      width: 100%;
-      padding: 0.9rem 1rem;
-      background: var(--bg);
-      border: 2px solid var(--border);
+    .login-header { text-align: center; margin-bottom: 2rem; }
+    .login-logo {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary), var(--purple));
       border-radius: 12px;
-      color: var(--text);
-      font-size: 1rem;
-      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin: 0 auto 1rem;
     }
-    .login-input:focus { outline: none; border-color: var(--agendado); }
-    .login-btn {
-      width: 100%;
-      padding: 0.9rem;
-      background: var(--agendado);
-      border: none;
-      border-radius: 12px;
-      color: white;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .login-btn:hover { opacity: 0.9; }
+    .login-title { font-size: 1.25rem; font-weight: 600; }
+    .login-subtitle { color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem; }
+    
     .login-error {
-      background: rgba(239,68,68,0.2);
-      color: var(--problema);
-      padding: 0.75rem;
+      background: var(--danger-bg);
+      color: var(--danger);
+      padding: 0.75rem 1rem;
       border-radius: 8px;
+      font-size: 0.875rem;
       margin-bottom: 1rem;
-      font-size: 0.85rem;
       display: none;
     }
     .login-error.show { display: block; }
-
-    /* ========== APP ========== */
-    .app { display: none; }
-    .app.visible { display: block; }
-
-    /* ========== HEADER ========== */
-    .header {
-      background: var(--card);
-      padding: 0.75rem 1.25rem;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      border-bottom: 1px solid var(--border);
+    
+    .login-input {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 0.9375rem;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s;
     }
-    .header-inner {
-      max-width: 1600px;
-      margin: 0 auto;
+    .login-input:focus { outline: none; border-color: var(--primary); }
+    .login-input::placeholder { color: var(--text-muted); }
+    
+    .login-btn {
+      width: 100%;
+      padding: 0.875rem;
+      background: var(--primary);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .login-btn:hover { background: var(--primary-hover); }
+
+    /* ==================== APP LAYOUT ==================== */
+    .app { display: none; }
+    .app.visible { display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* ==================== HEADER ==================== */
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 1.5rem;
+      height: 64px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 1rem;
-      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-weight: 700;
-    }
+    .header-left { display: flex; align-items: center; gap: 2rem; }
+    .logo { display: flex; align-items: center; gap: 0.75rem; font-weight: 600; }
     .logo-icon {
       width: 32px;
       height: 32px;
-      background: linear-gradient(135deg, var(--agendado), var(--paula));
+      background: linear-gradient(135deg, var(--primary), var(--purple));
       border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 0.875rem;
     }
-    .user-info {
+    
+    .nav { display: flex; gap: 0.25rem; }
+    .nav-item {
+      padding: 0.5rem 1rem;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.5rem;
+      transition: all 0.2s;
     }
+    .nav-item:hover { color: var(--text); background: var(--surface-hover); }
+    .nav-item.active { color: var(--text); background: var(--bg); }
+    .nav-badge {
+      background: var(--danger);
+      color: white;
+      font-size: 0.6875rem;
+      padding: 0.125rem 0.4rem;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+    
+    .header-right { display: flex; align-items: center; gap: 1rem; }
+    .today-date { color: var(--text-muted); font-size: 0.8125rem; }
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      padding: 0.375rem 0.5rem;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    .user-menu:hover { background: var(--surface-hover); }
     .user-avatar {
       width: 32px;
       height: 32px;
@@ -137,330 +191,571 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 700;
-      font-size: 0.8rem;
+      font-size: 0.8125rem;
+      font-weight: 600;
       color: white;
-      cursor: pointer;
     }
-    .user-name { font-weight: 600; font-size: 0.9rem; }
+    .user-name { font-size: 0.875rem; font-weight: 500; }
 
-    /* ========== ALERTA DE NOTIFICAÇÃO ========== */
-    .notification-bar {
-      background: linear-gradient(90deg, var(--publicar), #ea580c);
-      padding: 0.75rem 1.25rem;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      gap: 0.75rem;
-      animation: pulse-bg 1s infinite;
-      cursor: pointer;
-    }
-    .notification-bar.show { display: flex; }
-    .notification-bar span { font-weight: 600; }
-    @keyframes pulse-bg {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.85; }
-    }
-
-    /* ========== FILTROS ========== */
-    .filters {
-      background: var(--card);
-      padding: 0.75rem 1.25rem;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .filter-btn {
-      padding: 0.5rem 1rem;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      color: var(--text-muted);
-      font-size: 0.8rem;
-      font-weight: 500;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .filter-btn:hover { border-color: var(--text-muted); color: var(--text); }
-    .filter-btn.active { background: var(--agendado); border-color: var(--agendado); color: white; }
-    .filter-btn .count {
-      background: rgba(255,255,255,0.2);
-      padding: 0.1rem 0.4rem;
-      border-radius: 10px;
-      font-size: 0.7rem;
-    }
-    .filter-select {
-      padding: 0.5rem 0.75rem;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      font-size: 0.8rem;
-    }
-
-    /* ========== STATS ========== */
-    .stats {
-      display: flex;
-      gap: 0.5rem;
-      padding: 1rem 1.25rem;
-      max-width: 1600px;
-      margin: 0 auto;
-      flex-wrap: wrap;
-    }
-    .stat {
-      flex: 1;
-      min-width: 100px;
-      background: var(--card);
-      border-radius: 12px;
-      padding: 0.75rem 1rem;
-      text-align: center;
-    }
-    .stat-value { font-size: 1.5rem; font-weight: 700; }
-    .stat-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; }
-
-    /* ========== GRID DE CARDS ========== */
+    /* ==================== MAIN ==================== */
     .main {
-      max-width: 1600px;
+      flex: 1;
+      padding: 1.5rem;
+      max-width: 1400px;
       margin: 0 auto;
-      padding: 0 1.25rem 2rem;
+      width: 100%;
     }
-    .cards-grid {
+
+    /* ==================== PAGE HEADER ==================== */
+    .page-header {
+      margin-bottom: 1.5rem;
+    }
+    .page-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    .page-subtitle { color: var(--text-muted); font-size: 0.875rem; }
+
+    /* ==================== DASHBOARD CARDS ==================== */
+    .dashboard-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 0.75rem;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
     }
-
-    /* ========== CARD ========== */
-    .card {
-      background: var(--card);
-      border-radius: 16px;
-      padding: 1rem;
-      border: 2px solid transparent;
-      transition: all 0.15s;
+    .client-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      cursor: pointer;
+      transition: all 0.2s;
     }
-    .card:hover { background: var(--card-hover); }
-    .card.especial { border-color: var(--especial); }
-    .card.publicar-agora {
-      border-color: var(--publicar);
-      animation: card-pulse 1.5s infinite;
+    .client-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
     }
-    @keyframes card-pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4); }
-      50% { box-shadow: 0 0 20px 5px rgba(249, 115, 22, 0.2); }
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: start;
-      margin-bottom: 0.75rem;
-    }
-    .card-client {
+    .client-card-header {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .client-card-name {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
     }
     .client-dot {
       width: 10px;
       height: 10px;
       border-radius: 50%;
     }
-    .client-name { font-weight: 700; font-size: 0.95rem; }
-    .card-type {
-      padding: 0.2rem 0.6rem;
-      border-radius: 20px;
-      font-size: 0.7rem;
-      font-weight: 600;
-    }
-    .card-type.feed { background: rgba(168,85,247,0.2); color: #c084fc; }
-    .card-type.story { background: rgba(249,115,22,0.2); color: #fb923c; }
-
-    .card-content {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-bottom: 0.75rem;
+    .client-name { font-weight: 600; }
+    .client-sm { font-size: 0.75rem; color: var(--text-muted); }
+    
+    .client-progress { margin-bottom: 1rem; }
+    .progress-row {
       display: flex;
       align-items: center;
-      gap: 0.4rem;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
     }
-    .card-content.especial { color: var(--especial); font-weight: 500; }
-
-    .card-info {
+    .progress-label { font-size: 0.8125rem; color: var(--text-secondary); }
+    .progress-value { font-size: 0.8125rem; font-weight: 600; }
+    .progress-bar {
+      height: 6px;
+      background: var(--bg);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.3s;
+    }
+    .progress-fill.feed { background: var(--primary); }
+    .progress-fill.story { background: var(--purple); }
+    
+    .client-alerts {
       display: flex;
-      gap: 1rem;
-      margin-bottom: 0.75rem;
-      font-size: 0.8rem;
-    }
-    .card-info-item {
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-      color: var(--text-muted);
-    }
-    .card-info-item strong { color: var(--text); }
-
-    /* ========== STATUS BADGE ========== */
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-      padding: 0.35rem 0.75rem;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      margin-bottom: 0.75rem;
-    }
-    .status-badge.aguardando { background: rgba(102,102,102,0.3); color: #999; }
-    .status-badge.agendado { background: rgba(59,130,246,0.2); color: #60a5fa; }
-    .status-badge.verificado { background: rgba(6,182,212,0.2); color: #22d3ee; }
-    .status-badge.publicar { background: rgba(249,115,22,0.3); color: #fb923c; }
-    .status-badge.publicado { background: rgba(34,197,94,0.2); color: #4ade80; }
-    .status-badge.paula { background: rgba(168,85,247,0.2); color: #c084fc; }
-    .status-badge.problema { background: rgba(239,68,68,0.2); color: #f87171; }
-
-    /* ========== CHECKLIST ========== */
-    .checklist {
-      display: flex;
-      gap: 0.4rem;
-      margin-bottom: 0.75rem;
+      gap: 0.5rem;
       flex-wrap: wrap;
     }
-    .check-item {
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-      padding: 0.3rem 0.6rem;
-      background: var(--bg);
+    .client-alert {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.625rem;
       border-radius: 6px;
-      font-size: 0.7rem;
-      cursor: pointer;
-      border: 1px solid var(--border);
-      transition: all 0.15s;
+      font-weight: 500;
     }
-    .check-item:hover { border-color: var(--text-muted); }
-    .check-item.checked {
-      background: rgba(34,197,94,0.2);
-      border-color: var(--publicado);
-      color: var(--publicado);
-    }
-    .check-item input { display: none; }
+    .client-alert.pending { background: var(--warning-bg); color: var(--warning); }
+    .client-alert.danger { background: var(--danger-bg); color: var(--danger); }
+    .client-alert.success { background: var(--success-bg); color: var(--success); }
 
-    /* ========== BOTÕES DE AÇÃO ========== */
-    .card-actions {
+    /* ==================== CLIENT PAGE ==================== */
+    .client-nav {
       display: flex;
       gap: 0.5rem;
-      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
     }
-    .action-btn {
-      flex: 1;
-      min-width: 80px;
-      padding: 0.6rem 0.75rem;
-      border: none;
-      border-radius: 10px;
-      font-size: 0.8rem;
-      font-weight: 600;
+    .client-nav::-webkit-scrollbar { height: 4px; }
+    .client-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    
+    .client-nav-item {
+      padding: 0.5rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      white-space: nowrap;
       cursor: pointer;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+    .client-nav-item:hover { border-color: var(--text-muted); color: var(--text); }
+    .client-nav-item.active { 
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    .days-list { display: flex; flex-direction: column; gap: 1rem; }
+    
+    .day-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .day-card.special { border-color: var(--warning); }
+    
+    .day-header {
+      padding: 1rem 1.25rem;
+      background: var(--bg-subtle);
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 0.3rem;
-      transition: all 0.15s;
+      justify-content: space-between;
     }
-    .action-btn:hover { transform: scale(1.02); }
-    .action-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-    .action-btn.primary { background: var(--agendado); color: white; }
-    .action-btn.success { background: var(--publicado); color: white; }
-    .action-btn.warning { background: var(--publicar); color: white; }
-    .action-btn.danger { background: var(--problema); color: white; }
-    .action-btn.purple { background: var(--paula); color: white; }
-    .action-btn.outline {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-    }
-
-    /* ========== INPUTS ========== */
-    .card-inputs {
+    .day-date {
+      font-weight: 600;
       display: flex;
+      align-items: center;
       gap: 0.5rem;
-      margin-bottom: 0.75rem;
-      flex-wrap: wrap;
     }
-    .mini-select {
-      padding: 0.4rem 0.6rem;
-      background: var(--bg);
-      border: 1px solid var(--border);
+    .day-date .special-badge {
+      font-size: 0.6875rem;
+      background: var(--warning);
+      color: #000;
+      padding: 0.125rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .day-status { font-size: 0.8125rem; color: var(--text-muted); }
+    
+    .day-items { display: flex; flex-direction: column; }
+    
+    .post-item {
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .post-item:last-child { border-bottom: none; }
+    
+    .post-left { display: flex; align-items: center; gap: 1rem; flex: 1; }
+    .post-type {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      padding: 0.25rem 0.625rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+    }
+    .post-type.feed { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+    .post-type.story { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
+    
+    .post-info { flex: 1; }
+    .post-desc { font-size: 0.875rem; font-weight: 500; margin-bottom: 0.125rem; }
+    .post-meta { font-size: 0.75rem; color: var(--text-muted); }
+    
+    .post-status {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      padding: 0.375rem 0.75rem;
+      border-radius: 6px;
+    }
+    .post-status.pendente { background: var(--surface-hover); color: var(--text-muted); }
+    .post-status.nao_agendou { background: var(--danger-bg); color: var(--danger); }
+    .post-status.agendado { background: var(--info-bg); color: var(--info); }
+    .post-status.verificar_ig { background: var(--warning-bg); color: var(--warning); }
+    .post-status.publicado { background: var(--success-bg); color: var(--success); }
+    .post-status.problema { background: var(--danger-bg); color: var(--danger); }
+    
+    .post-actions { display: flex; gap: 0.5rem; }
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
       border-radius: 8px;
-      color: var(--text);
-      font-size: 0.75rem;
-      min-width: 90px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
     }
-    .mini-input {
-      padding: 0.4rem 0.6rem;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      font-size: 0.75rem;
-      width: 70px;
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-success { background: var(--success); color: white; }
+    .btn-success:hover { opacity: 0.9; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-danger:hover { opacity: 0.9; }
+    .btn-outline { 
+      background: transparent; 
+      border: 1px solid var(--border); 
+      color: var(--text-secondary);
     }
-    .mini-select:focus, .mini-input:focus { outline: none; border-color: var(--agendado); }
+    .btn-outline:hover { border-color: var(--text-muted); color: var(--text); }
 
-    /* ========== EMPTY STATE ========== */
-    .empty-state {
-      text-align: center;
-      padding: 4rem 2rem;
-      color: var(--text-muted);
+    /* ==================== ALERTS PAGE ==================== */
+    .alerts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1rem;
     }
-    .empty-state-icon { font-size: 3rem; margin-bottom: 1rem; }
-
-    /* ========== TOAST ========== */
-    .toast {
-      position: fixed;
-      bottom: 1.5rem;
-      right: 1.5rem;
-      background: var(--card);
-      border: 1px solid var(--publicado);
-      padding: 0.75rem 1.25rem;
+    .alert-card {
+      background: var(--surface);
+      border: 2px solid var(--warning);
       border-radius: 12px;
-      font-size: 0.9rem;
-      z-index: 1000;
-      transform: translateY(100px);
-      opacity: 0;
-      transition: all 0.3s;
+      padding: 1.25rem;
+      animation: pulse-border 2s infinite;
     }
-    .toast.show { transform: translateY(0); opacity: 1; }
+    @keyframes pulse-border {
+      0%, 100% { border-color: var(--warning); }
+      50% { border-color: rgba(245, 158, 11, 0.4); }
+    }
+    .alert-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .alert-client {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+    }
+    .alert-time {
+      font-size: 0.8125rem;
+      color: var(--warning);
+      font-weight: 600;
+    }
+    .alert-content { margin-bottom: 1rem; }
+    .alert-type { 
+      font-size: 0.6875rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+    .alert-desc { font-size: 0.9375rem; }
+    .alert-actions { display: flex; gap: 0.5rem; }
+    .alert-actions .btn { flex: 1; }
 
-    /* ========== SECTION TITLE ========== */
-    .section-title {
-      font-size: 1.1rem;
-      font-weight: 700;
+    /* ==================== ISSUES PAGE ==================== */
+    .issues-section { margin-bottom: 2rem; }
+    .issues-title {
+      font-size: 1rem;
+      font-weight: 600;
       margin-bottom: 1rem;
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
+    .issues-count {
+      font-size: 0.75rem;
+      background: var(--danger);
+      color: white;
+      padding: 0.125rem 0.5rem;
+      border-radius: 10px;
+    }
+    
+    .issues-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .issue-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .issue-item.urgent { border-color: var(--danger); }
+    .issue-info { flex: 1; }
+    .issue-client { font-weight: 500; margin-bottom: 0.125rem; }
+    .issue-detail { font-size: 0.8125rem; color: var(--text-muted); }
+    .issue-badge {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 6px;
+      font-weight: 500;
+    }
+    .issue-badge.nao-agendou { background: var(--danger-bg); color: var(--danger); }
+    .issue-badge.problema { background: var(--warning-bg); color: var(--warning); }
+    .issue-badge.urgente { background: var(--danger); color: white; }
 
-    /* ========== RESPONSIVE ========== */
-    @media (max-width: 600px) {
-      .cards-grid { grid-template-columns: 1fr; }
-      .stats { flex-direction: column; }
-      .stat { min-width: 100%; }
+    /* ==================== REPORT PAGE ==================== */
+    .report-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    .report-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+    .report-card-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .report-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .report-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .report-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .report-item-label { font-size: 0.875rem; }
+    .report-item-value { font-weight: 600; }
+    
+    .activity-list { display: flex; flex-direction: column; gap: 0.75rem; max-height: 300px; overflow-y: auto; }
+    .activity-item {
+      display: flex;
+      gap: 0.75rem;
+      font-size: 0.8125rem;
+    }
+    .activity-time { color: var(--text-muted); white-space: nowrap; }
+    .activity-text { color: var(--text-secondary); }
+    .activity-text strong { color: var(--text); font-weight: 500; }
+
+    /* ==================== MODAL ==================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1.5rem;
+    }
+    .modal-overlay.show { display: flex; }
+    
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 440px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-title { font-size: 1.125rem; font-weight: 600; }
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: var(--bg);
+      border-radius: 8px;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.125rem;
+    }
+    .modal-close:hover { color: var(--text); }
+    
+    .modal-body { padding: 1.5rem; }
+    
+    .modal-info { margin-bottom: 1.5rem; }
+    .modal-client { font-weight: 600; font-size: 1.125rem; margin-bottom: 0.25rem; }
+    .modal-meta { font-size: 0.875rem; color: var(--text-muted); }
+    
+    .modal-section { margin-bottom: 1.5rem; }
+    .modal-section-title { 
+      font-size: 0.75rem; 
+      text-transform: uppercase; 
+      color: var(--text-muted); 
+      margin-bottom: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+    
+    .modal-inputs { display: flex; flex-direction: column; gap: 0.75rem; }
+    .modal-row { display: flex; gap: 0.75rem; }
+    .modal-row > * { flex: 1; }
+    
+    .input-group { display: flex; flex-direction: column; gap: 0.375rem; }
+    .input-label { font-size: 0.8125rem; color: var(--text-secondary); }
+    .input-field {
+      padding: 0.625rem 0.875rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.875rem;
+    }
+    .input-field:focus { outline: none; border-color: var(--primary); }
+    
+    .checklist { display: flex; flex-direction: column; gap: 0.5rem; }
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .check-item:hover { border-color: var(--text-muted); }
+    .check-item.checked { 
+      background: var(--success-bg);
+      border-color: var(--success);
+    }
+    .check-box {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .check-item.checked .check-box {
+      background: var(--success);
+      border-color: var(--success);
+    }
+    .check-label { font-size: 0.875rem; }
+    
+    .modal-footer {
+      padding: 1.25rem 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 0.75rem;
+    }
+    .modal-footer .btn { flex: 1; padding: 0.75rem; }
+
+    /* ==================== TOAST ==================== */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--success);
+      padding: 0.875rem 1.25rem;
+      border-radius: 10px;
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 1001;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ==================== EMPTY STATE ==================== */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-muted);
+    }
+    .empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
+    .empty-text { font-size: 0.9375rem; }
+
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 768px) {
+      .header { padding: 0 1rem; }
+      .header-left { gap: 1rem; }
+      .nav { display: none; }
+      .main { padding: 1rem; }
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .alerts-grid { grid-template-columns: 1fr; }
+      .post-item { flex-wrap: wrap; }
+      .post-actions { width: 100%; margin-top: 0.5rem; }
+      .post-actions .btn { flex: 1; }
+    }
+    
+    /* Mobile Navigation */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 0.5rem;
+      z-index: 100;
+    }
+    .mobile-nav-inner {
+      display: flex;
+      justify-content: space-around;
+    }
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.5rem;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      font-size: 0.625rem;
+      cursor: pointer;
+    }
+    .mobile-nav-item.active { color: var(--primary); }
+    .mobile-nav-item span:first-child { font-size: 1.25rem; }
+    
+    @media (max-width: 768px) {
+      .mobile-nav { display: block; }
+      .app.visible { padding-bottom: 70px; }
     }
   </style>
 </head>
 <body>
 
 <!-- LOGIN -->
-<div class="login" id="loginScreen">
-  <div class="login-box">
-    <div class="login-logo">📊</div>
-    <div class="login-title">ConectMe Tracker</div>
-    <div class="login-sub">Monitoramento de Posts</div>
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="login-logo">📊</div>
+      <div class="login-title">ConectMe Tracker</div>
+      <div class="login-subtitle">Sistema de Monitoramento</div>
+    </div>
     <div class="login-error" id="loginError">E-mail não encontrado</div>
     <input type="email" class="login-input" id="loginEmail" placeholder="seu@conectme.digital">
     <button class="login-btn" id="loginBtn">Entrar</button>
@@ -472,121 +767,173 @@
   
   <!-- HEADER -->
   <header class="header">
-    <div class="header-inner">
+    <div class="header-left">
       <div class="logo">
         <div class="logo-icon">📊</div>
-        <span>ConectMe Tracker</span>
+        <span>ConectMe</span>
       </div>
-      <div class="user-info">
+      <nav class="nav">
+        <button class="nav-item active" data-page="dashboard">Dashboard</button>
+        <button class="nav-item" data-page="alerts">
+          Alertas
+          <span class="nav-badge" id="alertsBadge" style="display:none">0</span>
+        </button>
+        <button class="nav-item" data-page="issues">
+          Pendências
+          <span class="nav-badge" id="issuesBadge" style="display:none">0</span>
+        </button>
+        <button class="nav-item" data-page="report">Relatório</button>
+      </nav>
+    </div>
+    <div class="header-right">
+      <span class="today-date" id="todayDate"></span>
+      <div class="user-menu" onclick="logout()">
+        <div class="user-avatar" id="userAvatar">A</div>
         <span class="user-name" id="userName">Alec</span>
-        <div class="user-avatar" id="userAvatar" onclick="logout()">A</div>
       </div>
     </div>
   </header>
 
-  <!-- NOTIFICATION BAR -->
-  <div class="notification-bar" id="notificationBar" onclick="filterByStatus('publicar_agora')">
-    <span>🔔</span>
-    <span id="notificationText">3 posts precisam ser verificados no Instagram AGORA!</span>
-  </div>
-
-  <!-- FILTERS -->
-  <div class="filters">
-    <button class="filter-btn active" data-filter="todos">📋 Todos</button>
-    <button class="filter-btn" data-filter="pendentes">⏳ Pendentes <span class="count" id="countPendentes">0</span></button>
-    <button class="filter-btn" data-filter="verificar">🔍 Verificar <span class="count" id="countVerificar">0</span></button>
-    <button class="filter-btn" data-filter="publicar">🔔 Publicar Agora <span class="count" id="countPublicar">0</span></button>
-    <button class="filter-btn" data-filter="concluidos">✅ Concluídos <span class="count" id="countConcluidos">0</span></button>
-    <select class="filter-select" id="filterClient">
-      <option value="">Todos os clientes</option>
-    </select>
-    <select class="filter-select" id="filterDate">
-      <option value="">Todas as datas</option>
-    </select>
-  </div>
-
-  <!-- STATS -->
-  <div class="stats">
-    <div class="stat">
-      <div class="stat-value" id="statTotal">0</div>
-      <div class="stat-label">Total</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value" style="color:var(--aguardando)" id="statAguardando">0</div>
-      <div class="stat-label">Aguardando</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value" style="color:var(--agendado)" id="statAgendado">0</div>
-      <div class="stat-label">Agendado</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value" style="color:var(--verificado)" id="statVerificado">0</div>
-      <div class="stat-label">Verificado</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value" style="color:var(--publicar)" id="statPublicar">0</div>
-      <div class="stat-label">Publicar Agora</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value" style="color:var(--publicado)" id="statPublicado">0</div>
-      <div class="stat-label">Publicado</div>
-    </div>
-  </div>
-
-  <!-- MAIN -->
+  <!-- MAIN CONTENT -->
   <main class="main">
-    <div class="cards-grid" id="cardsGrid"></div>
-    <div class="empty-state" id="emptyState" style="display:none">
-      <div class="empty-state-icon">🎉</div>
-      <div>Nenhum post para mostrar</div>
+    
+    <!-- DASHBOARD PAGE -->
+    <div class="page" id="page-dashboard">
+      <div class="page-header">
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-subtitle">Visão geral de todos os clientes</p>
+      </div>
+      <div class="dashboard-grid" id="dashboardGrid"></div>
     </div>
+
+    <!-- CLIENT PAGE -->
+    <div class="page" id="page-client" style="display:none">
+      <div class="page-header">
+        <h1 class="page-title" id="clientPageTitle">Cliente</h1>
+        <p class="page-subtitle" id="clientPageSubtitle">Posts e stories</p>
+      </div>
+      <div class="client-nav" id="clientNav"></div>
+      <div class="days-list" id="daysList"></div>
+    </div>
+
+    <!-- ALERTS PAGE -->
+    <div class="page" id="page-alerts" style="display:none">
+      <div class="page-header">
+        <h1 class="page-title">🔔 Alertas do Dia</h1>
+        <p class="page-subtitle">Posts para verificar no Instagram agora</p>
+      </div>
+      <div class="alerts-grid" id="alertsGrid"></div>
+      <div class="empty-state" id="alertsEmpty" style="display:none">
+        <div class="empty-icon">✅</div>
+        <div class="empty-text">Nenhum alerta no momento</div>
+      </div>
+    </div>
+
+    <!-- ISSUES PAGE -->
+    <div class="page" id="page-issues" style="display:none">
+      <div class="page-header">
+        <h1 class="page-title">⚠️ Pendências</h1>
+        <p class="page-subtitle">Itens que precisam de atenção</p>
+      </div>
+      <div id="issuesContent"></div>
+      <div class="empty-state" id="issuesEmpty" style="display:none">
+        <div class="empty-icon">🎉</div>
+        <div class="empty-text">Nenhuma pendência</div>
+      </div>
+    </div>
+
+    <!-- REPORT PAGE -->
+    <div class="page" id="page-report" style="display:none">
+      <div class="page-header">
+        <h1 class="page-title">📊 Relatório</h1>
+        <p class="page-subtitle">Resumo geral e histórico</p>
+      </div>
+      <div class="report-grid" id="reportGrid"></div>
+    </div>
+
   </main>
 
-  <div class="toast" id="toast">✓ Salvo!</div>
+  <!-- MOBILE NAV -->
+  <div class="mobile-nav">
+    <div class="mobile-nav-inner">
+      <button class="mobile-nav-item active" data-page="dashboard"><span>🏠</span><span>Dashboard</span></button>
+      <button class="mobile-nav-item" data-page="alerts"><span>🔔</span><span>Alertas</span></button>
+      <button class="mobile-nav-item" data-page="issues"><span>⚠️</span><span>Pendências</span></button>
+      <button class="mobile-nav-item" data-page="report"><span>📊</span><span>Relatório</span></button>
+    </div>
+  </div>
 </div>
 
-<!-- AUDIO NOTIFICATION -->
-<audio id="notificationSound" preload="auto">
-  <source src="data:audio/wav;base64,UklGRl9vT19teleVBAAAAFdBVkVmbXQgEAAAA..." type="audio/wav">
-</audio>
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modalTitle">Verificar Post</h3>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✓ Salvo com sucesso</div>
 
 <script>
-// CONFIG
+// ==================== CONFIG ====================
 const SUPABASE_URL = 'https://jxxhypanwiqigtaptrrp.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4eGh5cGFud2lxaWd0YXB0cnJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY1MTgyMzQsImV4cCI6MjA4MjA5NDIzNH0.IKd0n-abux653kQspkE-uyoQwVXV5hvCzF_SA103auw';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// STATE
+// ==================== STATE ====================
 let items = [];
 let clients = [];
+let team = [];
+let activities = [];
 let currentUser = null;
-let currentFilter = 'todos';
-let currentClient = '';
-let currentDate = '';
+let currentPage = 'dashboard';
+let currentClient = null;
+let currentItem = null;
 
-// DATES
-const ALL_DATES = ['22/12', '23/12', '24/12', '25/12', '26/12', '29/12', '30/12', '31/12', '01/01', '02/01', '05/01'];
-
-// ========== LOGIN ==========
+// ==================== INIT ====================
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('loginBtn').addEventListener('click', handleLogin);
-  document.getElementById('loginEmail').addEventListener('keypress', e => { if (e.key === 'Enter') handleLogin(); });
-  
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentFilter = btn.dataset.filter;
-      renderCards();
-    });
+  document.getElementById('loginEmail').addEventListener('keypress', e => {
+    if (e.key === 'Enter') handleLogin();
   });
   
-  document.getElementById('filterClient').addEventListener('change', e => { currentClient = e.target.value; renderCards(); });
-  document.getElementById('filterDate').addEventListener('change', e => { currentDate = e.target.value; renderCards(); });
+  document.querySelectorAll('.nav-item, .mobile-nav-item').forEach(btn => {
+    btn.addEventListener('click', () => navigateTo(btn.dataset.page));
+  });
+  
+  document.getElementById('modalOverlay').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeModal();
+  });
+  
+  updateTodayDate();
+  setInterval(updateTodayDate, 60000);
   
   checkAuth();
 });
 
+function updateTodayDate() {
+  const now = new Date();
+  const options = { weekday: 'short', day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' };
+  document.getElementById('todayDate').textContent = now.toLocaleDateString('pt-BR', options);
+}
+
+function getToday() {
+  const now = new Date();
+  const day = String(now.getDate()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  return `${day}/${month}`;
+}
+
+function getNow() {
+  return new Date();
+}
+
+// ==================== AUTH ====================
 async function handleLogin() {
   const email = document.getElementById('loginEmail').value.trim().toLowerCase();
   const error = document.getElementById('loginError');
@@ -598,7 +945,7 @@ async function handleLogin() {
     const { data } = await db.from('team_members').select('*').eq('email', email).eq('active', true).maybeSingle();
     if (!data) { error.classList.add('show'); return; }
     currentUser = data;
-    localStorage.setItem('tracker_user', JSON.stringify(data));
+    localStorage.setItem('cmt_user', JSON.stringify(data));
     showApp();
   } catch (err) {
     console.error(err);
@@ -608,16 +955,16 @@ async function handleLogin() {
 }
 
 function checkAuth() {
-  const saved = localStorage.getItem('tracker_user');
+  const saved = localStorage.getItem('cmt_user');
   if (saved) {
     try { currentUser = JSON.parse(saved); showApp(); }
-    catch { localStorage.removeItem('tracker_user'); }
+    catch { localStorage.removeItem('cmt_user'); }
   }
 }
 
 function logout() {
   if (confirm('Sair do sistema?')) {
-    localStorage.removeItem('tracker_user');
+    localStorage.removeItem('cmt_user');
     location.reload();
   }
 }
@@ -631,409 +978,753 @@ function showApp() {
   init();
 }
 
-// ========== DATA ==========
+// ==================== DATA ====================
 async function loadData() {
-  try {
-    const [itemsRes, clientsRes] = await Promise.all([
-      db.from('items').select('*').order('scheduled_date').order('client'),
-      db.from('clients').select('*').order('name')
-    ]);
-    
-    items = itemsRes.data || [];
-    clients = clientsRes.data || [];
-    
-    // Atualizar status dos posts baseado em data/hora atual
-    await updatePostStatuses();
-    
-    populateFilters();
-    renderCards();
-    renderStats();
-    checkNotifications();
-  } catch (err) {
-    console.error('Erro ao carregar:', err);
-  }
+  const [itemsRes, clientsRes, teamRes, actRes] = await Promise.all([
+    db.from('items').select('*').order('scheduled_date').order('type'),
+    db.from('clients').select('*').order('name'),
+    db.from('team_members').select('*').eq('active', true),
+    db.from('activity_log').select('*').order('created_at', { ascending: false }).limit(50)
+  ]);
+  
+  items = itemsRes.data || [];
+  clients = clientsRes.data || [];
+  team = teamRes.data || [];
+  activities = actRes.data || [];
+  
+  await checkAndUpdateStatuses();
+  renderCurrentPage();
+  updateBadges();
 }
 
-async function updatePostStatuses() {
-  const now = new Date();
-  const today = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}`;
+async function checkAndUpdateStatuses() {
+  const today = getToday();
+  const now = getNow();
   const currentHour = now.getHours();
+  const currentMinute = now.getMinutes();
   
   for (const item of items) {
-    // Se está verificado e chegou a data/hora, mudar para publicar_agora
-    if (item.status === 'verificado' && item.scheduled_date) {
-      const [day, month] = item.scheduled_date.split('/');
-      const itemMonth = parseInt(month);
-      const itemDay = parseInt(day);
-      const todayParts = today.split('/');
-      const todayDay = parseInt(todayParts[0]);
-      const todayMonth = parseInt(todayParts[1]);
+    if (item.status === 'agendado') {
+      const isToday = item.scheduled_date === today;
+      const isPast = isDatePast(item.scheduled_date, today);
       
-      // Comparar datas considerando virada de ano
-      let shouldNotify = false;
-      
-      if (itemMonth === 12 && todayMonth === 12 && itemDay <= todayDay) shouldNotify = true;
-      if (itemMonth === 1 && todayMonth === 1 && itemDay <= todayDay) shouldNotify = true;
-      if (itemMonth === 12 && todayMonth === 1) shouldNotify = true; // Já passou
-      
-      if (shouldNotify) {
-        // Verificar horário se tiver
-        if (item.scheduled_time) {
-          const [hour] = item.scheduled_time.split(':');
-          if (parseInt(hour) <= currentHour) {
-            await updateStatus(item.id, 'publicar_agora', true);
-          }
-        } else {
-          await updateStatus(item.id, 'publicar_agora', true);
+      if (isPast || isToday) {
+        let shouldUpdate = isPast;
+        
+        if (isToday && item.scheduled_time) {
+          const [h, m] = item.scheduled_time.split(':').map(Number);
+          const itemMinutes = h * 60 + (m || 0) + 10; // +10 minutos
+          const nowMinutes = currentHour * 60 + currentMinute;
+          shouldUpdate = nowMinutes >= itemMinutes;
+        } else if (isToday && !item.scheduled_time) {
+          shouldUpdate = true;
+        }
+        
+        if (shouldUpdate) {
+          await db.from('items').update({ status: 'verificar_ig' }).eq('id', item.id);
+          item.status = 'verificar_ig';
         }
       }
     }
   }
 }
 
+function isDatePast(dateStr, today) {
+  const [d1, m1] = dateStr.split('/').map(Number);
+  const [d2, m2] = today.split('/').map(Number);
+  
+  const year1 = m1 === 1 ? 2025 : 2024;
+  const year2 = m2 === 1 ? 2025 : 2024;
+  
+  const date1 = new Date(year1, m1 - 1, d1);
+  const date2 = new Date(year2, m2 - 1, d2);
+  
+  return date1 < date2;
+}
+
 function setupRealtime() {
   db.channel('changes')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'items' }, payload => {
-      if (payload.eventType === 'UPDATE') {
-        const idx = items.findIndex(i => i.id === payload.new.id);
-        if (idx !== -1) items[idx] = payload.new;
-      }
-      renderCards();
-      renderStats();
-      checkNotifications();
-    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'items' }, () => loadData())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'activity_log' }, () => loadData())
     .subscribe();
-}
-
-// ========== UPDATE ==========
-async function updateStatus(id, newStatus, silent = false) {
-  const updates = {
-    status: newStatus,
-    updated_by: currentUser.name,
-    updated_at: new Date().toISOString()
-  };
-  
-  if (newStatus === 'verificado') {
-    updates.verificado_por = currentUser.name;
-    updates.verificado_em = new Date().toISOString();
-  }
-  if (newStatus === 'publicado') {
-    updates.publicado_verificado_por = currentUser.name;
-    updates.publicado_verificado_em = new Date().toISOString();
-    updates.publicado_ok = true;
-  }
-  if (newStatus === 'paula_ok') {
-    updates.paula_verificou_em = new Date().toISOString();
-  }
-  
-  await db.from('items').update(updates).eq('id', id);
-  
-  const item = items.find(i => i.id === id);
-  if (item) Object.assign(item, updates);
-  
-  if (!silent) {
-    renderCards();
-    renderStats();
-    toast('Salvo!');
-  }
-}
-
-async function updateField(id, field, value) {
-  const updates = {
-    [field]: value,
-    updated_by: currentUser.name,
-    updated_at: new Date().toISOString()
-  };
-  
-  await db.from('items').update(updates).eq('id', id);
-  
-  const item = items.find(i => i.id === id);
-  if (item) item[field] = value;
-  
-  renderCards();
-}
-
-async function toggleCheck(id, field) {
-  const item = items.find(i => i.id === id);
-  if (!item) return;
-  await updateField(id, field, !item[field]);
-}
-
-async function markAsProblem(id) {
-  const desc = prompt('Descreva o problema:');
-  if (!desc) return;
-  
-  await db.from('items').update({
-    status: 'publicado',
-    publicado_ok: false,
-    problema_desc: desc,
-    publicado_verificado_por: currentUser.name,
-    publicado_verificado_em: new Date().toISOString()
-  }).eq('id', id);
-  
-  const item = items.find(i => i.id === id);
-  if (item) {
-    item.status = 'publicado';
-    item.publicado_ok = false;
-    item.problema_desc = desc;
-  }
-  
-  renderCards();
-  renderStats();
-  toast('Problema registrado');
-}
-
-// ========== FILTERS ==========
-function populateFilters() {
-  const clientSelect = document.getElementById('filterClient');
-  const uniqueClients = [...new Set(getMyItems().map(i => i.client))].sort();
-  clientSelect.innerHTML = '<option value="">Todos os clientes</option>' +
-    uniqueClients.map(c => `<option value="${c}">${c}</option>`).join('');
-  
-  const dateSelect = document.getElementById('filterDate');
-  dateSelect.innerHTML = '<option value="">Todas as datas</option>' +
-    ALL_DATES.map(d => `<option value="${d}">${d}</option>`).join('');
 }
 
 function getMyItems() {
   if (currentUser.role === 'gestor') {
     return items.filter(i => i.gestor === currentUser.name);
   }
-  if (currentUser.role === 'social_media') {
-    return items.filter(i => i.social_media === currentUser.name);
-  }
-  return items; // Paula vê tudo
+  return items;
 }
 
-function getFilteredItems() {
-  let filtered = getMyItems();
-  
-  if (currentClient) filtered = filtered.filter(i => i.client === currentClient);
-  if (currentDate) filtered = filtered.filter(i => i.scheduled_date === currentDate);
-  
-  switch (currentFilter) {
-    case 'pendentes':
-      filtered = filtered.filter(i => i.status === 'aguardando');
-      break;
-    case 'verificar':
-      filtered = filtered.filter(i => i.status === 'agendado');
-      break;
-    case 'publicar':
-      filtered = filtered.filter(i => i.status === 'publicar_agora');
-      break;
-    case 'concluidos':
-      filtered = filtered.filter(i => ['publicado', 'paula_ok'].includes(i.status));
-      break;
+function getMyClients() {
+  if (currentUser.role === 'gestor') {
+    return clients.filter(c => c.gestor === currentUser.name);
   }
-  
-  return filtered;
+  return clients;
 }
 
-// ========== RENDER ==========
-function renderStats() {
+// ==================== NAVIGATION ====================
+function navigateTo(page, data = null) {
+  currentPage = page;
+  
+  document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.nav-item, .mobile-nav-item').forEach(n => n.classList.remove('active'));
+  
+  if (page === 'client' && data) {
+    currentClient = data;
+    document.getElementById('page-client').style.display = 'block';
+    renderClientPage();
+  } else {
+    document.getElementById(`page-${page}`).style.display = 'block';
+    document.querySelectorAll(`[data-page="${page}"]`).forEach(n => n.classList.add('active'));
+    renderCurrentPage();
+  }
+}
+
+function renderCurrentPage() {
+  switch (currentPage) {
+    case 'dashboard': renderDashboard(); break;
+    case 'alerts': renderAlerts(); break;
+    case 'issues': renderIssues(); break;
+    case 'report': renderReport(); break;
+    case 'client': renderClientPage(); break;
+  }
+}
+
+function updateBadges() {
   const my = getMyItems();
-  document.getElementById('statTotal').textContent = my.length;
-  document.getElementById('statAguardando').textContent = my.filter(i => i.status === 'aguardando').length;
-  document.getElementById('statAgendado').textContent = my.filter(i => i.status === 'agendado').length;
-  document.getElementById('statVerificado').textContent = my.filter(i => i.status === 'verificado').length;
-  document.getElementById('statPublicar').textContent = my.filter(i => i.status === 'publicar_agora').length;
-  document.getElementById('statPublicado').textContent = my.filter(i => ['publicado', 'paula_ok'].includes(i.status)).length;
+  const alerts = my.filter(i => i.status === 'verificar_ig').length;
+  const issues = my.filter(i => ['nao_agendou', 'problema'].includes(i.status) || 
+    (i.scheduled_date === '05/01' && i.status === 'pendente')).length;
   
-  document.getElementById('countPendentes').textContent = my.filter(i => i.status === 'aguardando').length;
-  document.getElementById('countVerificar').textContent = my.filter(i => i.status === 'agendado').length;
-  document.getElementById('countPublicar').textContent = my.filter(i => i.status === 'publicar_agora').length;
-  document.getElementById('countConcluidos').textContent = my.filter(i => ['publicado', 'paula_ok'].includes(i.status)).length;
+  const alertsBadge = document.getElementById('alertsBadge');
+  const issuesBadge = document.getElementById('issuesBadge');
+  
+  alertsBadge.textContent = alerts;
+  alertsBadge.style.display = alerts > 0 ? 'inline' : 'none';
+  
+  issuesBadge.textContent = issues;
+  issuesBadge.style.display = issues > 0 ? 'inline' : 'none';
 }
 
-function renderCards() {
-  const grid = document.getElementById('cardsGrid');
-  const empty = document.getElementById('emptyState');
-  const filtered = getFilteredItems();
+// ==================== RENDER: DASHBOARD ====================
+function renderDashboard() {
+  const myClients = getMyClients();
+  const grid = document.getElementById('dashboardGrid');
   
-  if (filtered.length === 0) {
+  grid.innerHTML = myClients.map(client => {
+    const clientItems = items.filter(i => i.client === client.name);
+    const feeds = clientItems.filter(i => i.type === 'FEED');
+    const stories = clientItems.filter(i => i.type === 'STORY');
+    
+    const feedsDone = feeds.filter(i => i.status === 'publicado').length;
+    const storiesDone = stories.filter(i => i.status === 'publicado').length;
+    
+    const pendingVerify = clientItems.filter(i => i.status === 'verificar_ig').length;
+    const problems = clientItems.filter(i => ['nao_agendou', 'problema'].includes(i.status)).length;
+    const allDone = feedsDone === feeds.length && storiesDone === stories.length;
+    
+    return `
+      <div class="client-card" onclick="navigateTo('client', '${client.name}')">
+        <div class="client-card-header">
+          <div class="client-card-name">
+            <div class="client-dot" style="background:${client.color}"></div>
+            <span class="client-name">${client.name}</span>
+          </div>
+          <span class="client-sm">${client.social_media}</span>
+        </div>
+        <div class="client-progress">
+          <div class="progress-row">
+            <span class="progress-label">Feed</span>
+            <span class="progress-value">${feedsDone}/${feeds.length}</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill feed" style="width:${(feedsDone/feeds.length)*100}%"></div>
+          </div>
+        </div>
+        <div class="client-progress">
+          <div class="progress-row">
+            <span class="progress-label">Story</span>
+            <span class="progress-value">${storiesDone}/${stories.length}</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill story" style="width:${(storiesDone/stories.length)*100}%"></div>
+          </div>
+        </div>
+        <div class="client-alerts">
+          ${pendingVerify > 0 ? `<span class="client-alert pending">${pendingVerify} para verificar</span>` : ''}
+          ${problems > 0 ? `<span class="client-alert danger">${problems} pendência${problems > 1 ? 's' : ''}</span>` : ''}
+          ${allDone ? `<span class="client-alert success">✓ Completo</span>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ==================== RENDER: CLIENT PAGE ====================
+function renderClientPage() {
+  const myClients = getMyClients();
+  const clientData = clients.find(c => c.name === currentClient);
+  
+  document.getElementById('clientPageTitle').textContent = currentClient;
+  document.getElementById('clientPageSubtitle').textContent = `Social Media: ${clientData?.social_media || '-'}`;
+  
+  // Client navigation
+  document.getElementById('clientNav').innerHTML = myClients.map(c => `
+    <button class="client-nav-item ${c.name === currentClient ? 'active' : ''}" 
+            onclick="navigateTo('client', '${c.name}')">${c.name}</button>
+  `).join('');
+  
+  // Group items by date
+  const clientItems = items.filter(i => i.client === currentClient);
+  const dates = [...new Set(clientItems.map(i => i.scheduled_date))];
+  
+  const sortedDates = dates.sort((a, b) => {
+    const [d1, m1] = a.split('/').map(Number);
+    const [d2, m2] = b.split('/').map(Number);
+    if (m1 !== m2) return m1 === 1 ? 1 : -1;
+    return d1 - d2;
+  });
+  
+  document.getElementById('daysList').innerHTML = sortedDates.map(date => {
+    const dayItems = clientItems.filter(i => i.scheduled_date === date);
+    const hasSpecial = dayItems.some(i => i.is_special);
+    const allDone = dayItems.every(i => i.status === 'publicado');
+    const doneCount = dayItems.filter(i => i.status === 'publicado').length;
+    
+    return `
+      <div class="day-card ${hasSpecial ? 'special' : ''}">
+        <div class="day-header">
+          <div class="day-date">
+            📅 ${date}
+            ${hasSpecial ? '<span class="special-badge">ESPECIAL</span>' : ''}
+          </div>
+          <div class="day-status">${allDone ? '✓ Completo' : `${doneCount}/${dayItems.length}`}</div>
+        </div>
+        <div class="day-items">
+          ${dayItems.map(item => renderPostItem(item)).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderPostItem(item) {
+  const statusLabels = {
+    'pendente': { text: 'Pendente', icon: '○' },
+    'nao_agendou': { text: 'Não agendou', icon: '✗' },
+    'agendado': { text: 'Agendado', icon: '◐' },
+    'verificar_ig': { text: 'Verificar IG', icon: '🔔' },
+    'publicado': { text: 'Publicado', icon: '✓' },
+    'problema': { text: 'Problema', icon: '!' }
+  };
+  
+  const status = statusLabels[item.status];
+  const meta = [];
+  if (item.platform) meta.push(item.platform.charAt(0).toUpperCase() + item.platform.slice(1));
+  if (item.scheduled_time) meta.push(item.scheduled_time);
+  
+  return `
+    <div class="post-item">
+      <div class="post-left">
+        <span class="post-type ${item.type.toLowerCase()}">${item.type}</span>
+        <div class="post-info">
+          <div class="post-desc">${item.description}</div>
+          <div class="post-meta">${meta.length > 0 ? meta.join(' • ') : 'Sem informações'}</div>
+        </div>
+      </div>
+      <span class="post-status ${item.status}">${status.icon} ${status.text}</span>
+      <div class="post-actions">
+        ${getActionButton(item)}
+      </div>
+    </div>
+  `;
+}
+
+function getActionButton(item) {
+  switch (item.status) {
+    case 'pendente':
+      return `<button class="btn btn-primary" onclick="openVerifyModal(${item.id})">Verificar</button>`;
+    case 'agendado':
+      return `<button class="btn btn-outline" onclick="openVerifyModal(${item.id})">Editar</button>`;
+    case 'verificar_ig':
+      return `
+        <button class="btn btn-success" onclick="markPublished(${item.id}, true)">OK</button>
+        <button class="btn btn-danger" onclick="markPublished(${item.id}, false)">Problema</button>
+      `;
+    case 'nao_agendou':
+    case 'problema':
+      return `<button class="btn btn-primary" onclick="resolveIssue(${item.id})">Resolver</button>`;
+    default:
+      return `<button class="btn btn-outline" disabled>Concluído</button>`;
+  }
+}
+
+// ==================== RENDER: ALERTS ====================
+function renderAlerts() {
+  const my = getMyItems().filter(i => i.status === 'verificar_ig');
+  const grid = document.getElementById('alertsGrid');
+  const empty = document.getElementById('alertsEmpty');
+  
+  if (my.length === 0) {
     grid.innerHTML = '';
     empty.style.display = 'block';
     return;
   }
   
   empty.style.display = 'none';
-  grid.innerHTML = filtered.map(item => renderCard(item)).join('');
+  grid.innerHTML = my.map(item => {
+    const client = clients.find(c => c.name === item.client);
+    return `
+      <div class="alert-card">
+        <div class="alert-card-header">
+          <div class="alert-client">
+            <div class="client-dot" style="background:${client?.color || '#666'}"></div>
+            <span>${item.client}</span>
+          </div>
+          <span class="alert-time">${item.scheduled_time || item.scheduled_date}</span>
+        </div>
+        <div class="alert-content">
+          <div class="alert-type">${item.type}</div>
+          <div class="alert-desc">${item.description}</div>
+        </div>
+        <div class="alert-actions">
+          <button class="btn btn-success" onclick="markPublished(${item.id}, true)">✓ Publicado OK</button>
+          <button class="btn btn-danger" onclick="markPublished(${item.id}, false)">✗ Problema</button>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
-function renderCard(item) {
-  const clientColor = clients.find(c => c.name === item.client)?.color || '#666';
-  const isSpecial = item.is_special;
-  const isPublicarAgora = item.status === 'publicar_agora';
+// ==================== RENDER: ISSUES ====================
+function renderIssues() {
+  const my = getMyItems();
+  const content = document.getElementById('issuesContent');
+  const empty = document.getElementById('issuesEmpty');
   
-  const statusLabels = {
-    'aguardando': { text: '⏳ Aguardando agendar', class: 'aguardando' },
-    'agendado': { text: '🔍 Verificar agendamento', class: 'agendado' },
-    'verificado': { text: '✓ Verificado, aguardando publicar', class: 'verificado' },
-    'publicar_agora': { text: '🔔 VERIFICAR NO INSTAGRAM!', class: 'publicar' },
-    'publicado': { text: item.publicado_ok ? '✅ Publicado OK' : '❌ Problema', class: item.publicado_ok ? 'publicado' : 'problema' },
-    'paula_ok': { text: '👁️ Paula conferiu', class: 'paula' }
-  };
+  const naoAgendou = my.filter(i => i.status === 'nao_agendou');
+  const problemas = my.filter(i => i.status === 'problema');
+  const urgente = my.filter(i => i.scheduled_date === '05/01' && i.status === 'pendente');
   
-  const status = statusLabels[item.status] || statusLabels.aguardando;
-  const canEdit = currentUser.role !== 'social_media' || item.status === 'aguardando';
-  const isPaula = currentUser.role === 'paula';
-  const isGestor = currentUser.role === 'gestor';
+  const total = naoAgendou.length + problemas.length + urgente.length;
   
-  return `
-    <div class="card ${isSpecial ? 'especial' : ''} ${isPublicarAgora ? 'publicar-agora' : ''}">
-      <div class="card-header">
-        <div class="card-client">
-          <div class="client-dot" style="background:${clientColor}"></div>
-          <span class="client-name">${item.client}</span>
+  if (total === 0) {
+    content.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  
+  empty.style.display = 'none';
+  
+  let html = '';
+  
+  if (urgente.length > 0) {
+    html += `
+      <div class="issues-section">
+        <div class="issues-title">
+          🚨 Agendar até 31/12
+          <span class="issues-count">${urgente.length}</span>
         </div>
-        <span class="card-type ${item.type.toLowerCase()}">${item.type}</span>
+        <div class="issues-list">
+          ${urgente.map(item => `
+            <div class="issue-item urgent">
+              <div class="issue-info">
+                <div class="issue-client">${item.client}</div>
+                <div class="issue-detail">${item.type} • ${item.description} • 05/01</div>
+              </div>
+              <span class="issue-badge urgente">URGENTE</span>
+              <button class="btn btn-primary" onclick="openVerifyModal(${item.id})">Verificar</button>
+            </div>
+          `).join('')}
+        </div>
       </div>
-      
-      <div class="card-content ${isSpecial ? 'especial' : ''}">
-        ${isSpecial ? '⭐' : ''} ${item.description}
+    `;
+  }
+  
+  if (naoAgendou.length > 0) {
+    html += `
+      <div class="issues-section">
+        <div class="issues-title">
+          ❌ Não agendou
+          <span class="issues-count">${naoAgendou.length}</span>
+        </div>
+        <div class="issues-list">
+          ${naoAgendou.map(item => `
+            <div class="issue-item">
+              <div class="issue-info">
+                <div class="issue-client">${item.client}</div>
+                <div class="issue-detail">${item.type} • ${item.description} • ${item.scheduled_date}</div>
+              </div>
+              <span class="issue-badge nao-agendou">Não agendou</span>
+              <button class="btn btn-primary" onclick="resolveIssue(${item.id})">Resolver</button>
+            </div>
+          `).join('')}
+        </div>
       </div>
-      
-      <div class="card-info">
-        <div class="card-info-item">📅 <strong>${item.scheduled_date || '-'}</strong></div>
-        <div class="card-info-item">🕐 <strong>${item.scheduled_time || '-'}</strong></div>
-        <div class="card-info-item">📱 <strong>${item.platform === 'pendente' ? '-' : item.platform}</strong></div>
+    `;
+  }
+  
+  if (problemas.length > 0) {
+    html += `
+      <div class="issues-section">
+        <div class="issues-title">
+          ⚠️ Problemas na publicação
+          <span class="issues-count">${problemas.length}</span>
+        </div>
+        <div class="issues-list">
+          ${problemas.map(item => `
+            <div class="issue-item">
+              <div class="issue-info">
+                <div class="issue-client">${item.client}</div>
+                <div class="issue-detail">${item.type} • ${item.description} • ${item.scheduled_date}</div>
+                ${item.problema_descricao ? `<div class="issue-detail" style="color:var(--danger)">→ ${item.problema_descricao}</div>` : ''}
+              </div>
+              <span class="issue-badge problema">Problema</span>
+              <button class="btn btn-primary" onclick="resolveIssue(${item.id})">Resolver</button>
+            </div>
+          `).join('')}
+        </div>
       </div>
-      
-      <div class="status-badge ${status.class}">${status.text}</div>
-      
-      ${item.status === 'aguardando' ? `
-        <div class="card-inputs">
-          <select class="mini-select" onchange="updateField(${item.id}, 'platform', this.value)">
-            <option value="pendente" ${item.platform === 'pendente' ? 'selected' : ''}>Plataforma</option>
-            <option value="ekyte" ${item.platform === 'ekyte' ? 'selected' : ''}>Ekyte</option>
-            <option value="meta" ${item.platform === 'meta' ? 'selected' : ''}>Meta</option>
-            <option value="direto" ${item.platform === 'direto' ? 'selected' : ''}>Direto</option>
-          </select>
-          <input type="text" class="mini-input" placeholder="Hora" value="${item.scheduled_time || ''}" 
-                 onchange="updateField(${item.id}, 'scheduled_time', this.value)">
-          <input type="text" class="mini-input" placeholder="Data" value="${item.scheduled_date || ''}" 
-                 onchange="updateField(${item.id}, 'scheduled_date', this.value)" style="width:60px">
+    `;
+  }
+  
+  content.innerHTML = html;
+}
+
+// ==================== RENDER: REPORT ====================
+function renderReport() {
+  const my = getMyItems();
+  const myClients = getMyClients();
+  
+  const totalItems = my.length;
+  const published = my.filter(i => i.status === 'publicado').length;
+  const pending = my.filter(i => i.status === 'pendente').length;
+  const issues = my.filter(i => ['nao_agendou', 'problema'].includes(i.status)).length;
+  
+  const feedTotal = my.filter(i => i.type === 'FEED').length;
+  const feedDone = my.filter(i => i.type === 'FEED' && i.status === 'publicado').length;
+  const storyTotal = my.filter(i => i.type === 'STORY').length;
+  const storyDone = my.filter(i => i.type === 'STORY' && i.status === 'publicado').length;
+  
+  const grid = document.getElementById('reportGrid');
+  
+  grid.innerHTML = `
+    <div class="report-card">
+      <div class="report-card-title">📈 Resumo Geral</div>
+      <div class="report-list">
+        <div class="report-item">
+          <span class="report-item-label">Total de Posts</span>
+          <span class="report-item-value">${totalItems}</span>
         </div>
-        <div class="card-actions">
-          <button class="action-btn primary" onclick="updateStatus(${item.id}, 'agendado')" 
-                  ${item.platform === 'pendente' ? 'disabled' : ''}>
-            ✓ Marcar como Agendado
-          </button>
+        <div class="report-item">
+          <span class="report-item-label">Publicados</span>
+          <span class="report-item-value" style="color:var(--success)">${published}</span>
         </div>
-      ` : ''}
-      
-      ${item.status === 'agendado' && isGestor ? `
-        <div class="checklist">
-          <label class="check-item ${item.check_horario ? 'checked' : ''}" onclick="toggleCheck(${item.id}, 'check_horario')">
-            <input type="checkbox" ${item.check_horario ? 'checked' : ''}>
-            🕐 Horário OK
-          </label>
-          <label class="check-item ${item.check_visual ? 'checked' : ''}" onclick="toggleCheck(${item.id}, 'check_visual')">
-            <input type="checkbox" ${item.check_visual ? 'checked' : ''}>
-            🎨 Visual OK
-          </label>
-          <label class="check-item ${item.check_texto ? 'checked' : ''}" onclick="toggleCheck(${item.id}, 'check_texto')">
-            <input type="checkbox" ${item.check_texto ? 'checked' : ''}>
-            📝 Texto OK
-          </label>
+        <div class="report-item">
+          <span class="report-item-label">Pendentes</span>
+          <span class="report-item-value" style="color:var(--warning)">${pending}</span>
         </div>
-        <div class="card-actions">
-          <button class="action-btn success" onclick="updateStatus(${item.id}, 'verificado')"
-                  ${!(item.check_horario && item.check_visual && item.check_texto) ? 'disabled' : ''}>
-            ✓ Tudo OK - Aguardar publicar
-          </button>
+        <div class="report-item">
+          <span class="report-item-label">Problemas</span>
+          <span class="report-item-value" style="color:var(--danger)">${issues}</span>
         </div>
-      ` : ''}
-      
-      ${item.status === 'publicar_agora' && isGestor ? `
-        <div class="card-actions">
-          <button class="action-btn success" onclick="updateStatus(${item.id}, 'publicado')">
-            ✅ Publicado OK
-          </button>
-          <button class="action-btn danger" onclick="markAsProblem(${item.id})">
-            ❌ Problema
-          </button>
+        <div class="report-item">
+          <span class="report-item-label">Progresso</span>
+          <span class="report-item-value">${Math.round((published/totalItems)*100)}%</span>
         </div>
-      ` : ''}
-      
-      ${item.status === 'publicado' && isPaula ? `
-        <div class="card-actions">
-          <button class="action-btn purple" onclick="updateStatus(${item.id}, 'paula_ok')">
-            👁️ Paula Conferiu
-          </button>
+      </div>
+    </div>
+    
+    <div class="report-card">
+      <div class="report-card-title">📊 Por Tipo</div>
+      <div class="report-list">
+        <div class="report-item">
+          <span class="report-item-label">Feed</span>
+          <span class="report-item-value">${feedDone}/${feedTotal}</span>
         </div>
-      ` : ''}
-      
-      ${item.status === 'publicado' && item.publicado_ok === false ? `
-        <div style="background:rgba(239,68,68,0.1);padding:0.5rem;border-radius:8px;font-size:0.75rem;margin-top:0.5rem;">
-          <strong>❌ Problema:</strong> ${item.problema_desc || 'Não especificado'}
+        <div class="report-item">
+          <span class="report-item-label">Story</span>
+          <span class="report-item-value">${storyDone}/${storyTotal}</span>
         </div>
-      ` : ''}
-      
-      ${item.verificado_por ? `
-        <div style="font-size:0.65rem;color:var(--text-muted);margin-top:0.5rem;">
-          Verificado por ${item.verificado_por}
-        </div>
-      ` : ''}
+      </div>
+    </div>
+    
+    <div class="report-card">
+      <div class="report-card-title">👥 Por Social Media</div>
+      <div class="report-list">
+        ${['Priscila', 'Marcela'].map(sm => {
+          const smItems = items.filter(i => i.social_media === sm);
+          const smDone = smItems.filter(i => i.status === 'publicado').length;
+          return `
+            <div class="report-item">
+              <span class="report-item-label">${sm}</span>
+              <span class="report-item-value">${smDone}/${smItems.length}</span>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+    
+    <div class="report-card">
+      <div class="report-card-title">🏢 Por Cliente</div>
+      <div class="report-list" style="max-height:250px;overflow-y:auto">
+        ${myClients.map(c => {
+          const cItems = items.filter(i => i.client === c.name);
+          const cDone = cItems.filter(i => i.status === 'publicado').length;
+          return `
+            <div class="report-item">
+              <span class="report-item-label">${c.name}</span>
+              <span class="report-item-value">${cDone}/${cItems.length}</span>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+    
+    <div class="report-card" style="grid-column: span 2">
+      <div class="report-card-title">📝 Histórico de Atividades</div>
+      <div class="activity-list">
+        ${activities.slice(0, 20).map(a => `
+          <div class="activity-item">
+            <span class="activity-time">${new Date(a.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
+            <span class="activity-text"><strong>${a.user_name}</strong> ${a.action} ${a.client ? `• ${a.client}` : ''} ${a.details ? `• ${a.details}` : ''}</span>
+          </div>
+        `).join('') || '<div class="activity-item"><span class="activity-text">Nenhuma atividade ainda</span></div>'}
+      </div>
     </div>
   `;
 }
 
-// ========== NOTIFICATIONS ==========
-function checkNotifications() {
-  const my = getMyItems();
-  const toPublish = my.filter(i => i.status === 'publicar_agora');
-  const bar = document.getElementById('notificationBar');
+// ==================== MODAL ====================
+function openVerifyModal(id) {
+  currentItem = items.find(i => i.id === id);
+  if (!currentItem) return;
   
-  if (toPublish.length > 0) {
-    bar.classList.add('show');
-    document.getElementById('notificationText').textContent = 
-      `🔔 ${toPublish.length} post${toPublish.length > 1 ? 's' : ''} para verificar no Instagram AGORA!`;
+  const client = clients.find(c => c.name === currentItem.client);
+  
+  document.getElementById('modalTitle').textContent = 'Verificar Agendamento';
+  
+  document.getElementById('modalBody').innerHTML = `
+    <div class="modal-info">
+      <div class="modal-client">${currentItem.client}</div>
+      <div class="modal-meta">${currentItem.type} • ${currentItem.description} • ${currentItem.scheduled_date}</div>
+    </div>
     
-    // Tentar tocar som (pode ser bloqueado pelo navegador)
-    try {
-      if (Notification.permission === 'granted') {
-        new Notification('ConectMe Tracker', {
-          body: `${toPublish.length} posts para verificar!`,
-          icon: '📊'
-        });
-      }
-    } catch (e) {}
+    <div class="modal-section">
+      <div class="modal-section-title">Informações do Agendamento</div>
+      <div class="modal-inputs">
+        <div class="modal-row">
+          <div class="input-group">
+            <label class="input-label">Plataforma</label>
+            <select class="input-field" id="modalPlatform">
+              <option value="">Selecione</option>
+              <option value="ekyte" ${currentItem.platform === 'ekyte' ? 'selected' : ''}>Ekyte</option>
+              <option value="meta" ${currentItem.platform === 'meta' ? 'selected' : ''}>Meta Business</option>
+              <option value="direto" ${currentItem.platform === 'direto' ? 'selected' : ''}>Direto</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Horário</label>
+            <input type="time" class="input-field" id="modalTime" value="${currentItem.scheduled_time || ''}">
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Data (se diferente)</label>
+          <input type="text" class="input-field" id="modalDate" value="${currentItem.scheduled_date}" placeholder="dd/mm">
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-section">
+      <div class="modal-section-title">Checklist de Verificação</div>
+      <div class="checklist">
+        <div class="check-item ${currentItem.check_horario ? 'checked' : ''}" onclick="toggleModalCheck(this, 'horario')">
+          <div class="check-box">${currentItem.check_horario ? '✓' : ''}</div>
+          <span class="check-label">🕐 Horário correto</span>
+        </div>
+        <div class="check-item ${currentItem.check_visual ? 'checked' : ''}" onclick="toggleModalCheck(this, 'visual')">
+          <div class="check-box">${currentItem.check_visual ? '✓' : ''}</div>
+          <span class="check-label">🎨 Identidade visual OK</span>
+        </div>
+        <div class="check-item ${currentItem.check_texto ? 'checked' : ''}" onclick="toggleModalCheck(this, 'texto')">
+          <div class="check-box">${currentItem.check_texto ? '✓' : ''}</div>
+          <span class="check-label">📝 Texto/legenda OK</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-section">
+      <div class="modal-section-title">Observações</div>
+      <textarea class="input-field" id="modalObs" rows="2" placeholder="Opcional...">${currentItem.observacoes || ''}</textarea>
+    </div>
+  `;
+  
+  document.getElementById('modalFooter').innerHTML = `
+    <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+    <button class="btn btn-danger" onclick="markNotScheduled()">Não agendou</button>
+    <button class="btn btn-success" onclick="saveVerification()">Salvar ✓</button>
+  `;
+  
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+let modalChecks = { horario: false, visual: false, texto: false };
+
+function toggleModalCheck(el, field) {
+  el.classList.toggle('checked');
+  modalChecks[field] = el.classList.contains('checked');
+  el.querySelector('.check-box').textContent = el.classList.contains('checked') ? '✓' : '';
+}
+
+async function saveVerification() {
+  const platform = document.getElementById('modalPlatform').value;
+  const time = document.getElementById('modalTime').value;
+  const date = document.getElementById('modalDate').value;
+  const obs = document.getElementById('modalObs').value;
+  
+  const horario = document.querySelector('.check-item:nth-child(1)').classList.contains('checked');
+  const visual = document.querySelector('.check-item:nth-child(2)').classList.contains('checked');
+  const texto = document.querySelector('.check-item:nth-child(3)').classList.contains('checked');
+  
+  if (!platform) {
+    alert('Selecione a plataforma');
+    return;
+  }
+  
+  const updates = {
+    platform,
+    scheduled_time: time || null,
+    scheduled_date: date,
+    observacoes: obs || null,
+    check_horario: horario,
+    check_visual: visual,
+    check_texto: texto,
+    status: 'agendado',
+    verificado_por: currentUser.name,
+    verificado_em: new Date().toISOString(),
+    updated_by: currentUser.name,
+    updated_at: new Date().toISOString()
+  };
+  
+  await db.from('items').update(updates).eq('id', currentItem.id);
+  await logActivity(currentItem.id, currentItem.client, currentItem.type, 'verificou agendamento', `${platform} ${time || ''}`);
+  
+  closeModal();
+  toast('Verificação salva!');
+  loadData();
+}
+
+async function markNotScheduled() {
+  if (!confirm('Confirma que este post NÃO foi agendado?')) return;
+  
+  await db.from('items').update({
+    status: 'nao_agendou',
+    updated_by: currentUser.name,
+    updated_at: new Date().toISOString()
+  }).eq('id', currentItem.id);
+  
+  await logActivity(currentItem.id, currentItem.client, currentItem.type, 'marcou como não agendado');
+  
+  closeModal();
+  toast('Marcado como não agendou');
+  loadData();
+}
+
+async function markPublished(id, success) {
+  if (success) {
+    await db.from('items').update({
+      status: 'publicado',
+      publicado_por: currentUser.name,
+      publicado_em: new Date().toISOString(),
+      updated_by: currentUser.name,
+      updated_at: new Date().toISOString()
+    }).eq('id', id);
+    
+    const item = items.find(i => i.id === id);
+    await logActivity(id, item?.client, item?.type, 'confirmou publicação OK');
+    
+    toast('Publicação confirmada!');
   } else {
-    bar.classList.remove('show');
+    const desc = prompt('Descreva o problema:');
+    if (!desc) return;
+    
+    await db.from('items').update({
+      status: 'problema',
+      problema_descricao: desc,
+      updated_by: currentUser.name,
+      updated_at: new Date().toISOString()
+    }).eq('id', id);
+    
+    const item = items.find(i => i.id === id);
+    await logActivity(id, item?.client, item?.type, 'registrou problema', desc);
+    
+    toast('Problema registrado');
+  }
+  
+  loadData();
+}
+
+async function resolveIssue(id) {
+  const item = items.find(i => i.id === id);
+  if (!item) return;
+  
+  if (item.status === 'nao_agendou') {
+    if (confirm('O post foi agendado agora?')) {
+      currentItem = item;
+      openVerifyModal(id);
+    }
+  } else if (item.status === 'problema') {
+    if (confirm('O problema foi resolvido e o post está OK?')) {
+      await db.from('items').update({
+        status: 'publicado',
+        problema_resolvido: true,
+        publicado_por: currentUser.name,
+        publicado_em: new Date().toISOString(),
+        updated_by: currentUser.name,
+        updated_at: new Date().toISOString()
+      }).eq('id', id);
+      
+      await logActivity(id, item.client, item.type, 'resolveu problema');
+      
+      toast('Problema resolvido!');
+      loadData();
+    }
   }
 }
 
-function filterByStatus(status) {
-  currentFilter = status === 'publicar_agora' ? 'publicar' : 'todos';
-  document.querySelectorAll('.filter-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.filter === currentFilter);
-  });
-  renderCards();
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+  currentItem = null;
 }
 
-// ========== UTILS ==========
+// ==================== UTILS ====================
+async function logActivity(itemId, client, type, action, details = null) {
+  await db.from('activity_log').insert({
+    item_id: itemId,
+    client,
+    type,
+    action,
+    details,
+    user_name: currentUser.name
+  });
+}
+
 function toast(msg) {
   const t = document.getElementById('toast');
   t.textContent = '✓ ' + msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2000);
+  setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// ========== INIT ==========
+// ==================== INIT ====================
 async function init() {
-  // Pedir permissão para notificações
-  if ('Notification' in window && Notification.permission === 'default') {
-    Notification.requestPermission();
-  }
-  
   await loadData();
   setupRealtime();
   
-  // Verificar posts a cada minuto
+  // Check every minute
   setInterval(() => {
-    updatePostStatuses();
-    checkNotifications();
+    checkAndUpdateStatuses();
   }, 60000);
 }
 </script>
