@@ -1,0 +1,2087 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📊 Social Media Tracker | ConectMe Uprise</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg-dark: #09090b;
+      --bg-card: #18181b;
+      --bg-elevated: #27272a;
+      --bg-hover: #3f3f46;
+      --border: #3f3f46;
+      --text: #fafafa;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      
+      --red: #ef4444;
+      --red-bg: rgba(239, 68, 68, 0.15);
+      --orange: #f97316;
+      --orange-bg: rgba(249, 115, 22, 0.15);
+      --yellow: #eab308;
+      --yellow-bg: rgba(234, 179, 8, 0.15);
+      --green: #22c55e;
+      --green-bg: rgba(34, 197, 94, 0.15);
+      --blue: #3b82f6;
+      --blue-bg: rgba(59, 130, 246, 0.15);
+      --purple: #a855f7;
+      --purple-bg: rgba(168, 85, 247, 0.15);
+      --pink: #ec4899;
+      --pink-bg: rgba(236, 72, 153, 0.15);
+      
+      --accent: #a855f7;
+      --accent-glow: rgba(168, 85, 247, 0.4);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* ==================== LOGIN ==================== */
+    .login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #09090b 0%, #18181b 50%, #09090b 100%);
+      padding: 1rem;
+    }
+
+    .login-screen.hidden { display: none; }
+
+    .login-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 3rem;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+    }
+
+    .login-logo {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .login-brand {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .login-subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .login-input-group {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      background: var(--bg-elevated);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+
+    .login-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px var(--accent-glow);
+    }
+
+    .login-input::placeholder { color: var(--text-muted); }
+
+    .login-btn {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px var(--accent-glow);
+    }
+
+    .login-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .login-error {
+      background: var(--red-bg);
+      color: var(--red);
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .login-error.show { display: block; }
+
+    /* ==================== APP CONTAINER ==================== */
+    .app { display: none; }
+    .app.visible { display: block; }
+
+    /* ==================== HEADER ==================== */
+    .header {
+      background: rgba(24, 24, 27, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1800px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+
+    .brand-text h1 {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .brand-text span {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .nav {
+      display: flex;
+      gap: 0.25rem;
+      background: var(--bg-elevated);
+      padding: 0.25rem;
+      border-radius: 12px;
+    }
+
+    .nav-btn {
+      padding: 0.5rem 1rem;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .nav-btn:hover { color: var(--text); background: var(--bg-hover); }
+    .nav-btn.active { background: var(--accent); color: white; }
+    .nav-btn.admin-only { border: 1px dashed var(--yellow); }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .sync-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .sync-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.9); }
+    }
+
+    .user-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 0.75rem 0.4rem 0.4rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .user-badge:hover { border-color: var(--accent); }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .user-name { font-size: 0.8rem; font-weight: 600; }
+    .user-role { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; }
+
+    /* ==================== MAIN ==================== */
+    .main {
+      max-width: 1800px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    /* ==================== MEGA STATS ==================== */
+    .mega-stats {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .mega-stat {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mega-stat.hero {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(236, 72, 153, 0.1));
+      border-color: var(--purple);
+    }
+
+    .mega-stat-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+
+    .mega-stat-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .mega-stat.hero .mega-stat-value {
+      font-size: 4rem;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .mega-stat.pending .mega-stat-value { color: var(--red); }
+    .mega-stat.progress .mega-stat-value { color: var(--orange); }
+    .mega-stat.done .mega-stat-value { color: var(--green); }
+    .mega-stat.published .mega-stat-value { color: var(--blue); }
+
+    .mega-stat-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+    }
+
+    .mega-stat.pending .mega-stat-bar { background: var(--red); }
+    .mega-stat.progress .mega-stat-bar { background: var(--orange); }
+    .mega-stat.done .mega-stat-bar { background: var(--green); }
+    .mega-stat.published .mega-stat-bar { background: var(--blue); }
+
+    /* ==================== PROGRESS HERO ==================== */
+    .progress-hero {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .progress-hero-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .progress-hero-title {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .progress-hero-percent {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .progress-hero-bar {
+      height: 24px;
+      background: var(--bg-elevated);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+    }
+
+    .progress-hero-segment {
+      height: 100%;
+      transition: width 0.5s ease;
+      position: relative;
+    }
+
+    .progress-hero-segment.published { background: var(--blue); }
+    .progress-hero-segment.done { background: var(--green); }
+    .progress-hero-segment.progress { background: var(--orange); }
+
+    .progress-hero-legend {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 4px;
+    }
+
+    .legend-dot.published { background: var(--blue); }
+    .legend-dot.done { background: var(--green); }
+    .legend-dot.progress { background: var(--orange); }
+    .legend-dot.pending { background: var(--red); }
+
+    /* ==================== QUICK ACTIONS ==================== */
+    .quick-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .quick-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .quick-btn:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .quick-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    .quick-btn.urgent { border-color: var(--red); color: var(--red); }
+    .quick-btn.urgent.active { background: var(--red); color: white; }
+
+    .quick-btn .badge {
+      background: rgba(255,255,255,0.2);
+      padding: 0.1rem 0.5rem;
+      border-radius: 100px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    /* ==================== TEAM PROGRESS ==================== */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .team-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .team-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .team-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white;
+    }
+
+    .team-name { font-weight: 600; }
+    .team-role { font-size: 0.7rem; color: var(--text-muted); }
+
+    .team-progress {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .team-bar {
+      flex: 1;
+      height: 8px;
+      background: var(--bg-elevated);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .team-bar-fill {
+      height: 100%;
+      background: var(--green);
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+
+    .team-percent {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    /* ==================== TABLE ==================== */
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .table-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .table-toolbar {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-select {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.85rem;
+      min-width: 140px;
+    }
+
+    .filter-select:focus { outline: none; border-color: var(--accent); }
+
+    .table-scroll { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    th {
+      background: var(--bg-elevated);
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+    }
+
+    td {
+      padding: 0.75rem 1rem;
+      border-top: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    tr:hover { background: var(--bg-elevated); }
+    tr.selected { background: var(--purple-bg); }
+    tr.checkpoint { background: var(--yellow-bg); }
+    tr.overdue { animation: urgentPulse 2s infinite; }
+
+    @keyframes urgentPulse {
+      0%, 100% { background: var(--red-bg); }
+      50% { background: rgba(239, 68, 68, 0.25); }
+    }
+
+    /* Row checkbox */
+    .row-check {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border);
+      border-radius: 5px;
+      appearance: none;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .row-check:checked {
+      background: var(--accent);
+      border-color: var(--accent);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    /* Client cell */
+    .client-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .client-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .client-text { font-weight: 600; }
+
+    /* Badges */
+    .type-pill {
+      display: inline-flex;
+      padding: 0.2rem 0.6rem;
+      border-radius: 100px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .type-pill.feed { background: var(--purple-bg); color: var(--purple); }
+    .type-pill.story { background: var(--orange-bg); color: var(--orange); }
+
+    .checkpoint-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      background: var(--yellow);
+      border-radius: 50%;
+      font-size: 0.6rem;
+      margin-left: 0.25rem;
+    }
+
+    .date-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+    }
+
+    .date-text.past { color: var(--red); }
+    .date-text.today { color: var(--purple); }
+
+    .responsible-pill {
+      display: inline-flex;
+      padding: 0.15rem 0.5rem;
+      border-radius: 100px;
+      font-size: 0.7rem;
+      font-weight: 500;
+    }
+
+    /* Status selects */
+    .status-select {
+      appearance: none;
+      padding: 0.3rem 1.5rem 0.3rem 0.6rem;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.4rem center;
+    }
+
+    .status-select:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .status-select.pending { background-color: var(--red-bg); color: var(--red); }
+    .status-select.em-andamento { background-color: var(--orange-bg); color: var(--orange); }
+    .status-select.criado { background-color: var(--yellow-bg); color: var(--yellow); }
+    .status-select.aprovado { background-color: var(--green-bg); color: var(--green); }
+    .status-select.programado { background-color: var(--green-bg); color: var(--green); }
+    .status-select.publicado { background-color: var(--blue-bg); color: var(--blue); }
+
+    /* Input fields */
+    .mini-input {
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      padding: 0.25rem 0.5rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.8rem;
+      width: 100%;
+      transition: all 0.15s;
+    }
+
+    .mini-input:hover { background: var(--bg-elevated); }
+    .mini-input:focus { outline: none; background: var(--bg-elevated); border-color: var(--accent); }
+    .mini-input.has-value { color: var(--blue); text-decoration: underline; }
+
+    .update-info {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .update-info strong { color: var(--text-secondary); }
+
+    /* ==================== BATCH BAR ==================== */
+    .batch-bar {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent);
+      padding: 0.75rem 1.5rem;
+      border-radius: 100px;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1);
+      z-index: 1000;
+    }
+
+    .batch-bar.hidden { display: none; }
+
+    .batch-info { font-weight: 600; }
+
+    .batch-btn {
+      padding: 0.4rem 0.75rem;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .batch-btn:hover { background: rgba(255,255,255,0.3); }
+    .batch-btn.cancel { background: rgba(0,0,0,0.3); }
+
+    /* ==================== ADMIN PANEL ==================== */
+    .admin-section {
+      display: none;
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .admin-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+
+    .admin-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .admin-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .form-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .form-input, .form-select {
+      padding: 0.75rem 1rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+    }
+
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .form-btn {
+      padding: 0.75rem 1.5rem;
+      background: var(--accent);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .form-btn:hover { transform: translateY(-1px); }
+
+    .client-list {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .client-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .client-item:last-child { border-bottom: none; }
+
+    .client-item-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .client-item-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .client-item-name { font-weight: 500; }
+    .client-item-resp { font-size: 0.75rem; color: var(--text-muted); }
+
+    .client-item-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .client-item-btn {
+      padding: 0.25rem 0.5rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
+    .client-item-btn:hover { border-color: var(--accent); color: var(--text); }
+    .client-item-btn.danger:hover { border-color: var(--red); color: var(--red); }
+
+    /* ==================== CALENDAR ==================== */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 1rem;
+    }
+
+    .cal-day {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.15s;
+    }
+
+    .cal-day:hover { border-color: var(--accent); }
+    .cal-day.checkpoint { border-color: var(--yellow); box-shadow: 0 0 20px var(--yellow-bg); }
+    .cal-day.reviewed { border-color: var(--green); }
+
+    .cal-day-head {
+      padding: 0.75rem;
+      text-align: center;
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cal-day.checkpoint .cal-day-head { background: var(--yellow-bg); }
+
+    .cal-day-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .cal-day-name {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .cal-day-body { padding: 0.75rem; }
+
+    .cal-stat {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .cal-stat-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+    }
+
+    .cal-stat-val.ok { color: var(--green); }
+    .cal-stat-val.bad { color: var(--red); }
+
+    .cal-review-btn {
+      width: 100%;
+      padding: 0.5rem;
+      background: var(--bg-elevated);
+      border: none;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .cal-review-btn:hover { background: var(--accent); color: white; }
+    .cal-review-btn.done { background: var(--green-bg); color: var(--green); }
+    .cal-review-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ==================== CHECKLIST ==================== */
+    .check-list { display: flex; flex-direction: column; gap: 0.5rem; }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .check-item:hover { border-color: var(--accent); }
+    .check-item.ok { border-color: var(--green); background: var(--green-bg); }
+
+    .check-box {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .check-item.ok .check-box { background: var(--green); border-color: var(--green); }
+    .check-box svg { opacity: 0; }
+    .check-item.ok .check-box svg { opacity: 1; }
+
+    .check-text { flex: 1; font-size: 0.9rem; }
+
+    .check-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 0.25rem 0.75rem;
+      border-radius: 100px;
+    }
+
+    .check-item.ok .check-count { background: rgba(255,255,255,0.2); color: var(--green); }
+    .check-item:not(.ok) .check-count { background: var(--red-bg); color: var(--red); }
+
+    /* ==================== TOAST ==================== */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--green);
+      padding: 0.75rem 1.25rem;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      z-index: 1001;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .toast.hidden { display: none; }
+
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 1200px) {
+      .mega-stats { grid-template-columns: repeat(3, 1fr); }
+      .mega-stat.hero { grid-column: span 3; }
+    }
+
+    @media (max-width: 768px) {
+      .header-content { flex-wrap: wrap; }
+      .nav { overflow-x: auto; width: 100%; order: 3; }
+      .main { padding: 1rem; }
+      .mega-stats { grid-template-columns: repeat(2, 1fr); }
+      .mega-stat.hero { grid-column: span 2; }
+      .admin-grid { grid-template-columns: 1fr; }
+      .table-toolbar { flex-direction: column; }
+      .filter-select { width: 100%; }
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-elevated); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN SCREEN -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-box">
+      <div class="login-logo">📊</div>
+      <div class="login-brand">ConectMe Uprise</div>
+      <div class="login-subtitle">Social Media Tracker</div>
+      
+      <div class="login-error" id="loginError">
+        E-mail não encontrado. Verifique e tente novamente.
+      </div>
+      
+      <form onsubmit="handleLogin(event)">
+        <div class="login-input-group">
+          <input type="email" class="login-input" id="loginEmail" placeholder="seu@email.digital" required autocomplete="email">
+        </div>
+        <button type="submit" class="login-btn" id="loginBtn">Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div class="app" id="app">
+    <header class="header">
+      <div class="header-content">
+        <div class="brand">
+          <div class="brand-icon">📊</div>
+          <div class="brand-text">
+            <h1>ConectMe Uprise</h1>
+            <span>Social Media Tracker • 22/12 - 05/01</span>
+          </div>
+        </div>
+
+        <nav class="nav">
+          <button class="nav-btn active" data-tab="dashboard">📈 Dashboard</button>
+          <button class="nav-btn" data-tab="controle">📋 Controle</button>
+          <button class="nav-btn" data-tab="calendario">📅 Calendário</button>
+          <button class="nav-btn" data-tab="checklist">✅ Checklist</button>
+          <button class="nav-btn admin-only" data-tab="admin" id="adminNavBtn">⚙️ Admin</button>
+        </nav>
+
+        <div class="header-right">
+          <div class="sync-indicator">
+            <div class="sync-dot" id="syncDot"></div>
+            <span id="syncText">Sincronizado</span>
+          </div>
+          <div class="user-badge" onclick="logout()">
+            <div class="user-avatar" id="userAvatar">A</div>
+            <div class="user-info">
+              <div class="user-name" id="userName">Alec</div>
+              <div class="user-role" id="userRole">Gestor</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <button class="quick-btn urgent" id="qf-urgent" onclick="toggleQuickFilter('urgent')">
+          🚨 Atrasados <span class="badge" id="cnt-urgent">0</span>
+        </button>
+        <button class="quick-btn" id="qf-today" onclick="toggleQuickFilter('today')">
+          📅 Hoje <span class="badge" id="cnt-today">0</span>
+        </button>
+        <button class="quick-btn" id="qf-checkpoints" onclick="toggleQuickFilter('checkpoints')">
+          ⭐ Checkpoints <span class="badge" id="cnt-checkpoints">0</span>
+        </button>
+        <button class="quick-btn" id="qf-pending" onclick="toggleQuickFilter('pending')">
+          ⏳ Pendentes <span class="badge" id="cnt-pending">0</span>
+        </button>
+        <button class="quick-btn" onclick="clearFilters()">✕ Limpar</button>
+      </div>
+
+      <!-- DASHBOARD -->
+      <section id="tab-dashboard" class="tab-content">
+        <div class="mega-stats">
+          <div class="mega-stat hero">
+            <div class="mega-stat-label">Progresso Total</div>
+            <div class="mega-stat-value" id="mega-progress">0%</div>
+          </div>
+          <div class="mega-stat pending">
+            <div class="mega-stat-label">Pendentes</div>
+            <div class="mega-stat-value" id="mega-pending">0</div>
+            <div class="mega-stat-bar"></div>
+          </div>
+          <div class="mega-stat progress">
+            <div class="mega-stat-label">Em Andamento</div>
+            <div class="mega-stat-value" id="mega-progress-count">0</div>
+            <div class="mega-stat-bar"></div>
+          </div>
+          <div class="mega-stat done">
+            <div class="mega-stat-label">Programados</div>
+            <div class="mega-stat-value" id="mega-done">0</div>
+            <div class="mega-stat-bar"></div>
+          </div>
+          <div class="mega-stat published">
+            <div class="mega-stat-label">Publicados</div>
+            <div class="mega-stat-value" id="mega-published">0</div>
+            <div class="mega-stat-bar"></div>
+          </div>
+        </div>
+
+        <div class="progress-hero">
+          <div class="progress-hero-header">
+            <div class="progress-hero-title">Barra de Progresso</div>
+            <div class="progress-hero-percent" id="bar-percent">0%</div>
+          </div>
+          <div class="progress-hero-bar">
+            <div class="progress-hero-segment published" id="bar-published" style="width:0%"></div>
+            <div class="progress-hero-segment done" id="bar-done" style="width:0%"></div>
+            <div class="progress-hero-segment progress" id="bar-progress" style="width:0%"></div>
+          </div>
+          <div class="progress-hero-legend">
+            <div class="legend-item"><div class="legend-dot published"></div> Publicados</div>
+            <div class="legend-item"><div class="legend-dot done"></div> Programados</div>
+            <div class="legend-item"><div class="legend-dot progress"></div> Em Andamento</div>
+            <div class="legend-item"><div class="legend-dot pending"></div> Pendentes</div>
+          </div>
+        </div>
+
+        <h3 class="section-title">👥 Progresso por Responsável</h3>
+        <div class="team-grid" id="teamGrid"></div>
+
+        <h3 class="section-title" style="margin-top:1.5rem">🚨 Itens que Precisam de Atenção</h3>
+        <div class="table-card">
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Tipo</th>
+                  <th>Data</th>
+                  <th>Conteúdo</th>
+                  <th>Responsável</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="urgentTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTROLE -->
+      <section id="tab-controle" class="tab-content" style="display:none">
+        <div class="table-card">
+          <div class="table-toolbar">
+            <select class="filter-select" id="f-responsible" onchange="applyFilters()">
+              <option value="">Todos Responsáveis</option>
+            </select>
+            <select class="filter-select" id="f-client" onchange="applyFilters()">
+              <option value="">Todos Clientes</option>
+            </select>
+            <select class="filter-select" id="f-type" onchange="applyFilters()">
+              <option value="">Todos Tipos</option>
+              <option value="FEED">Feed</option>
+              <option value="STORY">Story</option>
+            </select>
+            <select class="filter-select" id="f-status" onchange="applyFilters()">
+              <option value="">Todos Status</option>
+              <option value="Pendente">Pendente</option>
+              <option value="Em andamento">Em andamento</option>
+              <option value="Criado">Criado</option>
+              <option value="Aprovado">Aprovado</option>
+              <option value="Programado">Programado</option>
+              <option value="Publicado">Publicado</option>
+            </select>
+            <select class="filter-select" id="f-date" onchange="applyFilters()">
+              <option value="">Todas Datas</option>
+            </select>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:40px"><input type="checkbox" class="row-check" onchange="toggleSelectAll(this)"></th>
+                  <th>Cliente</th>
+                  <th>Tipo</th>
+                  <th>Data</th>
+                  <th>Conteúdo</th>
+                  <th>Resp.</th>
+                  <th>Criação</th>
+                  <th>Aprovação</th>
+                  <th>Programação</th>
+                  <th>Link</th>
+                  <th>Obs</th>
+                  <th>Atualização</th>
+                </tr>
+              </thead>
+              <tbody id="mainTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- CALENDARIO -->
+      <section id="tab-calendario" class="tab-content" style="display:none">
+        <h3 class="section-title">📅 Visão por Data</h3>
+        <div class="calendar-grid" id="calendarGrid"></div>
+      </section>
+
+      <!-- CHECKLIST -->
+      <section id="tab-checklist" class="tab-content" style="display:none">
+        <h3 class="section-title">✅ Checklist Final — Regra de Ouro</h3>
+        <div class="check-list" id="checkList"></div>
+      </section>
+
+      <!-- ADMIN -->
+      <section id="tab-admin" class="tab-content admin-section" style="display:none">
+        <h3 class="section-title">⚙️ Painel Administrativo</h3>
+        <div class="admin-grid">
+          <div class="admin-card">
+            <h3>➕ Adicionar Cliente</h3>
+            <form class="admin-form" onsubmit="addClient(event)">
+              <div class="form-group">
+                <label class="form-label">Nome do Cliente</label>
+                <input type="text" class="form-input" id="newClientName" placeholder="Ex: Studio Beauty" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Responsável</label>
+                <select class="form-select" id="newClientResp">
+                  <option value="">Sem responsável (por enquanto)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Cor do Cliente</label>
+                <input type="color" class="form-input" id="newClientColor" value="#a855f7" style="height:44px;padding:0.25rem;">
+              </div>
+              <button type="submit" class="form-btn">Adicionar Cliente</button>
+            </form>
+          </div>
+
+          <div class="admin-card">
+            <h3>📋 Clientes Cadastrados</h3>
+            <div class="client-list" id="clientList"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- BATCH BAR -->
+    <div class="batch-bar hidden" id="batchBar">
+      <div class="batch-info">✓ <span id="selCount">0</span> selecionados</div>
+      <button class="batch-btn" onclick="batchUpdate('status_creation','Criado')">Marcar Criado</button>
+      <button class="batch-btn gestor-only" onclick="batchUpdate('status_approval','Aprovado')">Marcar Aprovado</button>
+      <button class="batch-btn" onclick="batchUpdate('status_schedule','Programado')">Marcar Programado</button>
+      <button class="batch-btn" onclick="batchUpdate('status_schedule','Publicado')">Marcar Publicado</button>
+      <button class="batch-btn cancel" onclick="clearSelection()">Cancelar</button>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast hidden" id="toast">
+      <span>✓</span>
+      <span id="toastMsg">Salvo!</span>
+    </div>
+  </div>
+
+  <script>
+    // ==================== CONFIG ====================
+    const SUPABASE_URL = 'https://jxxhypanwiqigtaptrrp.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4eGh5cGFud2lxaWd0YXB0cnJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY1MTgyMzQsImV4cCI6MjA4MjA5NDIzNH0.IKd0n-abux653kQspkE-uyoQwVXV5hvCzF_SA103auw';
+    
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // ==================== STATE ====================
+    let items = [];
+    let clients = [];
+    let teamMembers = [];
+    let reviews = [];
+    let currentUser = null;
+    let selectedItems = new Set();
+    let activeFilter = null;
+
+    const FEED_DATES = ['22/12', '24/12', '26/12', '31/12', '02/01', '05/01'];
+    const STORY_DATES = ['22/12', '23/12', '25/12', '26/12', '29/12', '30/12', '01/01', '02/01', '05/01'];
+
+    // ==================== AUTH ====================
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+      const btn = document.getElementById('loginBtn');
+      const error = document.getElementById('loginError');
+      
+      btn.disabled = true;
+      btn.textContent = 'Verificando...';
+      error.classList.remove('show');
+
+      try {
+        const { data, error: err } = await supabase
+          .from('team_members')
+          .select('*')
+          .eq('email', email)
+          .eq('active', true)
+          .single();
+
+        if (err || !data) {
+          error.classList.add('show');
+          btn.disabled = false;
+          btn.textContent = 'Entrar';
+          return;
+        }
+
+        currentUser = data;
+        localStorage.setItem('user', JSON.stringify(data));
+        showApp();
+      } catch (err) {
+        console.error(err);
+        error.classList.add('show');
+        btn.disabled = false;
+        btn.textContent = 'Entrar';
+      }
+    }
+
+    function checkAuth() {
+      const saved = localStorage.getItem('user');
+      if (saved) {
+        currentUser = JSON.parse(saved);
+        showApp();
+      }
+    }
+
+    function logout() {
+      if (confirm('Deseja sair?')) {
+        localStorage.removeItem('user');
+        currentUser = null;
+        document.getElementById('app').classList.remove('visible');
+        document.getElementById('loginScreen').classList.remove('hidden');
+      }
+    }
+
+    function showApp() {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('app').classList.add('visible');
+      
+      document.getElementById('userName').textContent = currentUser.name;
+      document.getElementById('userRole').textContent = currentUser.role === 'gestor' ? 'Gestor' : 'Social Media';
+      document.getElementById('userAvatar').textContent = currentUser.name[0];
+      document.getElementById('userAvatar').style.background = currentUser.color;
+
+      // Show/hide admin
+      const adminBtn = document.getElementById('adminNavBtn');
+      if (currentUser.role !== 'gestor') {
+        adminBtn.style.display = 'none';
+      }
+
+      // Hide gestor-only buttons
+      document.querySelectorAll('.gestor-only').forEach(el => {
+        if (currentUser.role !== 'gestor') el.style.display = 'none';
+      });
+
+      init();
+    }
+
+    function isGestor() {
+      return currentUser && currentUser.role === 'gestor';
+    }
+
+    // ==================== DATA ====================
+    async function loadAll() {
+      try {
+        const [itemsRes, clientsRes, teamRes, reviewsRes] = await Promise.all([
+          supabase.from('items').select('*').order('id'),
+          supabase.from('clients').select('*').order('name'),
+          supabase.from('team_members').select('*').eq('active', true),
+          supabase.from('daily_reviews').select('*')
+        ]);
+
+        items = itemsRes.data || [];
+        clients = clientsRes.data || [];
+        teamMembers = teamRes.data || [];
+        reviews = reviewsRes.data || [];
+
+        updateSyncStatus(true);
+        populateFilters();
+        renderAll();
+      } catch (err) {
+        console.error('Load error:', err);
+        updateSyncStatus(false);
+      }
+    }
+
+    function setupRealtime() {
+      supabase.channel('changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'items' }, payload => {
+          if (payload.eventType === 'UPDATE') {
+            const idx = items.findIndex(i => i.id === payload.new.id);
+            if (idx !== -1) {
+              items[idx] = payload.new;
+              renderAll();
+              if (payload.new.last_updated_by !== currentUser.name) {
+                toast(`${payload.new.last_updated_by} atualizou ${payload.new.client}`);
+              }
+            }
+          } else if (payload.eventType === 'INSERT') {
+            items.push(payload.new);
+            renderAll();
+          }
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'clients' }, () => {
+          loadAll();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_reviews' }, () => {
+          supabase.from('daily_reviews').select('*').then(r => {
+            reviews = r.data || [];
+            renderCalendar();
+          });
+        })
+        .subscribe();
+    }
+
+    // ==================== UPDATES ====================
+    async function updateItem(id, field, value) {
+      // Check permissions for approval
+      if (field === 'status_approval' && value === 'Aprovado' && !isGestor()) {
+        toast('Apenas gestores podem aprovar');
+        return;
+      }
+
+      try {
+        const updateData = {
+          [field]: value,
+          last_updated_by: currentUser.name,
+          last_updated_at: new Date().toISOString()
+        };
+
+        if (field === 'status_approval' && value === 'Aprovado') {
+          updateData.approved_by = currentUser.name;
+          updateData.approved_at = new Date().toISOString();
+        }
+
+        await supabase.from('items').update(updateData).eq('id', id);
+
+        const item = items.find(i => i.id === id);
+        if (item) Object.assign(item, updateData);
+
+        renderAll();
+        toast('Atualizado!');
+      } catch (err) {
+        console.error(err);
+        toast('Erro ao salvar');
+      }
+    }
+
+    async function batchUpdate(field, value) {
+      if (selectedItems.size === 0) return;
+      if (field === 'status_approval' && value === 'Aprovado' && !isGestor()) {
+        toast('Apenas gestores podem aprovar');
+        return;
+      }
+
+      const ids = Array.from(selectedItems);
+      try {
+        const updateData = {
+          [field]: value,
+          last_updated_by: currentUser.name,
+          last_updated_at: new Date().toISOString()
+        };
+
+        if (field === 'status_approval' && value === 'Aprovado') {
+          updateData.approved_by = currentUser.name;
+          updateData.approved_at = new Date().toISOString();
+        }
+
+        await supabase.from('items').update(updateData).in('id', ids);
+
+        items.forEach(item => {
+          if (selectedItems.has(item.id)) Object.assign(item, updateData);
+        });
+
+        clearSelection();
+        renderAll();
+        toast(`${ids.length} itens atualizados!`);
+      } catch (err) {
+        console.error(err);
+        toast('Erro');
+      }
+    }
+
+    // ==================== REVIEWS ====================
+    async function toggleReview(date) {
+      if (!isGestor()) {
+        toast('Apenas gestores podem marcar como revisado');
+        return;
+      }
+
+      const existing = reviews.find(r => r.review_date === date && r.reviewed_by === currentUser.name);
+      
+      try {
+        if (existing) {
+          await supabase.from('daily_reviews').delete().eq('id', existing.id);
+          reviews = reviews.filter(r => r.id !== existing.id);
+          toast('Revisão removida');
+        } else {
+          const { data } = await supabase.from('daily_reviews').insert({
+            review_date: date,
+            reviewed_by: currentUser.name
+          }).select().single();
+          reviews.push(data);
+          toast('Dia revisado ✓');
+        }
+        renderCalendar();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // ==================== CLIENT MANAGEMENT ====================
+    async function addClient(e) {
+      e.preventDefault();
+      const name = document.getElementById('newClientName').value.trim();
+      const responsible = document.getElementById('newClientResp').value || null;
+      const color = document.getElementById('newClientColor').value;
+
+      if (!name) return;
+
+      try {
+        // Add client
+        const { data: newClient, error } = await supabase.from('clients').insert({
+          name, responsible, color, active: true
+        }).select().single();
+
+        if (error) throw error;
+
+        // Generate items for this client
+        const newItems = [];
+        
+        FEED_DATES.forEach(date => {
+          let content = 'Post Serviço';
+          let isCheck = false;
+          if (date === '24/12') { content = 'Happy Holidays 🎄'; isCheck = true; }
+          if (date === '31/12') { content = 'Happy New Year 🎆'; isCheck = true; }
+          if (date === '02/01') { content = 'Primeira postagem do ano'; }
+
+          newItems.push({
+            client_id: newClient.id,
+            client: name,
+            responsible,
+            type: 'FEED',
+            date,
+            content_type: content,
+            is_checkpoint: isCheck
+          });
+        });
+
+        STORY_DATES.forEach(date => {
+          let content = 'Story';
+          let isCheck = false;
+          if (date === '25/12') { content = 'Happy Holidays (diferente do feed) 🎄'; isCheck = true; }
+          if (date === '01/01') { content = 'Mensagem Motivacional ✨'; isCheck = true; }
+
+          newItems.push({
+            client_id: newClient.id,
+            client: name,
+            responsible,
+            type: 'STORY',
+            date,
+            content_type: content,
+            is_checkpoint: isCheck
+          });
+        });
+
+        await supabase.from('items').insert(newItems);
+
+        document.getElementById('newClientName').value = '';
+        toast(`Cliente "${name}" adicionado!`);
+        loadAll();
+      } catch (err) {
+        console.error(err);
+        toast('Erro ao adicionar cliente');
+      }
+    }
+
+    async function deleteClient(id, name) {
+      if (!confirm(`Excluir "${name}" e todos os itens associados?`)) return;
+
+      try {
+        await supabase.from('clients').delete().eq('id', id);
+        toast(`"${name}" removido`);
+        loadAll();
+      } catch (err) {
+        console.error(err);
+        toast('Erro');
+      }
+    }
+
+    // ==================== HELPERS ====================
+    function updateSyncStatus(ok) {
+      document.getElementById('syncDot').style.background = ok ? 'var(--green)' : 'var(--red)';
+      document.getElementById('syncText').textContent = ok ? 'Sincronizado' : 'Sem conexão';
+    }
+
+    function getDateStatus(d) {
+      const [day, month] = d.split('/');
+      const year = month === '01' ? 2025 : 2024;
+      const itemDate = new Date(year, parseInt(month) - 1, parseInt(day));
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      itemDate.setHours(0,0,0,0);
+      if (itemDate.getTime() === today.getTime()) return 'today';
+      if (itemDate < today) return 'past';
+      return 'future';
+    }
+
+    function isDone(i) { return i.status_schedule === 'Programado' || i.status_schedule === 'Publicado'; }
+    function isInProgress(i) {
+      return ['Em andamento', 'Criado'].includes(i.status_creation) ||
+             ['Em revisão', 'Aprovado'].includes(i.status_approval);
+    }
+
+    function getStatusClass(s) {
+      const map = {
+        'Pendente': 'pending', 'Aguardando': 'pending', 'Não programado': 'pending',
+        'Em andamento': 'em-andamento', 'Em revisão': 'em-andamento', 'Ajustes solicitados': 'em-andamento',
+        'Criado': 'criado', 'Aprovado': 'aprovado', 'Programado': 'programado', 'Publicado': 'publicado'
+      };
+      return map[s] || 'pending';
+    }
+
+    function getClientColor(name) {
+      const c = clients.find(x => x.name === name);
+      return c ? c.color : '#666';
+    }
+
+    function toast(msg) {
+      const t = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      t.classList.remove('hidden');
+      setTimeout(() => t.classList.add('hidden'), 2500);
+    }
+
+    // ==================== SELECTION ====================
+    function toggleSelectAll(checkbox) {
+      const filtered = getFilteredItems();
+      if (checkbox.checked) {
+        filtered.forEach(i => selectedItems.add(i.id));
+      } else {
+        selectedItems.clear();
+      }
+      updateBatchBar();
+      renderMainTable();
+    }
+
+    function toggleSelect(id) {
+      if (selectedItems.has(id)) selectedItems.delete(id);
+      else selectedItems.add(id);
+      updateBatchBar();
+      renderMainTable();
+    }
+
+    function clearSelection() {
+      selectedItems.clear();
+      updateBatchBar();
+      renderMainTable();
+    }
+
+    function updateBatchBar() {
+      const bar = document.getElementById('batchBar');
+      document.getElementById('selCount').textContent = selectedItems.size;
+      bar.classList.toggle('hidden', selectedItems.size === 0);
+    }
+
+    // ==================== QUICK FILTERS ====================
+    function toggleQuickFilter(f) {
+      activeFilter = activeFilter === f ? null : f;
+      document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active'));
+      if (activeFilter) document.getElementById(`qf-${activeFilter}`).classList.add('active');
+      renderAll();
+    }
+
+    function clearFilters() {
+      activeFilter = null;
+      document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('f-responsible').value = '';
+      document.getElementById('f-client').value = '';
+      document.getElementById('f-type').value = '';
+      document.getElementById('f-status').value = '';
+      document.getElementById('f-date').value = '';
+      renderAll();
+    }
+
+    function updateQuickCounts() {
+      const urgent = items.filter(i => !isDone(i) && getDateStatus(i.date) === 'past').length;
+      const today = items.filter(i => getDateStatus(i.date) === 'today').length;
+      const checks = items.filter(i => i.is_checkpoint && !isDone(i)).length;
+      const pending = items.filter(i => i.status_schedule === 'Não programado' && i.status_creation === 'Pendente').length;
+
+      document.getElementById('cnt-urgent').textContent = urgent;
+      document.getElementById('cnt-today').textContent = today;
+      document.getElementById('cnt-checkpoints').textContent = checks;
+      document.getElementById('cnt-pending').textContent = pending;
+    }
+
+    // ==================== FILTERS ====================
+    function populateFilters() {
+      // Responsible filter
+      const resps = [...new Set(items.map(i => i.responsible).filter(Boolean))].sort();
+      document.getElementById('f-responsible').innerHTML = '<option value="">Todos Responsáveis</option>' +
+        resps.map(r => `<option value="${r}">${r}</option>`).join('');
+
+      // Client filter
+      const cls = [...new Set(items.map(i => i.client))].sort();
+      document.getElementById('f-client').innerHTML = '<option value="">Todos Clientes</option>' +
+        cls.map(c => `<option value="${c}">${c}</option>`).join('');
+
+      // Date filter
+      const dates = [...new Set([...FEED_DATES, ...STORY_DATES])].sort((a, b) => {
+        const [dA, mA] = a.split('/'); const [dB, mB] = b.split('/');
+        if (mA !== mB) return parseInt(mA) - parseInt(mB);
+        return parseInt(dA) - parseInt(dB);
+      });
+      document.getElementById('f-date').innerHTML = '<option value="">Todas Datas</option>' +
+        dates.map(d => `<option value="${d}">${d}</option>`).join('');
+
+      // Admin responsible select
+      const socialMedias = teamMembers.filter(t => t.role === 'social_media');
+      document.getElementById('newClientResp').innerHTML = '<option value="">Sem responsável</option>' +
+        socialMedias.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
+    }
+
+    function getFilteredItems() {
+      let filtered = [...items];
+
+      if (activeFilter === 'urgent') filtered = filtered.filter(i => !isDone(i) && getDateStatus(i.date) === 'past');
+      else if (activeFilter === 'today') filtered = filtered.filter(i => getDateStatus(i.date) === 'today');
+      else if (activeFilter === 'checkpoints') filtered = filtered.filter(i => i.is_checkpoint);
+      else if (activeFilter === 'pending') filtered = filtered.filter(i => i.status_schedule === 'Não programado' && i.status_creation === 'Pendente');
+
+      const fResp = document.getElementById('f-responsible').value;
+      const fClient = document.getElementById('f-client').value;
+      const fType = document.getElementById('f-type').value;
+      const fStatus = document.getElementById('f-status').value;
+      const fDate = document.getElementById('f-date').value;
+
+      if (fResp) filtered = filtered.filter(i => i.responsible === fResp);
+      if (fClient) filtered = filtered.filter(i => i.client === fClient);
+      if (fType) filtered = filtered.filter(i => i.type === fType);
+      if (fDate) filtered = filtered.filter(i => i.date === fDate);
+      if (fStatus) filtered = filtered.filter(i => [i.status_creation, i.status_approval, i.status_schedule].includes(fStatus));
+
+      return filtered;
+    }
+
+    function applyFilters() { renderMainTable(); }
+
+    // ==================== RENDERING ====================
+    function renderAll() {
+      updateQuickCounts();
+      renderStats();
+      renderTeamGrid();
+      renderUrgentTable();
+      renderMainTable();
+      renderCalendar();
+      renderChecklist();
+      renderClientList();
+    }
+
+    function renderStats() {
+      const total = items.length;
+      const pending = items.filter(i => i.status_schedule === 'Não programado' && i.status_creation === 'Pendente').length;
+      const progress = items.filter(i => isInProgress(i) && !isDone(i)).length;
+      const done = items.filter(i => i.status_schedule === 'Programado').length;
+      const published = items.filter(i => i.status_schedule === 'Publicado').length;
+
+      const percent = total > 0 ? Math.round(((done + published) / total) * 100) : 0;
+
+      document.getElementById('mega-progress').textContent = percent + '%';
+      document.getElementById('mega-pending').textContent = pending;
+      document.getElementById('mega-progress-count').textContent = progress;
+      document.getElementById('mega-done').textContent = done;
+      document.getElementById('mega-published').textContent = published;
+
+      document.getElementById('bar-percent').textContent = percent + '%';
+      document.getElementById('bar-published').style.width = (published / total * 100) + '%';
+      document.getElementById('bar-done').style.width = (done / total * 100) + '%';
+      document.getElementById('bar-progress').style.width = (progress / total * 100) + '%';
+    }
+
+    function renderTeamGrid() {
+      const container = document.getElementById('teamGrid');
+      const socialMedias = teamMembers.filter(t => t.role === 'social_media');
+
+      container.innerHTML = socialMedias.map(member => {
+        const memberItems = items.filter(i => i.responsible === member.name);
+        const doneCount = memberItems.filter(i => isDone(i)).length;
+        const percent = memberItems.length > 0 ? Math.round((doneCount / memberItems.length) * 100) : 0;
+
+        return `
+          <div class="team-card">
+            <div class="team-card-header">
+              <div class="team-avatar" style="background:${member.color}">${member.name[0]}</div>
+              <div>
+                <div class="team-name">${member.name}</div>
+                <div class="team-role">${memberItems.length} itens</div>
+              </div>
+            </div>
+            <div class="team-progress">
+              <div class="team-bar">
+                <div class="team-bar-fill" style="width:${percent}%;background:${percent === 100 ? 'var(--green)' : percent > 50 ? 'var(--orange)' : 'var(--red)'}"></div>
+              </div>
+              <div class="team-percent" style="color:${percent === 100 ? 'var(--green)' : percent > 50 ? 'var(--orange)' : 'var(--red)'}">${percent}%</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderUrgentTable() {
+      const tbody = document.getElementById('urgentTableBody');
+      
+      const urgentItems = items.filter(i => {
+        if (isDone(i)) return false;
+        const ds = getDateStatus(i.date);
+        return ds === 'past' || ds === 'today' || i.is_checkpoint;
+      }).sort((a, b) => {
+        if (getDateStatus(a.date) === 'past' && getDateStatus(b.date) !== 'past') return -1;
+        if (getDateStatus(b.date) === 'past' && getDateStatus(a.date) !== 'past') return 1;
+        return 0;
+      }).slice(0, 15);
+
+      if (urgentItems.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted)">🎉 Nenhuma pendência urgente!</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = urgentItems.map(i => {
+        const ds = getDateStatus(i.date);
+        return `
+          <tr class="${i.is_checkpoint ? 'checkpoint' : ''} ${ds === 'past' ? 'overdue' : ''}">
+            <td><div class="client-cell"><div class="client-dot" style="background:${getClientColor(i.client)}"></div><span class="client-text">${i.client}</span></div></td>
+            <td><span class="type-pill ${i.type.toLowerCase()}">${i.type}</span>${i.is_checkpoint ? '<span class="checkpoint-icon">⭐</span>' : ''}</td>
+            <td><span class="date-text ${ds}">${i.date}</span></td>
+            <td style="color:${i.is_checkpoint ? 'var(--yellow)' : 'var(--text-muted)'}">${i.content_type}</td>
+            <td><span class="responsible-pill" style="background:${getClientColor(i.responsible + ' ') || 'var(--purple-bg)'}; color:var(--text)">${i.responsible || '-'}</span></td>
+            <td><span class="status-select ${getStatusClass(i.status_schedule)}" style="padding:0.3rem 0.6rem">${i.status_schedule}</span></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderMainTable() {
+      const tbody = document.getElementById('mainTableBody');
+      const filtered = getFilteredItems();
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:2rem;color:var(--text-muted)">Nenhum item encontrado</td></tr>';
+        return;
+      }
+
+      const approvalDisabled = !isGestor() ? 'disabled' : '';
+
+      tbody.innerHTML = filtered.map(i => {
+        const ds = getDateStatus(i.date);
+        const isOverdue = !isDone(i) && ds === 'past';
+        const isSel = selectedItems.has(i.id);
+        const updateInfo = i.last_updated_by ? `<strong>${i.last_updated_by}</strong> ${new Date(i.last_updated_at).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}` : '';
+
+        return `
+          <tr class="${i.is_checkpoint ? 'checkpoint' : ''} ${isOverdue ? 'overdue' : ''} ${isSel ? 'selected' : ''}">
+            <td><input type="checkbox" class="row-check" ${isSel ? 'checked' : ''} onchange="toggleSelect(${i.id})"></td>
+            <td><div class="client-cell"><div class="client-dot" style="background:${getClientColor(i.client)}"></div><span class="client-text">${i.client}</span></div></td>
+            <td><span class="type-pill ${i.type.toLowerCase()}">${i.type}</span>${i.is_checkpoint ? '<span class="checkpoint-icon">⭐</span>' : ''}</td>
+            <td><span class="date-text ${ds}">${i.date}</span></td>
+            <td style="font-size:0.8rem;color:${i.is_checkpoint ? 'var(--yellow)' : 'var(--text-muted)'}">${i.content_type}</td>
+            <td><span class="responsible-pill" style="background:var(--bg-elevated)">${i.responsible ? i.responsible[0] : '-'}</span></td>
+            <td>
+              <select class="status-select ${getStatusClass(i.status_creation)}" onchange="updateItem(${i.id},'status_creation',this.value)">
+                <option value="Pendente" ${i.status_creation === 'Pendente' ? 'selected' : ''}>Pendente</option>
+                <option value="Em andamento" ${i.status_creation === 'Em andamento' ? 'selected' : ''}>Em andamento</option>
+                <option value="Criado" ${i.status_creation === 'Criado' ? 'selected' : ''}>Criado</option>
+              </select>
+            </td>
+            <td>
+              <select class="status-select ${getStatusClass(i.status_approval)}" onchange="updateItem(${i.id},'status_approval',this.value)" ${approvalDisabled}>
+                <option value="Aguardando" ${i.status_approval === 'Aguardando' ? 'selected' : ''}>Aguardando</option>
+                <option value="Em revisão" ${i.status_approval === 'Em revisão' ? 'selected' : ''}>Em revisão</option>
+                <option value="Ajustes solicitados" ${i.status_approval === 'Ajustes solicitados' ? 'selected' : ''}>Ajustes</option>
+                <option value="Aprovado" ${i.status_approval === 'Aprovado' ? 'selected' : ''}>Aprovado</option>
+              </select>
+            </td>
+            <td>
+              <select class="status-select ${getStatusClass(i.status_schedule)}" onchange="updateItem(${i.id},'status_schedule',this.value)">
+                <option value="Não programado" ${i.status_schedule === 'Não programado' ? 'selected' : ''}>Não prog.</option>
+                <option value="Programado" ${i.status_schedule === 'Programado' ? 'selected' : ''}>Programado</option>
+                <option value="Publicado" ${i.status_schedule === 'Publicado' ? 'selected' : ''}>Publicado</option>
+              </select>
+            </td>
+            <td><input type="text" class="mini-input ${i.material_link ? 'has-value' : ''}" value="${i.material_link || ''}" placeholder="Link..." onclick="if(this.value)window.open(this.value,'_blank')" onchange="updateItem(${i.id},'material_link',this.value)"></td>
+            <td><input type="text" class="mini-input" value="${i.observations || ''}" placeholder="Obs..." onchange="updateItem(${i.id},'observations',this.value)"></td>
+            <td class="update-info">${updateInfo}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderCalendar() {
+      const grid = document.getElementById('calendarGrid');
+      const allDates = [...new Set([...FEED_DATES, ...STORY_DATES])].sort((a, b) => {
+        const [dA, mA] = a.split('/'); const [dB, mB] = b.split('/');
+        if (mA !== mB) return parseInt(mA) - parseInt(mB);
+        return parseInt(dA) - parseInt(dB);
+      });
+
+      const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
+      grid.innerHTML = allDates.map(date => {
+        const [day, month] = date.split('/');
+        const year = month === '01' ? 2025 : 2024;
+        const dateObj = new Date(year, parseInt(month) - 1, parseInt(day));
+        const dayName = dayNames[dateObj.getDay()];
+        
+        const dateItems = items.filter(i => i.date === date);
+        const totalFeeds = dateItems.filter(i => i.type === 'FEED').length;
+        const totalStories = dateItems.filter(i => i.type === 'STORY').length;
+        const doneFeeds = dateItems.filter(i => i.type === 'FEED' && isDone(i)).length;
+        const doneStories = dateItems.filter(i => i.type === 'STORY' && isDone(i)).length;
+        
+        const isCheck = ['24/12', '25/12', '31/12', '01/01'].includes(date);
+        const isReviewed = reviews.some(r => r.review_date === date);
+        const reviewBtnDisabled = !isGestor() ? 'disabled' : '';
+
+        return `
+          <div class="cal-day ${isCheck ? 'checkpoint' : ''} ${isReviewed ? 'reviewed' : ''}">
+            <div class="cal-day-head">
+              <div class="cal-day-num">${day}</div>
+              <div class="cal-day-name">${dayName} ${month === '01' ? 'Jan' : 'Dez'}</div>
+            </div>
+            <div class="cal-day-body">
+              <div class="cal-stat"><span>Feed</span><span class="cal-stat-val ${doneFeeds === totalFeeds ? 'ok' : 'bad'}">${doneFeeds}/${totalFeeds}</span></div>
+              <div class="cal-stat"><span>Story</span><span class="cal-stat-val ${doneStories === totalStories ? 'ok' : 'bad'}">${doneStories}/${totalStories}</span></div>
+            </div>
+            <button class="cal-review-btn ${isReviewed ? 'done' : ''}" onclick="toggleReview('${date}')" ${reviewBtnDisabled}>
+              ${isReviewed ? '✓ Revisado' : 'Marcar revisado'}
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderChecklist() {
+      const list = document.getElementById('checkList');
+      
+      const checks = [
+        { text: 'Feeds de 24/12 (Happy Holidays) programados?', filter: i => i.date === '24/12' && i.type === 'FEED' },
+        { text: 'Stories de 25/12 (Happy Holidays) programados?', filter: i => i.date === '25/12' && i.type === 'STORY' },
+        { text: 'Feeds de 31/12 (Happy New Year) programados?', filter: i => i.date === '31/12' && i.type === 'FEED' },
+        { text: 'Stories de 01/01 (Motivacional) programados?', filter: i => i.date === '01/01' && i.type === 'STORY' },
+        { text: 'Feeds de 05/01 programados antes de 31/12?', filter: i => i.date === '05/01' && i.type === 'FEED' },
+        { text: 'Todos os clientes da Priscila 100% concluídos?', filter: i => i.responsible === 'Priscila' },
+        { text: 'Todos os clientes da Marcela 100% concluídos?', filter: i => i.responsible === 'Marcela' },
+        { text: 'TUDO concluído — 100%?', filter: () => true }
+      ];
+
+      list.innerHTML = checks.map(c => {
+        const filtered = items.filter(c.filter);
+        const done = filtered.filter(i => isDone(i)).length;
+        const isOk = done === filtered.length && filtered.length > 0;
+
+        return `
+          <div class="check-item ${isOk ? 'ok' : ''}">
+            <div class="check-box"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <div class="check-text">${c.text}</div>
+            <div class="check-count">${done}/${filtered.length}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderClientList() {
+      const list = document.getElementById('clientList');
+      
+      list.innerHTML = clients.map(c => `
+        <div class="client-item">
+          <div class="client-item-info">
+            <div class="client-item-dot" style="background:${c.color}"></div>
+            <div>
+              <div class="client-item-name">${c.name}</div>
+              <div class="client-item-resp">${c.responsible || 'Sem responsável'}</div>
+            </div>
+          </div>
+          <div class="client-item-actions">
+            <button class="client-item-btn danger" onclick="deleteClient(${c.id}, '${c.name}')">Excluir</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ==================== NAVIGATION ====================
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+        document.getElementById('tab-' + btn.dataset.tab).style.display = 'block';
+      });
+    });
+
+    // ==================== INIT ====================
+    async function init() {
+      await loadAll();
+      setupRealtime();
+    }
+
+    checkAuth();
+  </script>
+</body>
+</html>
