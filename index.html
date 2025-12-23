@@ -3,121 +3,106 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📊 Social Media Tracker | ConectMe Uprise</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <title>📊 ConectMe Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
     :root {
-      --bg: #09090b;
-      --bg-card: #18181b;
-      --bg-elevated: #27272a;
-      --bg-hover: #3f3f46;
-      --border: #3f3f46;
-      --text: #fafafa;
-      --text-secondary: #a1a1aa;
-      --text-muted: #71717a;
+      --bg: #0f0f0f;
+      --card: #1a1a1a;
+      --card-hover: #222;
+      --border: #333;
+      --text: #fff;
+      --text-muted: #888;
       
-      --red: #ef4444;
-      --red-bg: rgba(239, 68, 68, 0.15);
-      --orange: #f97316;
-      --orange-bg: rgba(249, 115, 22, 0.15);
-      --yellow: #eab308;
-      --yellow-bg: rgba(234, 179, 8, 0.15);
-      --green: #22c55e;
-      --green-bg: rgba(34, 197, 94, 0.15);
-      --blue: #3b82f6;
-      --blue-bg: rgba(59, 130, 246, 0.15);
-      --purple: #a855f7;
-      --purple-bg: rgba(168, 85, 247, 0.15);
-      --pink: #ec4899;
-      --cyan: #06b6d4;
-      --cyan-bg: rgba(6, 182, 212, 0.15);
+      --aguardando: #666;
+      --agendado: #3b82f6;
+      --verificado: #06b6d4;
+      --publicar: #f97316;
+      --publicado: #22c55e;
+      --paula: #a855f7;
+      --problema: #ef4444;
+      --especial: #eab308;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
 
-    /* LOGIN */
-    .login-screen {
+    /* ========== LOGIN ========== */
+    .login {
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #09090b, #18181b, #09090b);
+      padding: 1rem;
     }
-    .login-screen.hidden { display: none; }
+    .login.hidden { display: none; }
     .login-box {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 3rem;
+      background: var(--card);
+      border-radius: 20px;
+      padding: 2.5rem;
       width: 100%;
-      max-width: 400px;
+      max-width: 360px;
       text-align: center;
     }
     .login-logo { font-size: 3rem; margin-bottom: 0.5rem; }
-    .login-brand {
-      font-size: 1.4rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--purple), var(--pink));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .login-subtitle { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 2rem; }
-    .login-error {
-      background: var(--red-bg);
-      color: var(--red);
-      padding: 0.75rem;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      margin-bottom: 1rem;
-      display: none;
-    }
-    .login-error.show { display: block; }
+    .login-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .login-sub { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem; }
     .login-input {
       width: 100%;
-      padding: 1rem;
-      background: var(--bg-elevated);
+      padding: 0.9rem 1rem;
+      background: var(--bg);
       border: 2px solid var(--border);
       border-radius: 12px;
       color: var(--text);
-      font-family: inherit;
       font-size: 1rem;
       margin-bottom: 1rem;
     }
-    .login-input:focus { outline: none; border-color: var(--purple); }
-    .login-input::placeholder { color: var(--text-muted); }
+    .login-input:focus { outline: none; border-color: var(--agendado); }
     .login-btn {
       width: 100%;
-      padding: 1rem;
-      background: linear-gradient(135deg, var(--purple), var(--pink));
+      padding: 0.9rem;
+      background: var(--agendado);
       border: none;
       border-radius: 12px;
       color: white;
-      font-family: inherit;
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
     }
     .login-btn:hover { opacity: 0.9; }
-    .login-btn:disabled { opacity: 0.5; }
+    .login-error {
+      background: rgba(239,68,68,0.2);
+      color: var(--problema);
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.85rem;
+      display: none;
+    }
+    .login-error.show { display: block; }
 
-    /* APP */
+    /* ========== APP ========== */
     .app { display: none; }
     .app.visible { display: block; }
 
-    /* HEADER */
+    /* ========== HEADER ========== */
     .header {
-      background: rgba(24, 24, 27, 0.95);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      padding: 0.6rem 1.5rem;
+      background: var(--card);
+      padding: 0.75rem 1.25rem;
       position: sticky;
       top: 0;
       z-index: 100;
+      border-bottom: 1px solid var(--border);
     }
-    .header-content {
-      max-width: 1800px;
+    .header-inner {
+      max-width: 1600px;
       margin: 0 auto;
       display: flex;
       align-items: center;
@@ -125,376 +110,324 @@
       gap: 1rem;
       flex-wrap: wrap;
     }
-    .brand { display: flex; align-items: center; gap: 0.6rem; }
-    .brand-icon {
-      width: 36px;
-      height: 36px;
-      background: linear-gradient(135deg, var(--purple), var(--pink));
-      border-radius: 10px;
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+    }
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--agendado), var(--paula));
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.1rem;
     }
-    .brand h1 { font-size: 0.95rem; font-weight: 700; }
-    .brand span { font-size: 0.65rem; color: var(--text-muted); display: block; }
-    
-    .nav { display: flex; gap: 0.2rem; background: var(--bg-elevated); padding: 0.2rem; border-radius: 10px; }
-    .nav-btn {
-      padding: 0.45rem 0.8rem;
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      font-family: inherit;
-      font-size: 0.75rem;
-      font-weight: 500;
-      border-radius: 8px;
-      cursor: pointer;
+    .user-info {
       display: flex;
       align-items: center;
-      gap: 0.3rem;
-      white-space: nowrap;
+      gap: 0.75rem;
     }
-    .nav-btn:hover { color: var(--text); background: var(--bg-hover); }
-    .nav-btn.active { background: var(--purple); color: white; }
-    .nav-btn .badge {
-      background: var(--red);
-      color: white;
-      font-size: 0.6rem;
-      padding: 0.1rem 0.35rem;
-      border-radius: 10px;
-      font-weight: 700;
-    }
-
-    .header-right { display: flex; align-items: center; gap: 0.75rem; }
-    .sync { display: flex; align-items: center; gap: 0.3rem; font-size: 0.7rem; color: var(--text-muted); }
-    .sync-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; }
-    .user-pill {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.3rem 0.6rem 0.3rem 0.3rem;
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      cursor: pointer;
-    }
-    .user-pill:hover { border-color: var(--purple); }
     .user-avatar {
-      width: 24px;
-      height: 24px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.65rem;
       font-weight: 700;
+      font-size: 0.8rem;
       color: white;
-    }
-    .user-name { font-size: 0.75rem; font-weight: 600; }
-
-    /* MAIN */
-    .main { max-width: 1800px; margin: 0 auto; padding: 1.25rem; }
-
-    /* SECTION */
-    .section-title {
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    /* ALERT CARDS */
-    .alerts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem; }
-    .alert {
-      padding: 1rem;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
       cursor: pointer;
-      border: 1px solid transparent;
-      transition: transform 0.15s;
     }
-    .alert:hover { transform: translateY(-2px); }
-    .alert.red { background: var(--red-bg); border-color: var(--red); }
-    .alert.orange { background: var(--orange-bg); border-color: var(--orange); }
-    .alert.cyan { background: var(--cyan-bg); border-color: var(--cyan); }
-    .alert.green { background: var(--green-bg); border-color: var(--green); }
-    .alert-icon { font-size: 1.4rem; }
-    .alert-info { flex: 1; }
-    .alert-title { font-weight: 700; font-size: 0.85rem; }
-    .alert-desc { font-size: 0.7rem; color: var(--text-secondary); }
-    .alert-count { font-family: 'JetBrains Mono', monospace; font-size: 1.75rem; font-weight: 700; }
-    .alert.red .alert-count { color: var(--red); }
-    .alert.orange .alert-count { color: var(--orange); }
-    .alert.cyan .alert-count { color: var(--cyan); }
-    .alert.green .alert-count { color: var(--green); }
+    .user-name { font-weight: 600; font-size: 0.9rem; }
 
-    /* STATS ROW */
-    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.6rem; margin-bottom: 1.25rem; }
-    .stat {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 0.85rem;
-      text-align: center;
+    /* ========== ALERTA DE NOTIFICAÇÃO ========== */
+    .notification-bar {
+      background: linear-gradient(90deg, var(--publicar), #ea580c);
+      padding: 0.75rem 1.25rem;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      animation: pulse-bg 1s infinite;
+      cursor: pointer;
     }
-    .stat-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
-    .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; font-weight: 700; }
+    .notification-bar.show { display: flex; }
+    .notification-bar span { font-weight: 600; }
+    @keyframes pulse-bg {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.85; }
+    }
 
-    /* PROGRESS */
-    .progress-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1rem;
-      margin-bottom: 1.25rem;
-    }
-    .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
-    .progress-title { font-weight: 600; font-size: 0.9rem; }
-    .progress-percent {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1.25rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, var(--purple), var(--pink));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .progress-bar { height: 12px; background: var(--bg-elevated); border-radius: 6px; overflow: hidden; display: flex; }
-    .progress-seg { height: 100%; transition: width 0.4s; }
-    .progress-seg.done { background: var(--green); }
-    .progress-seg.checked { background: var(--cyan); }
-    .progress-seg.scheduled { background: var(--blue); }
-
-    /* TABLE CARD */
-    .table-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-      margin-bottom: 1.25rem;
-    }
-    .table-toolbar {
-      padding: 0.6rem 0.75rem;
+    /* ========== FILTROS ========== */
+    .filters {
+      background: var(--card);
+      padding: 0.75rem 1.25rem;
       border-bottom: 1px solid var(--border);
       display: flex;
       gap: 0.5rem;
       flex-wrap: wrap;
       align-items: center;
     }
-    .filter-select {
-      background: var(--bg-elevated);
+    .filter-btn {
+      padding: 0.5rem 1rem;
+      background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 0.35rem 0.5rem;
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.75rem;
-    }
-    .filter-select:focus { outline: none; border-color: var(--purple); }
-    .table-scroll { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
-    th {
-      background: var(--bg-elevated);
-      padding: 0.55rem 0.6rem;
-      text-align: left;
-      font-weight: 600;
-      font-size: 0.6rem;
+      border-radius: 20px;
       color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      white-space: nowrap;
-    }
-    td { padding: 0.5rem 0.6rem; border-top: 1px solid var(--border); vertical-align: middle; }
-    tr:hover { background: var(--bg-elevated); }
-    tr.checkpoint { background: var(--yellow-bg); }
-    tr.overdue { animation: pulse-red 2s infinite; }
-    tr.verify-now { animation: pulse-cyan 1.5s infinite; }
-    @keyframes pulse-red { 0%,100% { background: var(--red-bg); } 50% { background: rgba(239,68,68,0.25); } }
-    @keyframes pulse-cyan { 0%,100% { background: var(--cyan-bg); } 50% { background: rgba(6,182,212,0.3); } }
-
-    /* CELL STYLES */
-    .client-cell { display: flex; align-items: center; gap: 0.35rem; }
-    .client-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .client-name { font-weight: 600; }
-    .pill {
-      display: inline-flex;
-      padding: 0.12rem 0.4rem;
-      border-radius: 100px;
-      font-size: 0.65rem;
-      font-weight: 600;
-    }
-    .pill.feed { background: var(--purple-bg); color: var(--purple); }
-    .pill.story { background: var(--orange-bg); color: var(--orange); }
-    .pill.cp { background: var(--yellow); color: #000; font-size: 0.55rem; margin-left: 0.2rem; }
-    .date-text { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.75rem; }
-    .date-text.past { color: var(--red); }
-    .date-text.today { color: var(--purple); }
-
-    .mini-select {
-      appearance: none;
-      padding: 0.2rem 1rem 0.2rem 0.4rem;
-      border-radius: 5px;
-      font-family: inherit;
-      font-size: 0.65rem;
-      font-weight: 600;
-      border: none;
-      cursor: pointer;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 0.25rem center;
-    }
-    .mini-select:disabled { opacity: 0.5; cursor: not-allowed; }
-    .mini-select.red { background-color: var(--red-bg); color: var(--red); }
-    .mini-select.orange { background-color: var(--orange-bg); color: var(--orange); }
-    .mini-select.blue { background-color: var(--blue-bg); color: var(--blue); }
-    .mini-select.cyan { background-color: var(--cyan-bg); color: var(--cyan); }
-    .mini-select.green { background-color: var(--green-bg); color: var(--green); }
-    .mini-select.gray { background-color: var(--bg-elevated); color: var(--text-muted); }
-
-    .mini-input {
-      background: transparent;
-      border: 1px solid transparent;
-      border-radius: 4px;
-      padding: 0.15rem 0.3rem;
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.7rem;
-      width: 55px;
-    }
-    .mini-input:hover { background: var(--bg-elevated); }
-    .mini-input:focus { outline: none; background: var(--bg-elevated); border-color: var(--purple); }
-    .mini-input.link { color: var(--blue); text-decoration: underline; cursor: pointer; width: 80px; }
-
-    .check-group { display: flex; gap: 0.3rem; }
-    .check-btn {
-      width: 22px;
-      height: 22px;
-      border-radius: 5px;
-      border: 1px solid var(--border);
-      background: var(--bg-elevated);
-      color: var(--text-muted);
-      font-size: 0.6rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .check-btn:hover { border-color: var(--purple); }
-    .check-btn.checked { background: var(--green); border-color: var(--green); color: white; }
-    .check-btn[title]:hover::after {
-      content: attr(title);
-      position: absolute;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-      font-size: 0.65rem;
-      white-space: nowrap;
-      transform: translateY(-100%);
-      margin-top: -5px;
-    }
-
-    .update-cell { font-size: 0.55rem; color: var(--text-muted); max-width: 70px; }
-    .update-cell strong { color: var(--text-secondary); }
-
-    /* VERIFY CARDS */
-    .verify-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 0.75rem; }
-    .verify-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1rem;
-      transition: all 0.15s;
-    }
-    .verify-card:hover { border-color: var(--purple); }
-    .verify-card.urgent { border-color: var(--cyan); animation: pulse-cyan 1.5s infinite; }
-    .verify-card-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem; }
-    .verify-client { font-weight: 700; font-size: 0.95rem; }
-    .verify-meta { font-size: 0.7rem; color: var(--text-muted); }
-    .verify-type { display: flex; gap: 0.3rem; align-items: center; }
-    .verify-time {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--cyan);
-    }
-    .verify-content { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem; }
-    .verify-actions { display: flex; gap: 0.5rem; }
-    .verify-btn {
-      flex: 1;
-      padding: 0.6rem;
-      border: none;
-      border-radius: 8px;
-      font-family: inherit;
       font-size: 0.8rem;
-      font-weight: 600;
+      font-weight: 500;
       cursor: pointer;
-    }
-    .verify-btn.ok { background: var(--green); color: white; }
-    .verify-btn.problem { background: var(--red); color: white; }
-    .verify-btn:hover { opacity: 0.9; }
-
-    /* TEAM */
-    .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.75rem; }
-    .team-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1rem;
-    }
-    .team-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem; }
-    .team-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      color: white;
-    }
-    .team-name { font-weight: 700; }
-    .team-role { font-size: 0.7rem; color: var(--text-muted); }
-    .team-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; margin-bottom: 0.6rem; }
-    .team-stat { text-align: center; padding: 0.4rem; background: var(--bg-elevated); border-radius: 6px; }
-    .team-stat-value { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 1rem; }
-    .team-stat-label { font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase; }
-    .team-bar { height: 6px; background: var(--bg-elevated); border-radius: 3px; overflow: hidden; }
-    .team-bar-fill { height: 100%; background: var(--green); transition: width 0.3s; }
-
-    /* ADMIN */
-    .admin-form {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1.25rem;
-      max-width: 450px;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      margin-bottom: 1.25rem;
-    }
-    .form-row { display: flex; gap: 0.5rem; }
-    .form-row > * { flex: 1; }
-
-    /* TOAST */
-    .toast {
-      position: fixed;
-      bottom: 1.25rem;
-      right: 1.25rem;
-      background: var(--bg-card);
-      border: 1px solid var(--green);
-      padding: 0.65rem 1rem;
-      border-radius: 10px;
       display: flex;
       align-items: center;
       gap: 0.4rem;
+    }
+    .filter-btn:hover { border-color: var(--text-muted); color: var(--text); }
+    .filter-btn.active { background: var(--agendado); border-color: var(--agendado); color: white; }
+    .filter-btn .count {
+      background: rgba(255,255,255,0.2);
+      padding: 0.1rem 0.4rem;
+      border-radius: 10px;
+      font-size: 0.7rem;
+    }
+    .filter-select {
+      padding: 0.5rem 0.75rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.8rem;
+    }
+
+    /* ========== STATS ========== */
+    .stats {
+      display: flex;
+      gap: 0.5rem;
+      padding: 1rem 1.25rem;
+      max-width: 1600px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+    }
+    .stat {
+      flex: 1;
+      min-width: 100px;
+      background: var(--card);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+    }
+    .stat-value { font-size: 1.5rem; font-weight: 700; }
+    .stat-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; }
+
+    /* ========== GRID DE CARDS ========== */
+    .main {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 0 1.25rem 2rem;
+    }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 0.75rem;
+    }
+
+    /* ========== CARD ========== */
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 1rem;
+      border: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .card:hover { background: var(--card-hover); }
+    .card.especial { border-color: var(--especial); }
+    .card.publicar-agora {
+      border-color: var(--publicar);
+      animation: card-pulse 1.5s infinite;
+    }
+    @keyframes card-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4); }
+      50% { box-shadow: 0 0 20px 5px rgba(249, 115, 22, 0.2); }
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 0.75rem;
+    }
+    .card-client {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .client-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .client-name { font-weight: 700; font-size: 0.95rem; }
+    .card-type {
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .card-type.feed { background: rgba(168,85,247,0.2); color: #c084fc; }
+    .card-type.story { background: rgba(249,115,22,0.2); color: #fb923c; }
+
+    .card-content {
       font-size: 0.85rem;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .card-content.especial { color: var(--especial); font-weight: 500; }
+
+    .card-info {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+      font-size: 0.8rem;
+    }
+    .card-info-item {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      color: var(--text-muted);
+    }
+    .card-info-item strong { color: var(--text); }
+
+    /* ========== STATUS BADGE ========== */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+    .status-badge.aguardando { background: rgba(102,102,102,0.3); color: #999; }
+    .status-badge.agendado { background: rgba(59,130,246,0.2); color: #60a5fa; }
+    .status-badge.verificado { background: rgba(6,182,212,0.2); color: #22d3ee; }
+    .status-badge.publicar { background: rgba(249,115,22,0.3); color: #fb923c; }
+    .status-badge.publicado { background: rgba(34,197,94,0.2); color: #4ade80; }
+    .status-badge.paula { background: rgba(168,85,247,0.2); color: #c084fc; }
+    .status-badge.problema { background: rgba(239,68,68,0.2); color: #f87171; }
+
+    /* ========== CHECKLIST ========== */
+    .checklist {
+      display: flex;
+      gap: 0.4rem;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.3rem 0.6rem;
+      background: var(--bg);
+      border-radius: 6px;
+      font-size: 0.7rem;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      transition: all 0.15s;
+    }
+    .check-item:hover { border-color: var(--text-muted); }
+    .check-item.checked {
+      background: rgba(34,197,94,0.2);
+      border-color: var(--publicado);
+      color: var(--publicado);
+    }
+    .check-item input { display: none; }
+
+    /* ========== BOTÕES DE AÇÃO ========== */
+    .card-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .action-btn {
+      flex: 1;
+      min-width: 80px;
+      padding: 0.6rem 0.75rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      transition: all 0.15s;
+    }
+    .action-btn:hover { transform: scale(1.02); }
+    .action-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .action-btn.primary { background: var(--agendado); color: white; }
+    .action-btn.success { background: var(--publicado); color: white; }
+    .action-btn.warning { background: var(--publicar); color: white; }
+    .action-btn.danger { background: var(--problema); color: white; }
+    .action-btn.purple { background: var(--paula); color: white; }
+    .action-btn.outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+
+    /* ========== INPUTS ========== */
+    .card-inputs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .mini-select {
+      padding: 0.4rem 0.6rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.75rem;
+      min-width: 90px;
+    }
+    .mini-input {
+      padding: 0.4rem 0.6rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.75rem;
+      width: 70px;
+    }
+    .mini-select:focus, .mini-input:focus { outline: none; border-color: var(--agendado); }
+
+    /* ========== EMPTY STATE ========== */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-muted);
+    }
+    .empty-state-icon { font-size: 3rem; margin-bottom: 1rem; }
+
+    /* ========== TOAST ========== */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: var(--card);
+      border: 1px solid var(--publicado);
+      padding: 0.75rem 1.25rem;
+      border-radius: 12px;
+      font-size: 0.9rem;
       z-index: 1000;
       transform: translateY(100px);
       opacity: 0;
@@ -502,26 +435,32 @@
     }
     .toast.show { transform: translateY(0); opacity: 1; }
 
-    /* RESPONSIVE */
-    @media (max-width: 768px) {
-      .header-content { flex-direction: column; }
-      .nav { width: 100%; overflow-x: auto; justify-content: start; }
-      .alerts { grid-template-columns: 1fr; }
+    /* ========== SECTION TITLE ========== */
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: var(--bg-elevated); }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 600px) {
+      .cards-grid { grid-template-columns: 1fr; }
+      .stats { flex-direction: column; }
+      .stat { min-width: 100%; }
+    }
   </style>
 </head>
 <body>
 
 <!-- LOGIN -->
-<div class="login-screen" id="loginScreen">
+<div class="login" id="loginScreen">
   <div class="login-box">
     <div class="login-logo">📊</div>
-    <div class="login-brand">ConectMe Uprise</div>
-    <div class="login-subtitle">Social Media Tracker</div>
+    <div class="login-title">ConectMe Tracker</div>
+    <div class="login-sub">Monitoramento de Posts</div>
     <div class="login-error" id="loginError">E-mail não encontrado</div>
     <input type="email" class="login-input" id="loginEmail" placeholder="seu@conectme.digital">
     <button class="login-btn" id="loginBtn">Entrar</button>
@@ -530,237 +469,158 @@
 
 <!-- APP -->
 <div class="app" id="app">
+  
+  <!-- HEADER -->
   <header class="header">
-    <div class="header-content">
-      <div class="brand">
-        <div class="brand-icon">📊</div>
-        <div>
-          <h1>ConectMe Uprise</h1>
-          <span>Tracker • 22/12 - 05/01</span>
-        </div>
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon">📊</div>
+        <span>ConectMe Tracker</span>
       </div>
-
-      <nav class="nav">
-        <button class="nav-btn active" data-tab="dashboard">📈 Dashboard</button>
-        <button class="nav-btn" data-tab="pre-check" id="navPreCheck">🔍 Verificar Agendamentos <span class="badge" id="preCheckCount">0</span></button>
-        <button class="nav-btn" data-tab="post-check" id="navPostCheck">📱 Verificar Instagram <span class="badge" id="postCheckCount">0</span></button>
-        <button class="nav-btn" data-tab="controle">📋 Controle</button>
-        <button class="nav-btn" data-tab="equipe">👥 Equipe</button>
-        <button class="nav-btn admin-only" data-tab="admin">⚙️ Admin</button>
-      </nav>
-
-      <div class="header-right">
-        <div class="sync">
-          <div class="sync-dot" id="syncDot"></div>
-          <span id="syncText">OK</span>
-        </div>
-        <div class="user-pill" onclick="logout()">
-          <div class="user-avatar" id="userAvatar">A</div>
-          <span class="user-name" id="userName">Alec</span>
-        </div>
+      <div class="user-info">
+        <span class="user-name" id="userName">Alec</span>
+        <div class="user-avatar" id="userAvatar" onclick="logout()">A</div>
       </div>
     </div>
   </header>
 
+  <!-- NOTIFICATION BAR -->
+  <div class="notification-bar" id="notificationBar" onclick="filterByStatus('publicar_agora')">
+    <span>🔔</span>
+    <span id="notificationText">3 posts precisam ser verificados no Instagram AGORA!</span>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters">
+    <button class="filter-btn active" data-filter="todos">📋 Todos</button>
+    <button class="filter-btn" data-filter="pendentes">⏳ Pendentes <span class="count" id="countPendentes">0</span></button>
+    <button class="filter-btn" data-filter="verificar">🔍 Verificar <span class="count" id="countVerificar">0</span></button>
+    <button class="filter-btn" data-filter="publicar">🔔 Publicar Agora <span class="count" id="countPublicar">0</span></button>
+    <button class="filter-btn" data-filter="concluidos">✅ Concluídos <span class="count" id="countConcluidos">0</span></button>
+    <select class="filter-select" id="filterClient">
+      <option value="">Todos os clientes</option>
+    </select>
+    <select class="filter-select" id="filterDate">
+      <option value="">Todas as datas</option>
+    </select>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-value" id="statTotal">0</div>
+      <div class="stat-label">Total</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" style="color:var(--aguardando)" id="statAguardando">0</div>
+      <div class="stat-label">Aguardando</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" style="color:var(--agendado)" id="statAgendado">0</div>
+      <div class="stat-label">Agendado</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" style="color:var(--verificado)" id="statVerificado">0</div>
+      <div class="stat-label">Verificado</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" style="color:var(--publicar)" id="statPublicar">0</div>
+      <div class="stat-label">Publicar Agora</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" style="color:var(--publicado)" id="statPublicado">0</div>
+      <div class="stat-label">Publicado</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
   <main class="main">
-    <!-- DASHBOARD -->
-    <section id="tab-dashboard" class="tab-content">
-      <div class="alerts" id="alertsContainer"></div>
-
-      <div class="stats">
-        <div class="stat"><div class="stat-label">Total</div><div class="stat-value" id="sTotal">0</div></div>
-        <div class="stat"><div class="stat-label">Não Agendados</div><div class="stat-value" style="color:var(--red)" id="sNotScheduled">0</div></div>
-        <div class="stat"><div class="stat-label">Agendados</div><div class="stat-value" style="color:var(--blue)" id="sScheduled">0</div></div>
-        <div class="stat"><div class="stat-label">Verificados</div><div class="stat-value" style="color:var(--cyan)" id="sPreChecked">0</div></div>
-        <div class="stat"><div class="stat-label">Publicados OK</div><div class="stat-value" style="color:var(--green)" id="sPostChecked">0</div></div>
-      </div>
-
-      <div class="progress-card">
-        <div class="progress-header">
-          <div class="progress-title">Progresso Geral</div>
-          <div class="progress-percent" id="progressPercent">0%</div>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-seg done" id="barDone"></div>
-          <div class="progress-seg checked" id="barChecked"></div>
-          <div class="progress-seg scheduled" id="barScheduled"></div>
-        </div>
-      </div>
-
-      <h3 class="section-title">🚨 Precisam de Atenção</h3>
-      <div class="table-card">
-        <div class="table-scroll">
-          <table>
-            <thead><tr><th>Cliente</th><th>Tipo</th><th>Data</th><th>Conteúdo</th><th>Social Media</th><th>Gestor</th><th>Status</th></tr></thead>
-            <tbody id="urgentTable"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- PRE-CHECK -->
-    <section id="tab-pre-check" class="tab-content" style="display:none">
-      <h3 class="section-title">🔍 Verificar Agendamentos no Ekyte/Meta</h3>
-      <p style="color:var(--text-muted);margin-bottom:1rem;font-size:0.85rem;">
-        Vá no Ekyte ou Meta, confira se está agendado corretamente, e marque os itens abaixo.
-      </p>
-      <div class="table-card">
-        <div class="table-scroll">
-          <table>
-            <thead>
-              <tr>
-                <th>Cliente</th>
-                <th>Tipo</th>
-                <th>Data</th>
-                <th>Plataforma</th>
-                <th>Horário</th>
-                <th>Link Agendamento</th>
-                <th>Verificação</th>
-                <th>Checklist</th>
-                <th>Obs</th>
-              </tr>
-            </thead>
-            <tbody id="preCheckTable"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- POST-CHECK -->
-    <section id="tab-post-check" class="tab-content" style="display:none">
-      <h3 class="section-title">📱 Verificar se Publicou no Instagram</h3>
-      <p style="color:var(--text-muted);margin-bottom:1rem;font-size:0.85rem;">
-        Estes posts já deviam ter sido publicados. Vá no Instagram do cliente e confirme se está tudo OK.
-      </p>
-      <div class="verify-grid" id="postCheckGrid"></div>
-    </section>
-
-    <!-- CONTROLE -->
-    <section id="tab-controle" class="tab-content" style="display:none">
-      <div class="table-card">
-        <div class="table-toolbar">
-          <select class="filter-select" id="fGestor" onchange="renderMainTable()"><option value="">Todos Gestores</option></select>
-          <select class="filter-select" id="fSocialMedia" onchange="renderMainTable()"><option value="">Todas Social Media</option></select>
-          <select class="filter-select" id="fClient" onchange="renderMainTable()"><option value="">Todos Clientes</option></select>
-          <select class="filter-select" id="fType" onchange="renderMainTable()"><option value="">Todos Tipos</option><option value="FEED">Feed</option><option value="STORY">Story</option></select>
-          <select class="filter-select" id="fDate" onchange="renderMainTable()"><option value="">Todas Datas</option></select>
-        </div>
-        <div class="table-scroll">
-          <table>
-            <thead>
-              <tr>
-                <th>Cliente</th>
-                <th>Tipo</th>
-                <th>Data</th>
-                <th>Plataforma</th>
-                <th>Horário</th>
-                <th>Link</th>
-                <th>Pré-Verif.</th>
-                <th>✓</th>
-                <th>Pós-Verif.</th>
-                <th>Obs</th>
-                <th>Atualizado</th>
-              </tr>
-            </thead>
-            <tbody id="mainTable"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- EQUIPE -->
-    <section id="tab-equipe" class="tab-content" style="display:none">
-      <h3 class="section-title">👥 Desempenho</h3>
-      <div class="team-grid" id="teamGrid"></div>
-    </section>
-
-    <!-- ADMIN -->
-    <section id="tab-admin" class="tab-content admin-only" style="display:none">
-      <h3 class="section-title">⚙️ Adicionar Cliente</h3>
-      <div class="admin-form">
-        <input type="text" class="login-input" id="newClientName" placeholder="Nome do cliente" style="margin:0">
-        <div class="form-row">
-          <select class="filter-select" id="newClientSM" style="padding:0.65rem"><option value="">Social Media</option></select>
-          <select class="filter-select" id="newClientGestor" style="padding:0.65rem"><option value="">Gestor</option></select>
-        </div>
-        <input type="color" id="newClientColor" value="#a855f7" style="height:40px;border:none;border-radius:6px;cursor:pointer;">
-        <button class="login-btn" onclick="addClient()">Adicionar</button>
-      </div>
-      <h3 class="section-title">📋 Clientes</h3>
-      <div class="table-card">
-        <div class="table-scroll">
-          <table>
-            <thead><tr><th>Cliente</th><th>Social Media</th><th>Gestor</th><th>Itens</th><th></th></tr></thead>
-            <tbody id="clientsTable"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
+    <div class="cards-grid" id="cardsGrid"></div>
+    <div class="empty-state" id="emptyState" style="display:none">
+      <div class="empty-state-icon">🎉</div>
+      <div>Nenhum post para mostrar</div>
+    </div>
   </main>
 
-  <div class="toast" id="toast"><span>✓</span><span id="toastMsg">Salvo!</span></div>
+  <div class="toast" id="toast">✓ Salvo!</div>
 </div>
+
+<!-- AUDIO NOTIFICATION -->
+<audio id="notificationSound" preload="auto">
+  <source src="data:audio/wav;base64,UklGRl9vT19teleVBAAAAFdBVkVmbXQgEAAAA..." type="audio/wav">
+</audio>
 
 <script>
 // CONFIG
 const SUPABASE_URL = 'https://jxxhypanwiqigtaptrrp.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4eGh5cGFud2lxaWd0YXB0cnJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY1MTgyMzQsImV4cCI6MjA4MjA5NDIzNH0.IKd0n-abux653kQspkE-uyoQwVXV5hvCzF_SA103auw';
-
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // STATE
-let items = [], clients = [], team = [], currentUser = null;
-const FEED_DATES = ['22/12', '24/12', '26/12', '31/12', '02/01', '05/01'];
-const STORY_DATES = ['22/12', '23/12', '25/12', '26/12', '29/12', '30/12', '01/01', '02/01', '05/01'];
+let items = [];
+let clients = [];
+let currentUser = null;
+let currentFilter = 'todos';
+let currentClient = '';
+let currentDate = '';
 
-// LOGIN - Event Listeners
-document.addEventListener('DOMContentLoaded', function() {
-  const loginBtn = document.getElementById('loginBtn');
-  const loginEmail = document.getElementById('loginEmail');
+// DATES
+const ALL_DATES = ['22/12', '23/12', '24/12', '25/12', '26/12', '29/12', '30/12', '31/12', '01/01', '02/01', '05/01'];
+
+// ========== LOGIN ==========
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('loginBtn').addEventListener('click', handleLogin);
+  document.getElementById('loginEmail').addEventListener('keypress', e => { if (e.key === 'Enter') handleLogin(); });
   
-  if (loginBtn) {
-    loginBtn.addEventListener('click', handleLogin);
-  }
-  
-  if (loginEmail) {
-    loginEmail.addEventListener('keypress', function(e) { 
-      if (e.key === 'Enter') handleLogin(); 
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      renderCards();
     });
-  }
+  });
   
-  document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
+  document.getElementById('filterClient').addEventListener('change', e => { currentClient = e.target.value; renderCards(); });
+  document.getElementById('filterDate').addEventListener('change', e => { currentDate = e.target.value; renderCards(); });
   
   checkAuth();
 });
 
 async function handleLogin() {
   const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-  const btn = document.getElementById('loginBtn');
   const error = document.getElementById('loginError');
   if (!email) return;
   
-  btn.disabled = true; btn.textContent = 'Entrando...'; error.classList.remove('show');
+  error.classList.remove('show');
   
   try {
     const { data } = await db.from('team_members').select('*').eq('email', email).eq('active', true).maybeSingle();
-    if (!data) { error.classList.add('show'); btn.disabled = false; btn.textContent = 'Entrar'; return; }
+    if (!data) { error.classList.add('show'); return; }
     currentUser = data;
-    localStorage.setItem('smtUser', JSON.stringify(data));
+    localStorage.setItem('tracker_user', JSON.stringify(data));
     showApp();
   } catch (err) {
     console.error(err);
     error.textContent = 'Erro de conexão';
     error.classList.add('show');
-    btn.disabled = false; btn.textContent = 'Entrar';
   }
 }
 
 function checkAuth() {
-  const saved = localStorage.getItem('smtUser');
-  if (saved) { try { currentUser = JSON.parse(saved); showApp(); } catch { localStorage.removeItem('smtUser'); } }
+  const saved = localStorage.getItem('tracker_user');
+  if (saved) {
+    try { currentUser = JSON.parse(saved); showApp(); }
+    catch { localStorage.removeItem('tracker_user'); }
+  }
 }
 
-function logout() { if (confirm('Sair?')) { localStorage.removeItem('smtUser'); location.reload(); } }
+function logout() {
+  if (confirm('Sair do sistema?')) {
+    localStorage.removeItem('tracker_user');
+    location.reload();
+  }
+}
 
 function showApp() {
   document.getElementById('loginScreen').classList.add('hidden');
@@ -768,402 +628,414 @@ function showApp() {
   document.getElementById('userName').textContent = currentUser.name;
   document.getElementById('userAvatar').textContent = currentUser.name[0];
   document.getElementById('userAvatar').style.background = currentUser.color;
-  if (currentUser.role === 'social_media') document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
   init();
 }
 
-function isGestor() { return ['supervisor', 'gestor'].includes(currentUser.role); }
-
-// DATA
-async function loadAll() {
+// ========== DATA ==========
+async function loadData() {
   try {
-    const [i, c, t] = await Promise.all([
-      db.from('items').select('*').order('id'),
-      db.from('clients').select('*').order('name'),
-      db.from('team_members').select('*').eq('active', true)
+    const [itemsRes, clientsRes] = await Promise.all([
+      db.from('items').select('*').order('scheduled_date').order('client'),
+      db.from('clients').select('*').order('name')
     ]);
-    items = i.data || []; clients = c.data || []; team = t.data || [];
-    document.getElementById('syncDot').style.background = 'var(--green)';
-    populateFilters(); renderAll();
-  } catch (err) { console.error(err); document.getElementById('syncDot').style.background = 'var(--red)'; }
+    
+    items = itemsRes.data || [];
+    clients = clientsRes.data || [];
+    
+    // Atualizar status dos posts baseado em data/hora atual
+    await updatePostStatuses();
+    
+    populateFilters();
+    renderCards();
+    renderStats();
+    checkNotifications();
+  } catch (err) {
+    console.error('Erro ao carregar:', err);
+  }
+}
+
+async function updatePostStatuses() {
+  const now = new Date();
+  const today = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const currentHour = now.getHours();
+  
+  for (const item of items) {
+    // Se está verificado e chegou a data/hora, mudar para publicar_agora
+    if (item.status === 'verificado' && item.scheduled_date) {
+      const [day, month] = item.scheduled_date.split('/');
+      const itemMonth = parseInt(month);
+      const itemDay = parseInt(day);
+      const todayParts = today.split('/');
+      const todayDay = parseInt(todayParts[0]);
+      const todayMonth = parseInt(todayParts[1]);
+      
+      // Comparar datas considerando virada de ano
+      let shouldNotify = false;
+      
+      if (itemMonth === 12 && todayMonth === 12 && itemDay <= todayDay) shouldNotify = true;
+      if (itemMonth === 1 && todayMonth === 1 && itemDay <= todayDay) shouldNotify = true;
+      if (itemMonth === 12 && todayMonth === 1) shouldNotify = true; // Já passou
+      
+      if (shouldNotify) {
+        // Verificar horário se tiver
+        if (item.scheduled_time) {
+          const [hour] = item.scheduled_time.split(':');
+          if (parseInt(hour) <= currentHour) {
+            await updateStatus(item.id, 'publicar_agora', true);
+          }
+        } else {
+          await updateStatus(item.id, 'publicar_agora', true);
+        }
+      }
+    }
+  }
 }
 
 function setupRealtime() {
   db.channel('changes')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'items' }, p => {
-      if (p.eventType === 'UPDATE') { const idx = items.findIndex(x => x.id === p.new.id); if (idx !== -1) items[idx] = p.new; }
-      else if (p.eventType === 'INSERT') items.push(p.new);
-      renderAll();
-      if (p.new?.last_updated_by && p.new.last_updated_by !== currentUser.name) toast(`${p.new.last_updated_by} atualizou ${p.new.client}`);
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'items' }, payload => {
+      if (payload.eventType === 'UPDATE') {
+        const idx = items.findIndex(i => i.id === payload.new.id);
+        if (idx !== -1) items[idx] = payload.new;
+      }
+      renderCards();
+      renderStats();
+      checkNotifications();
     })
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'clients' }, () => loadAll())
     .subscribe();
 }
 
-// UPDATE
-async function updateItem(id, field, value) {
-  try {
-    const upd = { [field]: value, last_updated_by: currentUser.name, last_updated_at: new Date().toISOString() };
-    if (field === 'pre_check_status' && value === 'Tudo OK') { upd.pre_check_by = currentUser.name; upd.pre_check_at = new Date().toISOString(); }
-    if (field === 'post_check_status' && value === 'Publicado OK') { upd.post_check_by = currentUser.name; upd.post_check_at = new Date().toISOString(); }
-    await db.from('items').update(upd).eq('id', id);
-    const item = items.find(x => x.id === id); if (item) Object.assign(item, upd);
-    renderAll(); toast('Salvo!');
-  } catch (err) { console.error(err); toast('Erro'); }
+// ========== UPDATE ==========
+async function updateStatus(id, newStatus, silent = false) {
+  const updates = {
+    status: newStatus,
+    updated_by: currentUser.name,
+    updated_at: new Date().toISOString()
+  };
+  
+  if (newStatus === 'verificado') {
+    updates.verificado_por = currentUser.name;
+    updates.verificado_em = new Date().toISOString();
+  }
+  if (newStatus === 'publicado') {
+    updates.publicado_verificado_por = currentUser.name;
+    updates.publicado_verificado_em = new Date().toISOString();
+    updates.publicado_ok = true;
+  }
+  if (newStatus === 'paula_ok') {
+    updates.paula_verificou_em = new Date().toISOString();
+  }
+  
+  await db.from('items').update(updates).eq('id', id);
+  
+  const item = items.find(i => i.id === id);
+  if (item) Object.assign(item, updates);
+  
+  if (!silent) {
+    renderCards();
+    renderStats();
+    toast('Salvo!');
+  }
+}
+
+async function updateField(id, field, value) {
+  const updates = {
+    [field]: value,
+    updated_by: currentUser.name,
+    updated_at: new Date().toISOString()
+  };
+  
+  await db.from('items').update(updates).eq('id', id);
+  
+  const item = items.find(i => i.id === id);
+  if (item) item[field] = value;
+  
+  renderCards();
 }
 
 async function toggleCheck(id, field) {
-  const item = items.find(x => x.id === id);
+  const item = items.find(i => i.id === id);
   if (!item) return;
-  await updateItem(id, field, !item[field]);
+  await updateField(id, field, !item[field]);
 }
 
-// CLIENTS
-async function addClient() {
-  const name = document.getElementById('newClientName').value.trim();
-  const sm = document.getElementById('newClientSM').value || null;
-  const gestor = document.getElementById('newClientGestor').value || null;
-  const color = document.getElementById('newClientColor').value;
-  if (!name) { toast('Digite o nome'); return; }
+async function markAsProblem(id) {
+  const desc = prompt('Descreva o problema:');
+  if (!desc) return;
   
-  try {
-    const { data: nc } = await db.from('clients').insert({ name, social_media: sm, gestor, color }).select().single();
-    const newItems = [];
-    FEED_DATES.forEach(d => {
-      let ct = 'Post Serviço', cp = false;
-      if (d === '24/12') { ct = 'Happy Holidays 🎄'; cp = true; }
-      if (d === '31/12') { ct = 'Happy New Year 🎆'; cp = true; }
-      if (d === '02/01') ct = 'Primeira postagem do ano';
-      newItems.push({ client_id: nc.id, client: name, social_media: sm, gestor, type: 'FEED', date: d, content_type: ct, is_checkpoint: cp });
-    });
-    STORY_DATES.forEach(d => {
-      let ct = 'Story', cp = false;
-      if (d === '25/12') { ct = 'Happy Holidays (diferente do feed) 🎄'; cp = true; }
-      if (d === '01/01') { ct = 'Mensagem Motivacional ✨'; cp = true; }
-      newItems.push({ client_id: nc.id, client: name, social_media: sm, gestor, type: 'STORY', date: d, content_type: ct, is_checkpoint: cp });
-    });
-    await db.from('items').insert(newItems);
-    document.getElementById('newClientName').value = '';
-    toast(`"${name}" adicionado!`); loadAll();
-  } catch (err) { console.error(err); toast('Erro'); }
+  await db.from('items').update({
+    status: 'publicado',
+    publicado_ok: false,
+    problema_desc: desc,
+    publicado_verificado_por: currentUser.name,
+    publicado_verificado_em: new Date().toISOString()
+  }).eq('id', id);
+  
+  const item = items.find(i => i.id === id);
+  if (item) {
+    item.status = 'publicado';
+    item.publicado_ok = false;
+    item.problema_desc = desc;
+  }
+  
+  renderCards();
+  renderStats();
+  toast('Problema registrado');
 }
 
-async function deleteClient(id, name) {
-  if (!confirm(`Excluir "${name}"?`)) return;
-  await db.from('clients').delete().eq('id', id);
-  toast('Removido'); loadAll();
-}
-
-// HELPERS
-function getDateStatus(d) {
-  const [day, month] = d.split('/');
-  const year = month === '01' ? 2025 : 2024;
-  const dt = new Date(year, parseInt(month) - 1, parseInt(day));
-  const today = new Date(); today.setHours(0,0,0,0); dt.setHours(0,0,0,0);
-  if (dt.getTime() === today.getTime()) return 'today';
-  if (dt < today) return 'past';
-  return 'future';
-}
-
-function isScheduled(i) { return i.platform !== 'Não agendado'; }
-function isPreChecked(i) { return i.pre_check_status === 'Tudo OK'; }
-function isPostChecked(i) { return i.post_check_status === 'Publicado OK'; }
-function needsPreCheck(i) { return isScheduled(i) && i.pre_check_status === 'Não verificado'; }
-function needsPostCheck(i) {
-  if (i.post_check_status !== 'Aguardando') return false;
-  const ds = getDateStatus(i.date);
-  return ds === 'past' || ds === 'today';
-}
-function getClientColor(name) { const c = clients.find(x => x.name === name); return c?.color || '#666'; }
-function toast(msg) { const t = document.getElementById('toast'); document.getElementById('toastMsg').textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
-function formatUpdate(i) { if (!i.last_updated_by) return ''; const d = new Date(i.last_updated_at); return `<strong>${i.last_updated_by}</strong><br>${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`; }
-
-// FILTERS
+// ========== FILTERS ==========
 function populateFilters() {
-  const gestores = team.filter(t => t.role === 'gestor');
-  const sms = team.filter(t => t.role === 'social_media');
-  const cls = clients.map(c => c.name).sort();
-  const dates = [...new Set([...FEED_DATES, ...STORY_DATES])].sort((a,b) => { const [dA,mA]=a.split('/');const [dB,mB]=b.split('/'); return mA!==mB?parseInt(mA)-parseInt(mB):parseInt(dA)-parseInt(dB); });
-
-  document.getElementById('fGestor').innerHTML = '<option value="">Todos Gestores</option>' + gestores.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
-  document.getElementById('fSocialMedia').innerHTML = '<option value="">Todas Social Media</option>' + sms.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
-  document.getElementById('fClient').innerHTML = '<option value="">Todos Clientes</option>' + cls.map(c => `<option value="${c}">${c}</option>`).join('');
-  document.getElementById('fDate').innerHTML = '<option value="">Todas Datas</option>' + dates.map(d => `<option value="${d}">${d}</option>`).join('');
-  document.getElementById('newClientSM').innerHTML = '<option value="">Social Media</option>' + sms.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
-  document.getElementById('newClientGestor').innerHTML = '<option value="">Gestor</option>' + gestores.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
+  const clientSelect = document.getElementById('filterClient');
+  const uniqueClients = [...new Set(getMyItems().map(i => i.client))].sort();
+  clientSelect.innerHTML = '<option value="">Todos os clientes</option>' +
+    uniqueClients.map(c => `<option value="${c}">${c}</option>`).join('');
+  
+  const dateSelect = document.getElementById('filterDate');
+  dateSelect.innerHTML = '<option value="">Todas as datas</option>' +
+    ALL_DATES.map(d => `<option value="${d}">${d}</option>`).join('');
 }
 
 function getMyItems() {
-  if (currentUser.role === 'gestor') return items.filter(i => i.gestor === currentUser.name);
-  if (currentUser.role === 'social_media') return items.filter(i => i.social_media === currentUser.name);
-  return items;
+  if (currentUser.role === 'gestor') {
+    return items.filter(i => i.gestor === currentUser.name);
+  }
+  if (currentUser.role === 'social_media') {
+    return items.filter(i => i.social_media === currentUser.name);
+  }
+  return items; // Paula vê tudo
 }
 
 function getFilteredItems() {
-  let f = [...items];
-  const fG = document.getElementById('fGestor').value;
-  const fS = document.getElementById('fSocialMedia').value;
-  const fC = document.getElementById('fClient').value;
-  const fT = document.getElementById('fType').value;
-  const fD = document.getElementById('fDate').value;
-  if (fG) f = f.filter(i => i.gestor === fG);
-  if (fS) f = f.filter(i => i.social_media === fS);
-  if (fC) f = f.filter(i => i.client === fC);
-  if (fT) f = f.filter(i => i.type === fT);
-  if (fD) f = f.filter(i => i.date === fD);
-  return f;
-}
-
-// RENDER
-function renderAll() {
-  renderAlerts(); renderStats(); renderProgress(); renderUrgent();
-  renderPreCheck(); renderPostCheck(); renderMainTable(); renderTeam(); renderClients();
-}
-
-function renderAlerts() {
-  const my = getMyItems();
-  const notScheduled = my.filter(i => !isScheduled(i)).length;
-  const needsPre = my.filter(i => needsPreCheck(i)).length;
-  const needsPost = my.filter(i => needsPostCheck(i)).length;
-  const overdue = my.filter(i => !isPostChecked(i) && getDateStatus(i.date) === 'past').length;
+  let filtered = getMyItems();
   
-  document.getElementById('preCheckCount').textContent = needsPre;
-  document.getElementById('postCheckCount').textContent = needsPost;
+  if (currentClient) filtered = filtered.filter(i => i.client === currentClient);
+  if (currentDate) filtered = filtered.filter(i => i.scheduled_date === currentDate);
+  
+  switch (currentFilter) {
+    case 'pendentes':
+      filtered = filtered.filter(i => i.status === 'aguardando');
+      break;
+    case 'verificar':
+      filtered = filtered.filter(i => i.status === 'agendado');
+      break;
+    case 'publicar':
+      filtered = filtered.filter(i => i.status === 'publicar_agora');
+      break;
+    case 'concluidos':
+      filtered = filtered.filter(i => ['publicado', 'paula_ok'].includes(i.status));
+      break;
+  }
+  
+  return filtered;
+}
 
-  const c = document.getElementById('alertsContainer');
-  c.innerHTML = `
-    ${overdue > 0 ? `<div class="alert red"><div class="alert-icon">🚨</div><div class="alert-info"><div class="alert-title">Atrasados</div><div class="alert-desc">Posts passados não concluídos</div></div><div class="alert-count">${overdue}</div></div>` : ''}
-    ${needsPost > 0 ? `<div class="alert cyan" onclick="switchTab('post-check')"><div class="alert-icon">📱</div><div class="alert-info"><div class="alert-title">Verificar Instagram</div><div class="alert-desc">Checar se publicou</div></div><div class="alert-count">${needsPost}</div></div>` : ''}
-    ${needsPre > 0 ? `<div class="alert orange" onclick="switchTab('pre-check')"><div class="alert-icon">🔍</div><div class="alert-info"><div class="alert-title">Verificar Agendamentos</div><div class="alert-desc">Conferir no Ekyte/Meta</div></div><div class="alert-count">${needsPre}</div></div>` : ''}
-    ${notScheduled > 0 ? `<div class="alert red"><div class="alert-icon">⏳</div><div class="alert-info"><div class="alert-title">Não Agendados</div><div class="alert-desc">Social Media precisa agendar</div></div><div class="alert-count">${notScheduled}</div></div>` : ''}
-    ${overdue === 0 && needsPost === 0 && needsPre === 0 && notScheduled === 0 ? `<div class="alert green"><div class="alert-icon">🎉</div><div class="alert-info"><div class="alert-title">Tudo em dia!</div><div class="alert-desc">Nenhuma pendência</div></div></div>` : ''}
+// ========== RENDER ==========
+function renderStats() {
+  const my = getMyItems();
+  document.getElementById('statTotal').textContent = my.length;
+  document.getElementById('statAguardando').textContent = my.filter(i => i.status === 'aguardando').length;
+  document.getElementById('statAgendado').textContent = my.filter(i => i.status === 'agendado').length;
+  document.getElementById('statVerificado').textContent = my.filter(i => i.status === 'verificado').length;
+  document.getElementById('statPublicar').textContent = my.filter(i => i.status === 'publicar_agora').length;
+  document.getElementById('statPublicado').textContent = my.filter(i => ['publicado', 'paula_ok'].includes(i.status)).length;
+  
+  document.getElementById('countPendentes').textContent = my.filter(i => i.status === 'aguardando').length;
+  document.getElementById('countVerificar').textContent = my.filter(i => i.status === 'agendado').length;
+  document.getElementById('countPublicar').textContent = my.filter(i => i.status === 'publicar_agora').length;
+  document.getElementById('countConcluidos').textContent = my.filter(i => ['publicado', 'paula_ok'].includes(i.status)).length;
+}
+
+function renderCards() {
+  const grid = document.getElementById('cardsGrid');
+  const empty = document.getElementById('emptyState');
+  const filtered = getFilteredItems();
+  
+  if (filtered.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  
+  empty.style.display = 'none';
+  grid.innerHTML = filtered.map(item => renderCard(item)).join('');
+}
+
+function renderCard(item) {
+  const clientColor = clients.find(c => c.name === item.client)?.color || '#666';
+  const isSpecial = item.is_special;
+  const isPublicarAgora = item.status === 'publicar_agora';
+  
+  const statusLabels = {
+    'aguardando': { text: '⏳ Aguardando agendar', class: 'aguardando' },
+    'agendado': { text: '🔍 Verificar agendamento', class: 'agendado' },
+    'verificado': { text: '✓ Verificado, aguardando publicar', class: 'verificado' },
+    'publicar_agora': { text: '🔔 VERIFICAR NO INSTAGRAM!', class: 'publicar' },
+    'publicado': { text: item.publicado_ok ? '✅ Publicado OK' : '❌ Problema', class: item.publicado_ok ? 'publicado' : 'problema' },
+    'paula_ok': { text: '👁️ Paula conferiu', class: 'paula' }
+  };
+  
+  const status = statusLabels[item.status] || statusLabels.aguardando;
+  const canEdit = currentUser.role !== 'social_media' || item.status === 'aguardando';
+  const isPaula = currentUser.role === 'paula';
+  const isGestor = currentUser.role === 'gestor';
+  
+  return `
+    <div class="card ${isSpecial ? 'especial' : ''} ${isPublicarAgora ? 'publicar-agora' : ''}">
+      <div class="card-header">
+        <div class="card-client">
+          <div class="client-dot" style="background:${clientColor}"></div>
+          <span class="client-name">${item.client}</span>
+        </div>
+        <span class="card-type ${item.type.toLowerCase()}">${item.type}</span>
+      </div>
+      
+      <div class="card-content ${isSpecial ? 'especial' : ''}">
+        ${isSpecial ? '⭐' : ''} ${item.description}
+      </div>
+      
+      <div class="card-info">
+        <div class="card-info-item">📅 <strong>${item.scheduled_date || '-'}</strong></div>
+        <div class="card-info-item">🕐 <strong>${item.scheduled_time || '-'}</strong></div>
+        <div class="card-info-item">📱 <strong>${item.platform === 'pendente' ? '-' : item.platform}</strong></div>
+      </div>
+      
+      <div class="status-badge ${status.class}">${status.text}</div>
+      
+      ${item.status === 'aguardando' ? `
+        <div class="card-inputs">
+          <select class="mini-select" onchange="updateField(${item.id}, 'platform', this.value)">
+            <option value="pendente" ${item.platform === 'pendente' ? 'selected' : ''}>Plataforma</option>
+            <option value="ekyte" ${item.platform === 'ekyte' ? 'selected' : ''}>Ekyte</option>
+            <option value="meta" ${item.platform === 'meta' ? 'selected' : ''}>Meta</option>
+            <option value="direto" ${item.platform === 'direto' ? 'selected' : ''}>Direto</option>
+          </select>
+          <input type="text" class="mini-input" placeholder="Hora" value="${item.scheduled_time || ''}" 
+                 onchange="updateField(${item.id}, 'scheduled_time', this.value)">
+          <input type="text" class="mini-input" placeholder="Data" value="${item.scheduled_date || ''}" 
+                 onchange="updateField(${item.id}, 'scheduled_date', this.value)" style="width:60px">
+        </div>
+        <div class="card-actions">
+          <button class="action-btn primary" onclick="updateStatus(${item.id}, 'agendado')" 
+                  ${item.platform === 'pendente' ? 'disabled' : ''}>
+            ✓ Marcar como Agendado
+          </button>
+        </div>
+      ` : ''}
+      
+      ${item.status === 'agendado' && isGestor ? `
+        <div class="checklist">
+          <label class="check-item ${item.check_horario ? 'checked' : ''}" onclick="toggleCheck(${item.id}, 'check_horario')">
+            <input type="checkbox" ${item.check_horario ? 'checked' : ''}>
+            🕐 Horário OK
+          </label>
+          <label class="check-item ${item.check_visual ? 'checked' : ''}" onclick="toggleCheck(${item.id}, 'check_visual')">
+            <input type="checkbox" ${item.check_visual ? 'checked' : ''}>
+            🎨 Visual OK
+          </label>
+          <label class="check-item ${item.check_texto ? 'checked' : ''}" onclick="toggleCheck(${item.id}, 'check_texto')">
+            <input type="checkbox" ${item.check_texto ? 'checked' : ''}>
+            📝 Texto OK
+          </label>
+        </div>
+        <div class="card-actions">
+          <button class="action-btn success" onclick="updateStatus(${item.id}, 'verificado')"
+                  ${!(item.check_horario && item.check_visual && item.check_texto) ? 'disabled' : ''}>
+            ✓ Tudo OK - Aguardar publicar
+          </button>
+        </div>
+      ` : ''}
+      
+      ${item.status === 'publicar_agora' && isGestor ? `
+        <div class="card-actions">
+          <button class="action-btn success" onclick="updateStatus(${item.id}, 'publicado')">
+            ✅ Publicado OK
+          </button>
+          <button class="action-btn danger" onclick="markAsProblem(${item.id})">
+            ❌ Problema
+          </button>
+        </div>
+      ` : ''}
+      
+      ${item.status === 'publicado' && isPaula ? `
+        <div class="card-actions">
+          <button class="action-btn purple" onclick="updateStatus(${item.id}, 'paula_ok')">
+            👁️ Paula Conferiu
+          </button>
+        </div>
+      ` : ''}
+      
+      ${item.status === 'publicado' && item.publicado_ok === false ? `
+        <div style="background:rgba(239,68,68,0.1);padding:0.5rem;border-radius:8px;font-size:0.75rem;margin-top:0.5rem;">
+          <strong>❌ Problema:</strong> ${item.problema_desc || 'Não especificado'}
+        </div>
+      ` : ''}
+      
+      ${item.verificado_por ? `
+        <div style="font-size:0.65rem;color:var(--text-muted);margin-top:0.5rem;">
+          Verificado por ${item.verificado_por}
+        </div>
+      ` : ''}
+    </div>
   `;
 }
 
-function renderStats() {
+// ========== NOTIFICATIONS ==========
+function checkNotifications() {
   const my = getMyItems();
-  document.getElementById('sTotal').textContent = my.length;
-  document.getElementById('sNotScheduled').textContent = my.filter(i => !isScheduled(i)).length;
-  document.getElementById('sScheduled').textContent = my.filter(i => isScheduled(i)).length;
-  document.getElementById('sPreChecked').textContent = my.filter(i => isPreChecked(i)).length;
-  document.getElementById('sPostChecked').textContent = my.filter(i => isPostChecked(i)).length;
-}
-
-function renderProgress() {
-  const my = getMyItems();
-  const total = my.length;
-  const done = my.filter(i => isPostChecked(i)).length;
-  const checked = my.filter(i => isPreChecked(i) && !isPostChecked(i)).length;
-  const scheduled = my.filter(i => isScheduled(i) && !isPreChecked(i)).length;
-  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  const toPublish = my.filter(i => i.status === 'publicar_agora');
+  const bar = document.getElementById('notificationBar');
   
-  document.getElementById('progressPercent').textContent = pct + '%';
-  document.getElementById('barDone').style.width = (done / total * 100) + '%';
-  document.getElementById('barChecked').style.width = (checked / total * 100) + '%';
-  document.getElementById('barScheduled').style.width = (scheduled / total * 100) + '%';
-}
-
-function renderUrgent() {
-  const my = getMyItems();
-  const urgent = my.filter(i => {
-    if (isPostChecked(i)) return false;
-    const ds = getDateStatus(i.date);
-    return ds === 'past' || ds === 'today' || i.is_checkpoint || needsPreCheck(i) || needsPostCheck(i);
-  }).sort((a, b) => {
-    if (getDateStatus(a.date) === 'past' && getDateStatus(b.date) !== 'past') return -1;
-    return 0;
-  }).slice(0, 12);
-
-  const tb = document.getElementById('urgentTable');
-  if (urgent.length === 0) { tb.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:var(--text-muted)">🎉 Nenhuma pendência!</td></tr>'; return; }
-
-  tb.innerHTML = urgent.map(i => {
-    const ds = getDateStatus(i.date);
-    let status = 'Não agendado';
-    if (isScheduled(i)) status = 'Agendado';
-    if (isPreChecked(i)) status = 'Verificado';
-    if (needsPostCheck(i)) status = '📱 Checar Instagram';
-    if (isPostChecked(i)) status = '✓ OK';
+  if (toPublish.length > 0) {
+    bar.classList.add('show');
+    document.getElementById('notificationText').textContent = 
+      `🔔 ${toPublish.length} post${toPublish.length > 1 ? 's' : ''} para verificar no Instagram AGORA!`;
     
-    return `<tr class="${i.is_checkpoint ? 'checkpoint' : ''} ${ds === 'past' && !isPostChecked(i) ? 'overdue' : ''} ${needsPostCheck(i) ? 'verify-now' : ''}">
-      <td><div class="client-cell"><div class="client-dot" style="background:${getClientColor(i.client)}"></div><span class="client-name">${i.client}</span></div></td>
-      <td><span class="pill ${i.type.toLowerCase()}">${i.type}</span>${i.is_checkpoint ? '<span class="pill cp">⭐</span>' : ''}</td>
-      <td><span class="date-text ${ds}">${i.date}</span></td>
-      <td style="font-size:0.7rem;color:var(--text-muted)">${i.content_type}</td>
-      <td style="font-size:0.7rem">${i.social_media || '-'}</td>
-      <td style="font-size:0.7rem">${i.gestor || '-'}</td>
-      <td><span class="pill" style="background:var(--bg-elevated)">${status}</span></td>
-    </tr>`;
-  }).join('');
-}
-
-function renderPreCheck() {
-  const my = getMyItems().filter(i => isScheduled(i));
-  const tb = document.getElementById('preCheckTable');
-  
-  if (my.length === 0) { tb.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Nenhum agendamento para verificar</td></tr>'; return; }
-
-  tb.innerHTML = my.map(i => {
-    const preClass = i.pre_check_status === 'Não verificado' ? 'orange' : i.pre_check_status === 'Tudo OK' ? 'green' : 'red';
-    const platformClass = i.platform === 'Ekyte' ? 'blue' : i.platform === 'Meta Business' ? 'purple' : 'cyan';
-    
-    return `<tr class="${i.pre_check_status === 'Não verificado' ? '' : ''} ${i.is_checkpoint ? 'checkpoint' : ''}">
-      <td><div class="client-cell"><div class="client-dot" style="background:${getClientColor(i.client)}"></div><span class="client-name">${i.client}</span></div></td>
-      <td><span class="pill ${i.type.toLowerCase()}">${i.type}</span></td>
-      <td><span class="date-text ${getDateStatus(i.date)}">${i.date}</span></td>
-      <td><select class="mini-select ${platformClass}" onchange="updateItem(${i.id},'platform',this.value)">
-        <option value="Ekyte" ${i.platform==='Ekyte'?'selected':''}>Ekyte</option>
-        <option value="Meta Business" ${i.platform==='Meta Business'?'selected':''}>Meta</option>
-        <option value="Agendado direto" ${i.platform==='Agendado direto'?'selected':''}>Direto</option>
-      </select></td>
-      <td><input type="text" class="mini-input" value="${i.scheduled_time||''}" placeholder="00:00" onchange="updateItem(${i.id},'scheduled_time',this.value)" style="width:45px"></td>
-      <td><input type="text" class="mini-input link" value="${i.scheduling_link||''}" placeholder="Link..." onclick="if(this.value)window.open(this.value,'_blank')" onchange="updateItem(${i.id},'scheduling_link',this.value)"></td>
-      <td><select class="mini-select ${preClass}" onchange="updateItem(${i.id},'pre_check_status',this.value)" ${isGestor()?'':'disabled'}>
-        <option value="Não verificado" ${i.pre_check_status==='Não verificado'?'selected':''}>Não verificado</option>
-        <option value="Tudo OK" ${i.pre_check_status==='Tudo OK'?'selected':''}>Tudo OK</option>
-        <option value="Problemas" ${i.pre_check_status==='Problemas'?'selected':''}>Problemas</option>
-      </select></td>
-      <td><div class="check-group">
-        <button class="check-btn ${i.pre_check_time_ok?'checked':''}" title="Horário OK" onclick="toggleCheck(${i.id},'pre_check_time_ok')" ${isGestor()?'':'disabled'}>🕐</button>
-        <button class="check-btn ${i.pre_check_visual_ok?'checked':''}" title="Visual OK" onclick="toggleCheck(${i.id},'pre_check_visual_ok')" ${isGestor()?'':'disabled'}>🎨</button>
-        <button class="check-btn ${i.pre_check_text_ok?'checked':''}" title="Texto OK" onclick="toggleCheck(${i.id},'pre_check_text_ok')" ${isGestor()?'':'disabled'}>📝</button>
-        <button class="check-btn ${i.pre_check_hashtags_ok?'checked':''}" title="Hashtags OK" onclick="toggleCheck(${i.id},'pre_check_hashtags_ok')" ${isGestor()?'':'disabled'}>#</button>
-      </div></td>
-      <td><input type="text" class="mini-input" value="${i.pre_check_notes||''}" placeholder="..." onchange="updateItem(${i.id},'pre_check_notes',this.value)" style="width:70px"></td>
-    </tr>`;
-  }).join('');
-}
-
-function renderPostCheck() {
-  const toCheck = getMyItems().filter(i => needsPostCheck(i));
-  const grid = document.getElementById('postCheckGrid');
-  
-  if (toCheck.length === 0) {
-    grid.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--text-muted);grid-column:1/-1"><div style="font-size:3rem;margin-bottom:0.5rem">🎉</div>Nenhum post para verificar agora!</div>';
-    return;
+    // Tentar tocar som (pode ser bloqueado pelo navegador)
+    try {
+      if (Notification.permission === 'granted') {
+        new Notification('ConectMe Tracker', {
+          body: `${toPublish.length} posts para verificar!`,
+          icon: '📊'
+        });
+      }
+    } catch (e) {}
+  } else {
+    bar.classList.remove('show');
   }
-
-  grid.innerHTML = toCheck.map(i => {
-    const ds = getDateStatus(i.date);
-    return `<div class="verify-card ${ds === 'past' ? 'urgent' : ''}">
-      <div class="verify-card-header">
-        <div>
-          <div class="verify-client">${i.client}</div>
-          <div class="verify-meta">${i.social_media || ''} • ${i.gestor || ''}</div>
-        </div>
-        <div class="verify-type">
-          <span class="pill ${i.type.toLowerCase()}">${i.type}</span>
-          <span class="verify-time">${i.scheduled_time || i.date}</span>
-        </div>
-      </div>
-      <div class="verify-content">${i.content_type}</div>
-      <div class="verify-actions">
-        <button class="verify-btn ok" onclick="updateItem(${i.id},'post_check_status','Publicado OK')" ${isGestor()?'':'disabled'}>✓ Publicado OK</button>
-        <button class="verify-btn problem" onclick="updateItem(${i.id},'post_check_status','Não publicou')" ${isGestor()?'':'disabled'}>✕ Problema</button>
-      </div>
-    </div>`;
-  }).join('');
 }
 
-function renderMainTable() {
-  const filtered = getFilteredItems();
-  const tb = document.getElementById('mainTable');
+function filterByStatus(status) {
+  currentFilter = status === 'publicar_agora' ? 'publicar' : 'todos';
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.filter === currentFilter);
+  });
+  renderCards();
+}
+
+// ========== UTILS ==========
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = '✓ ' + msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ========== INIT ==========
+async function init() {
+  // Pedir permissão para notificações
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
   
-  if (filtered.length === 0) { tb.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Nenhum item</td></tr>'; return; }
-
-  tb.innerHTML = filtered.map(i => {
-    const ds = getDateStatus(i.date);
-    const platformClass = i.platform === 'Não agendado' ? 'red' : i.platform === 'Ekyte' ? 'blue' : i.platform === 'Meta Business' ? 'purple' : 'cyan';
-    const preClass = i.pre_check_status === 'Não verificado' ? 'gray' : i.pre_check_status === 'Tudo OK' ? 'green' : 'red';
-    const postClass = i.post_check_status === 'Aguardando' ? 'gray' : i.post_check_status === 'Publicado OK' ? 'green' : 'red';
-    const checks = [i.pre_check_time_ok, i.pre_check_visual_ok, i.pre_check_text_ok, i.pre_check_hashtags_ok].filter(Boolean).length;
-
-    return `<tr class="${i.is_checkpoint ? 'checkpoint' : ''} ${ds === 'past' && !isPostChecked(i) ? 'overdue' : ''} ${needsPostCheck(i) ? 'verify-now' : ''}">
-      <td><div class="client-cell"><div class="client-dot" style="background:${getClientColor(i.client)}"></div><span class="client-name">${i.client}</span></div></td>
-      <td><span class="pill ${i.type.toLowerCase()}">${i.type}</span>${i.is_checkpoint?'<span class="pill cp">⭐</span>':''}</td>
-      <td><span class="date-text ${ds}">${i.date}</span></td>
-      <td><select class="mini-select ${platformClass}" onchange="updateItem(${i.id},'platform',this.value)">
-        <option value="Não agendado" ${i.platform==='Não agendado'?'selected':''}>Não agend.</option>
-        <option value="Ekyte" ${i.platform==='Ekyte'?'selected':''}>Ekyte</option>
-        <option value="Meta Business" ${i.platform==='Meta Business'?'selected':''}>Meta</option>
-        <option value="Agendado direto" ${i.platform==='Agendado direto'?'selected':''}>Direto</option>
-      </select></td>
-      <td><input type="text" class="mini-input" value="${i.scheduled_time||''}" placeholder="00:00" onchange="updateItem(${i.id},'scheduled_time',this.value)" style="width:45px"></td>
-      <td><input type="text" class="mini-input ${i.scheduling_link?'link':''}" value="${i.scheduling_link||''}" placeholder="Link" onclick="if(this.value)window.open(this.value,'_blank')" onchange="updateItem(${i.id},'scheduling_link',this.value)" style="width:60px"></td>
-      <td><select class="mini-select ${preClass}" onchange="updateItem(${i.id},'pre_check_status',this.value)" ${isGestor()?'':'disabled'}>
-        <option value="Não verificado" ${i.pre_check_status==='Não verificado'?'selected':''}>Não verif.</option>
-        <option value="Tudo OK" ${i.pre_check_status==='Tudo OK'?'selected':''}>OK</option>
-        <option value="Problemas" ${i.pre_check_status==='Problemas'?'selected':''}>Problemas</option>
-      </select></td>
-      <td style="font-size:0.7rem;color:${checks===4?'var(--green)':'var(--text-muted)'}">${checks}/4</td>
-      <td><select class="mini-select ${postClass}" onchange="updateItem(${i.id},'post_check_status',this.value)" ${isGestor()?'':'disabled'}>
-        <option value="Aguardando" ${i.post_check_status==='Aguardando'?'selected':''}>Aguard.</option>
-        <option value="Publicado OK" ${i.post_check_status==='Publicado OK'?'selected':''}>OK</option>
-        <option value="Não publicou" ${i.post_check_status==='Não publicou'?'selected':''}>Não pub.</option>
-        <option value="Publicou com erro" ${i.post_check_status==='Publicou com erro'?'selected':''}>Erro</option>
-      </select></td>
-      <td><input type="text" class="mini-input" value="${i.observations||''}" placeholder="..." onchange="updateItem(${i.id},'observations',this.value)" style="width:60px"></td>
-      <td class="update-cell">${formatUpdate(i)}</td>
-    </tr>`;
-  }).join('');
-}
-
-function renderTeam() {
-  const grid = document.getElementById('teamGrid');
-  const roles = { supervisor: 'Supervisora', gestor: 'Gestor', social_media: 'Social Media' };
+  await loadData();
+  setupRealtime();
   
-  grid.innerHTML = team.map(m => {
-    let mi = [];
-    if (m.role === 'gestor') mi = items.filter(i => i.gestor === m.name);
-    else if (m.role === 'social_media') mi = items.filter(i => i.social_media === m.name);
-    else mi = items;
-    
-    const total = mi.length;
-    const pending = mi.filter(i => !isScheduled(i)).length;
-    const preChecked = mi.filter(i => isPreChecked(i)).length;
-    const done = mi.filter(i => isPostChecked(i)).length;
-    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-
-    return `<div class="team-card">
-      <div class="team-header">
-        <div class="team-avatar" style="background:${m.color}">${m.name[0]}</div>
-        <div><div class="team-name">${m.name}</div><div class="team-role">${roles[m.role]}</div></div>
-      </div>
-      <div class="team-stats">
-        <div class="team-stat"><div class="team-stat-value" style="color:var(--red)">${pending}</div><div class="team-stat-label">Pendente</div></div>
-        <div class="team-stat"><div class="team-stat-value" style="color:var(--cyan)">${preChecked}</div><div class="team-stat-label">Verificado</div></div>
-        <div class="team-stat"><div class="team-stat-value" style="color:var(--green)">${done}</div><div class="team-stat-label">Concluído</div></div>
-      </div>
-      <div class="team-bar"><div class="team-bar-fill" style="width:${pct}%"></div></div>
-      <div style="text-align:center;margin-top:0.4rem;font-family:'JetBrains Mono';font-weight:700;font-size:0.9rem;color:${pct===100?'var(--green)':'var(--text-muted)'}">${pct}%</div>
-    </div>`;
-  }).join('');
+  // Verificar posts a cada minuto
+  setInterval(() => {
+    updatePostStatuses();
+    checkNotifications();
+  }, 60000);
 }
-
-function renderClients() {
-  const tb = document.getElementById('clientsTable');
-  tb.innerHTML = clients.map(c => {
-    const cnt = items.filter(i => i.client === c.name).length;
-    return `<tr>
-      <td><div class="client-cell"><div class="client-dot" style="background:${c.color}"></div><span class="client-name">${c.name}</span></div></td>
-      <td style="font-size:0.75rem">${c.social_media || '-'}</td>
-      <td style="font-size:0.75rem">${c.gestor || '-'}</td>
-      <td style="font-size:0.75rem">${cnt}</td>
-      <td><button class="mini-select red" style="cursor:pointer;border:none" onclick="deleteClient(${c.id},'${c.name}')">Excluir</button></td>
-    </tr>`;
-  }).join('');
-}
-
-// NAV
-function switchTab(t) {
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector(`[data-tab="${t}"]`).classList.add('active');
-  document.querySelectorAll('.tab-content').forEach(s => s.style.display = 'none');
-  document.getElementById('tab-' + t).style.display = 'block';
-}
-
-// INIT
-async function init() { await loadAll(); setupRealtime(); }
 </script>
 </body>
 </html>
