@@ -8,7 +8,7 @@
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
     :root {
-      --bg-dark: #09090b;
+      --bg: #09090b;
       --bg-card: #18181b;
       --bg-elevated: #27272a;
       --bg-hover: #3f3f46;
@@ -30,90 +30,63 @@
       --purple: #a855f7;
       --purple-bg: rgba(168, 85, 247, 0.15);
       --pink: #ec4899;
-      --pink-bg: rgba(236, 72, 153, 0.15);
-      
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.4);
+      --cyan: #06b6d4;
+      --cyan-bg: rgba(6, 182, 212, 0.15);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-    body {
-      font-family: 'Inter', -apple-system, sans-serif;
-      background: var(--bg-dark);
-      color: var(--text);
-      min-height: 100vh;
-      line-height: 1.5;
-    }
-
-    /* ==================== LOGIN ==================== */
+    /* LOGIN */
     .login-screen {
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #09090b 0%, #18181b 50%, #09090b 100%);
-      padding: 1rem;
+      background: linear-gradient(135deg, #09090b, #18181b, #09090b);
     }
-
     .login-screen.hidden { display: none; }
-
     .login-box {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 24px;
       padding: 3rem;
       width: 100%;
-      max-width: 420px;
+      max-width: 400px;
       text-align: center;
     }
-
-    .login-logo {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-    }
-
+    .login-logo { font-size: 3rem; margin-bottom: 0.5rem; }
     .login-brand {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       font-weight: 800;
       background: linear-gradient(135deg, var(--purple), var(--pink));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-clip: text;
     }
-
-    .login-subtitle {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      margin-top: 0.25rem;
-      margin-bottom: 2rem;
+    .login-subtitle { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 2rem; }
+    .login-error {
+      background: var(--red-bg);
+      color: var(--red);
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+      display: none;
     }
-
-    .login-input-group {
-      position: relative;
-      margin-bottom: 1.5rem;
-    }
-
+    .login-error.show { display: block; }
     .login-input {
       width: 100%;
-      padding: 1rem 1.25rem;
+      padding: 1rem;
       background: var(--bg-elevated);
       border: 2px solid var(--border);
       border-radius: 12px;
       color: var(--text);
       font-family: inherit;
       font-size: 1rem;
-      transition: all 0.2s;
+      margin-bottom: 1rem;
     }
-
-    .login-input:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 4px var(--accent-glow);
-    }
-
+    .login-input:focus { outline: none; border-color: var(--purple); }
     .login-input::placeholder { color: var(--text-muted); }
-
     .login-btn {
       width: 100%;
       padding: 1rem;
@@ -125,47 +98,24 @@
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
     }
+    .login-btn:hover { opacity: 0.9; }
+    .login-btn:disabled { opacity: 0.5; }
 
-    .login-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px var(--accent-glow);
-    }
-
-    .login-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .login-error {
-      background: var(--red-bg);
-      color: var(--red);
-      padding: 0.75rem 1rem;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      margin-bottom: 1rem;
-      display: none;
-    }
-
-    .login-error.show { display: block; }
-
-    /* ==================== APP CONTAINER ==================== */
+    /* APP */
     .app { display: none; }
     .app.visible { display: block; }
 
-    /* ==================== HEADER ==================== */
+    /* HEADER */
     .header {
-      background: rgba(24, 24, 27, 0.8);
+      background: rgba(24, 24, 27, 0.95);
       backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border);
-      padding: 0.75rem 1.5rem;
+      padding: 0.6rem 1.5rem;
       position: sticky;
       top: 0;
       z-index: 100;
     }
-
     .header-content {
       max-width: 1800px;
       margin: 0 auto;
@@ -173,341 +123,333 @@
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
+      flex-wrap: wrap;
     }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
+    .brand { display: flex; align-items: center; gap: 0.6rem; }
     .brand-icon {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       background: linear-gradient(135deg, var(--purple), var(--pink));
-      border-radius: 12px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.25rem;
+      font-size: 1.1rem;
     }
-
-    .brand-text h1 {
-      font-size: 1rem;
-      font-weight: 700;
-    }
-
-    .brand-text span {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-    }
-
-    .nav {
-      display: flex;
-      gap: 0.25rem;
-      background: var(--bg-elevated);
-      padding: 0.25rem;
-      border-radius: 12px;
-    }
-
+    .brand h1 { font-size: 0.95rem; font-weight: 700; }
+    .brand span { font-size: 0.65rem; color: var(--text-muted); display: block; }
+    
+    .nav { display: flex; gap: 0.2rem; background: var(--bg-elevated); padding: 0.2rem; border-radius: 10px; }
     .nav-btn {
-      padding: 0.5rem 1rem;
+      padding: 0.45rem 0.8rem;
       background: transparent;
       border: none;
       color: var(--text-muted);
       font-family: inherit;
-      font-size: 0.85rem;
+      font-size: 0.75rem;
       font-weight: 500;
       border-radius: 8px;
       cursor: pointer;
-      transition: all 0.15s;
       display: flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.3rem;
+      white-space: nowrap;
     }
-
     .nav-btn:hover { color: var(--text); background: var(--bg-hover); }
-    .nav-btn.active { background: var(--accent); color: white; }
-    .nav-btn.admin-only { border: 1px dashed var(--yellow); }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
+    .nav-btn.active { background: var(--purple); color: white; }
+    .nav-btn .badge {
+      background: var(--red);
+      color: white;
+      font-size: 0.6rem;
+      padding: 0.1rem 0.35rem;
+      border-radius: 10px;
+      font-weight: 700;
     }
 
-    .sync-indicator {
+    .header-right { display: flex; align-items: center; gap: 0.75rem; }
+    .sync { display: flex; align-items: center; gap: 0.3rem; font-size: 0.7rem; color: var(--text-muted); }
+    .sync-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; }
+    .user-pill {
       display: flex;
       align-items: center;
       gap: 0.4rem;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-
-    .sync-dot {
-      width: 8px;
-      height: 8px;
-      background: var(--green);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.9); }
-    }
-
-    .user-badge {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.4rem 0.75rem 0.4rem 0.4rem;
+      padding: 0.3rem 0.6rem 0.3rem 0.3rem;
       background: var(--bg-elevated);
       border: 1px solid var(--border);
       border-radius: 100px;
       cursor: pointer;
-      transition: border-color 0.2s;
     }
-
-    .user-badge:hover { border-color: var(--accent); }
-
+    .user-pill:hover { border-color: var(--purple); }
     .user-avatar {
-      width: 28px;
-      height: 28px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.75rem;
+      font-size: 0.65rem;
       font-weight: 700;
       color: white;
     }
+    .user-name { font-size: 0.75rem; font-weight: 600; }
 
-    .user-info {
-      display: flex;
-      flex-direction: column;
-    }
+    /* MAIN */
+    .main { max-width: 1800px; margin: 0 auto; padding: 1.25rem; }
 
-    .user-name { font-size: 0.8rem; font-weight: 600; }
-    .user-role { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; }
-
-    /* ==================== MAIN ==================== */
-    .main {
-      max-width: 1800px;
-      margin: 0 auto;
-      padding: 1.5rem;
-    }
-
-    /* ==================== MEGA STATS ==================== */
-    .mega-stats {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .mega-stat {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.25rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .mega-stat.hero {
-      background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(236, 72, 153, 0.1));
-      border-color: var(--purple);
-    }
-
-    .mega-stat-label {
-      font-size: 0.7rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 0.5rem;
-    }
-
-    .mega-stat-value {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 2.5rem;
-      font-weight: 700;
-      line-height: 1;
-    }
-
-    .mega-stat.hero .mega-stat-value {
-      font-size: 4rem;
-      background: linear-gradient(135deg, var(--purple), var(--pink));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .mega-stat.pending .mega-stat-value { color: var(--red); }
-    .mega-stat.progress .mega-stat-value { color: var(--orange); }
-    .mega-stat.done .mega-stat-value { color: var(--green); }
-    .mega-stat.published .mega-stat-value { color: var(--blue); }
-
-    .mega-stat-bar {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-    }
-
-    .mega-stat.pending .mega-stat-bar { background: var(--red); }
-    .mega-stat.progress .mega-stat-bar { background: var(--orange); }
-    .mega-stat.done .mega-stat-bar { background: var(--green); }
-    .mega-stat.published .mega-stat-bar { background: var(--blue); }
-
-    /* ==================== PROGRESS HERO ==================== */
-    .progress-hero {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .progress-hero-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-
-    .progress-hero-title {
+    /* SECTION */
+    .section-title {
       font-size: 1rem;
-      font-weight: 600;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
     }
 
-    .progress-hero-percent {
+    /* ALERT CARDS */
+    .alerts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem; }
+    .alert {
+      padding: 1rem;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: transform 0.15s;
+    }
+    .alert:hover { transform: translateY(-2px); }
+    .alert.red { background: var(--red-bg); border-color: var(--red); }
+    .alert.orange { background: var(--orange-bg); border-color: var(--orange); }
+    .alert.cyan { background: var(--cyan-bg); border-color: var(--cyan); }
+    .alert.green { background: var(--green-bg); border-color: var(--green); }
+    .alert-icon { font-size: 1.4rem; }
+    .alert-info { flex: 1; }
+    .alert-title { font-weight: 700; font-size: 0.85rem; }
+    .alert-desc { font-size: 0.7rem; color: var(--text-secondary); }
+    .alert-count { font-family: 'JetBrains Mono', monospace; font-size: 1.75rem; font-weight: 700; }
+    .alert.red .alert-count { color: var(--red); }
+    .alert.orange .alert-count { color: var(--orange); }
+    .alert.cyan .alert-count { color: var(--cyan); }
+    .alert.green .alert-count { color: var(--green); }
+
+    /* STATS ROW */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.6rem; margin-bottom: 1.25rem; }
+    .stat {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.85rem;
+      text-align: center;
+    }
+    .stat-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+    .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; font-weight: 700; }
+
+    /* PROGRESS */
+    .progress-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
+    .progress-title { font-weight: 600; font-size: 0.9rem; }
+    .progress-percent {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 2rem;
+      font-size: 1.25rem;
       font-weight: 700;
       background: linear-gradient(135deg, var(--purple), var(--pink));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+    .progress-bar { height: 12px; background: var(--bg-elevated); border-radius: 6px; overflow: hidden; display: flex; }
+    .progress-seg { height: 100%; transition: width 0.4s; }
+    .progress-seg.done { background: var(--green); }
+    .progress-seg.checked { background: var(--cyan); }
+    .progress-seg.scheduled { background: var(--blue); }
 
-    .progress-hero-bar {
-      height: 24px;
-      background: var(--bg-elevated);
+    /* TABLE CARD */
+    .table-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       border-radius: 12px;
       overflow: hidden;
-      display: flex;
+      margin-bottom: 1.25rem;
     }
-
-    .progress-hero-segment {
-      height: 100%;
-      transition: width 0.5s ease;
-      position: relative;
-    }
-
-    .progress-hero-segment.published { background: var(--blue); }
-    .progress-hero-segment.done { background: var(--green); }
-    .progress-hero-segment.progress { background: var(--orange); }
-
-    .progress-hero-legend {
+    .table-toolbar {
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid var(--border);
       display: flex;
-      gap: 1.5rem;
-      margin-top: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
       gap: 0.5rem;
-      font-size: 0.8rem;
-      color: var(--text-secondary);
+      flex-wrap: wrap;
+      align-items: center;
     }
+    .filter-select {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.35rem 0.5rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.75rem;
+    }
+    .filter-select:focus { outline: none; border-color: var(--purple); }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+    th {
+      background: var(--bg-elevated);
+      padding: 0.55rem 0.6rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+    td { padding: 0.5rem 0.6rem; border-top: 1px solid var(--border); vertical-align: middle; }
+    tr:hover { background: var(--bg-elevated); }
+    tr.checkpoint { background: var(--yellow-bg); }
+    tr.overdue { animation: pulse-red 2s infinite; }
+    tr.verify-now { animation: pulse-cyan 1.5s infinite; }
+    @keyframes pulse-red { 0%,100% { background: var(--red-bg); } 50% { background: rgba(239,68,68,0.25); } }
+    @keyframes pulse-cyan { 0%,100% { background: var(--cyan-bg); } 50% { background: rgba(6,182,212,0.3); } }
 
-    .legend-dot {
-      width: 12px;
-      height: 12px;
+    /* CELL STYLES */
+    .client-cell { display: flex; align-items: center; gap: 0.35rem; }
+    .client-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .client-name { font-weight: 600; }
+    .pill {
+      display: inline-flex;
+      padding: 0.12rem 0.4rem;
+      border-radius: 100px;
+      font-size: 0.65rem;
+      font-weight: 600;
+    }
+    .pill.feed { background: var(--purple-bg); color: var(--purple); }
+    .pill.story { background: var(--orange-bg); color: var(--orange); }
+    .pill.cp { background: var(--yellow); color: #000; font-size: 0.55rem; margin-left: 0.2rem; }
+    .date-text { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.75rem; }
+    .date-text.past { color: var(--red); }
+    .date-text.today { color: var(--purple); }
+
+    .mini-select {
+      appearance: none;
+      padding: 0.2rem 1rem 0.2rem 0.4rem;
+      border-radius: 5px;
+      font-family: inherit;
+      font-size: 0.65rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.25rem center;
+    }
+    .mini-select:disabled { opacity: 0.5; cursor: not-allowed; }
+    .mini-select.red { background-color: var(--red-bg); color: var(--red); }
+    .mini-select.orange { background-color: var(--orange-bg); color: var(--orange); }
+    .mini-select.blue { background-color: var(--blue-bg); color: var(--blue); }
+    .mini-select.cyan { background-color: var(--cyan-bg); color: var(--cyan); }
+    .mini-select.green { background-color: var(--green-bg); color: var(--green); }
+    .mini-select.gray { background-color: var(--bg-elevated); color: var(--text-muted); }
+
+    .mini-input {
+      background: transparent;
+      border: 1px solid transparent;
       border-radius: 4px;
+      padding: 0.15rem 0.3rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.7rem;
+      width: 55px;
     }
+    .mini-input:hover { background: var(--bg-elevated); }
+    .mini-input:focus { outline: none; background: var(--bg-elevated); border-color: var(--purple); }
+    .mini-input.link { color: var(--blue); text-decoration: underline; cursor: pointer; width: 80px; }
 
-    .legend-dot.published { background: var(--blue); }
-    .legend-dot.done { background: var(--green); }
-    .legend-dot.progress { background: var(--orange); }
-    .legend-dot.pending { background: var(--red); }
-
-    /* ==================== QUICK ACTIONS ==================== */
-    .quick-actions {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-    }
-
-    .quick-btn {
+    .check-group { display: flex; gap: 0.3rem; }
+    .check-btn {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      color: var(--text-muted);
+      font-size: 0.6rem;
+      cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.6rem 1rem;
+      justify-content: center;
+    }
+    .check-btn:hover { border-color: var(--purple); }
+    .check-btn.checked { background: var(--green); border-color: var(--green); color: white; }
+    .check-btn[title]:hover::after {
+      content: attr(title);
+      position: absolute;
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 100px;
-      color: var(--text-secondary);
-      font-family: inherit;
-      font-size: 0.8rem;
-      font-weight: 500;
-      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.65rem;
+      white-space: nowrap;
+      transform: translateY(-100%);
+      margin-top: -5px;
+    }
+
+    .update-cell { font-size: 0.55rem; color: var(--text-muted); max-width: 70px; }
+    .update-cell strong { color: var(--text-secondary); }
+
+    /* VERIFY CARDS */
+    .verify-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 0.75rem; }
+    .verify-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
       transition: all 0.15s;
     }
-
-    .quick-btn:hover {
-      border-color: var(--accent);
-      color: var(--text);
-    }
-
-    .quick-btn.active {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: white;
-    }
-
-    .quick-btn.urgent { border-color: var(--red); color: var(--red); }
-    .quick-btn.urgent.active { background: var(--red); color: white; }
-
-    .quick-btn .badge {
-      background: rgba(255,255,255,0.2);
-      padding: 0.1rem 0.5rem;
-      border-radius: 100px;
-      font-size: 0.7rem;
+    .verify-card:hover { border-color: var(--purple); }
+    .verify-card.urgent { border-color: var(--cyan); animation: pulse-cyan 1.5s infinite; }
+    .verify-card-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem; }
+    .verify-client { font-weight: 700; font-size: 0.95rem; }
+    .verify-meta { font-size: 0.7rem; color: var(--text-muted); }
+    .verify-type { display: flex; gap: 0.3rem; align-items: center; }
+    .verify-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.1rem;
       font-weight: 700;
+      color: var(--cyan);
     }
-
-    /* ==================== TEAM PROGRESS ==================== */
-    .team-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      margin-bottom: 1.5rem;
+    .verify-content { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem; }
+    .verify-actions { display: flex; gap: 0.5rem; }
+    .verify-btn {
+      flex: 1;
+      padding: 0.6rem;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
     }
+    .verify-btn.ok { background: var(--green); color: white; }
+    .verify-btn.problem { background: var(--red); color: white; }
+    .verify-btn:hover { opacity: 0.9; }
 
+    /* TEAM */
+    .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.75rem; }
     .team-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 1rem;
-      position: relative;
-      overflow: hidden;
     }
-
-    .team-card-header {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 0.75rem;
-    }
-
+    .team-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem; }
     .team-avatar {
-      width: 36px;
-      height: 36px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -515,1573 +457,698 @@
       font-weight: 700;
       color: white;
     }
-
-    .team-name { font-weight: 600; }
+    .team-name { font-weight: 700; }
     .team-role { font-size: 0.7rem; color: var(--text-muted); }
+    .team-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; margin-bottom: 0.6rem; }
+    .team-stat { text-align: center; padding: 0.4rem; background: var(--bg-elevated); border-radius: 6px; }
+    .team-stat-value { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 1rem; }
+    .team-stat-label { font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase; }
+    .team-bar { height: 6px; background: var(--bg-elevated); border-radius: 3px; overflow: hidden; }
+    .team-bar-fill { height: 100%; background: var(--green); transition: width 0.3s; }
 
-    .team-progress {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .team-bar {
-      flex: 1;
-      height: 8px;
-      background: var(--bg-elevated);
-      border-radius: 4px;
-      overflow: hidden;
-    }
-
-    .team-bar-fill {
-      height: 100%;
-      background: var(--green);
-      border-radius: 4px;
-      transition: width 0.3s;
-    }
-
-    .team-percent {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1rem;
-      font-weight: 700;
-    }
-
-    /* ==================== TABLE ==================== */
-    .section-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .table-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
-    }
-
-    .table-toolbar {
-      padding: 1rem;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-    }
-
-    .filter-select {
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.5rem 0.75rem;
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.85rem;
-      min-width: 140px;
-    }
-
-    .filter-select:focus { outline: none; border-color: var(--accent); }
-
-    .table-scroll { overflow-x: auto; }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.85rem;
-    }
-
-    th {
-      background: var(--bg-elevated);
-      padding: 0.75rem 1rem;
-      text-align: left;
-      font-weight: 600;
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      white-space: nowrap;
-      position: sticky;
-      top: 0;
-    }
-
-    td {
-      padding: 0.75rem 1rem;
-      border-top: 1px solid var(--border);
-      vertical-align: middle;
-    }
-
-    tr:hover { background: var(--bg-elevated); }
-    tr.selected { background: var(--purple-bg); }
-    tr.checkpoint { background: var(--yellow-bg); }
-    tr.overdue { animation: urgentPulse 2s infinite; }
-
-    @keyframes urgentPulse {
-      0%, 100% { background: var(--red-bg); }
-      50% { background: rgba(239, 68, 68, 0.25); }
-    }
-
-    /* Row checkbox */
-    .row-check {
-      width: 18px;
-      height: 18px;
-      border: 2px solid var(--border);
-      border-radius: 5px;
-      appearance: none;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .row-check:checked {
-      background: var(--accent);
-      border-color: var(--accent);
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: center;
-    }
-
-    /* Client cell */
-    .client-cell {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .client-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .client-text { font-weight: 600; }
-
-    /* Badges */
-    .type-pill {
-      display: inline-flex;
-      padding: 0.2rem 0.6rem;
-      border-radius: 100px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-
-    .type-pill.feed { background: var(--purple-bg); color: var(--purple); }
-    .type-pill.story { background: var(--orange-bg); color: var(--orange); }
-
-    .checkpoint-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 20px;
-      height: 20px;
-      background: var(--yellow);
-      border-radius: 50%;
-      font-size: 0.6rem;
-      margin-left: 0.25rem;
-    }
-
-    .date-text {
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 600;
-    }
-
-    .date-text.past { color: var(--red); }
-    .date-text.today { color: var(--purple); }
-
-    .responsible-pill {
-      display: inline-flex;
-      padding: 0.15rem 0.5rem;
-      border-radius: 100px;
-      font-size: 0.7rem;
-      font-weight: 500;
-    }
-
-    /* Status selects */
-    .status-select {
-      appearance: none;
-      padding: 0.3rem 1.5rem 0.3rem 0.6rem;
-      border-radius: 6px;
-      font-family: inherit;
-      font-size: 0.75rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 0.4rem center;
-    }
-
-    .status-select:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .status-select.pending { background-color: var(--red-bg); color: var(--red); }
-    .status-select.em-andamento { background-color: var(--orange-bg); color: var(--orange); }
-    .status-select.criado { background-color: var(--yellow-bg); color: var(--yellow); }
-    .status-select.aprovado { background-color: var(--green-bg); color: var(--green); }
-    .status-select.programado { background-color: var(--green-bg); color: var(--green); }
-    .status-select.publicado { background-color: var(--blue-bg); color: var(--blue); }
-
-    /* Input fields */
-    .mini-input {
-      background: transparent;
-      border: 1px solid transparent;
-      border-radius: 4px;
-      padding: 0.25rem 0.5rem;
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.8rem;
-      width: 100%;
-      transition: all 0.15s;
-    }
-
-    .mini-input:hover { background: var(--bg-elevated); }
-    .mini-input:focus { outline: none; background: var(--bg-elevated); border-color: var(--accent); }
-    .mini-input.has-value { color: var(--blue); text-decoration: underline; }
-
-    .update-info {
-      font-size: 0.65rem;
-      color: var(--text-muted);
-      white-space: nowrap;
-    }
-
-    .update-info strong { color: var(--text-secondary); }
-
-    /* ==================== BATCH BAR ==================== */
-    .batch-bar {
-      position: fixed;
-      bottom: 1.5rem;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--accent);
-      padding: 0.75rem 1.5rem;
-      border-radius: 100px;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1);
-      z-index: 1000;
-    }
-
-    .batch-bar.hidden { display: none; }
-
-    .batch-info { font-weight: 600; }
-
-    .batch-btn {
-      padding: 0.4rem 0.75rem;
-      background: rgba(255,255,255,0.2);
-      border: none;
-      border-radius: 6px;
-      color: white;
-      font-family: inherit;
-      font-size: 0.8rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.15s;
-    }
-
-    .batch-btn:hover { background: rgba(255,255,255,0.3); }
-    .batch-btn.cancel { background: rgba(0,0,0,0.3); }
-
-    /* ==================== ADMIN PANEL ==================== */
-    .admin-section {
-      display: none;
-    }
-
-    .admin-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-    }
-
-    .admin-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.5rem;
-    }
-
-    .admin-card h3 {
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
+    /* ADMIN */
     .admin-form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .form-label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-    }
-
-    .form-input, .form-select {
-      padding: 0.75rem 1rem;
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.9rem;
-    }
-
-    .form-input:focus, .form-select:focus {
-      outline: none;
-      border-color: var(--accent);
-    }
-
-    .form-btn {
-      padding: 0.75rem 1.5rem;
-      background: var(--accent);
-      border: none;
-      border-radius: 8px;
-      color: white;
-      font-family: inherit;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .form-btn:hover { transform: translateY(-1px); }
-
-    .client-list {
-      max-height: 400px;
-      overflow-y: auto;
-    }
-
-    .client-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.75rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .client-item:last-child { border-bottom: none; }
-
-    .client-item-info {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .client-item-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-    }
-
-    .client-item-name { font-weight: 500; }
-    .client-item-resp { font-size: 0.75rem; color: var(--text-muted); }
-
-    .client-item-actions {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .client-item-btn {
-      padding: 0.25rem 0.5rem;
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      color: var(--text-secondary);
-      font-size: 0.75rem;
-      cursor: pointer;
-    }
-
-    .client-item-btn:hover { border-color: var(--accent); color: var(--text); }
-    .client-item-btn.danger:hover { border-color: var(--red); color: var(--red); }
-
-    /* ==================== CALENDAR ==================== */
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 1rem;
-    }
-
-    .cal-day {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 12px;
-      overflow: hidden;
-      transition: all 0.15s;
-    }
-
-    .cal-day:hover { border-color: var(--accent); }
-    .cal-day.checkpoint { border-color: var(--yellow); box-shadow: 0 0 20px var(--yellow-bg); }
-    .cal-day.reviewed { border-color: var(--green); }
-
-    .cal-day-head {
-      padding: 0.75rem;
-      text-align: center;
-      background: var(--bg-elevated);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .cal-day.checkpoint .cal-day-head { background: var(--yellow-bg); }
-
-    .cal-day-num {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1.5rem;
-      font-weight: 700;
-    }
-
-    .cal-day-name {
-      font-size: 0.65rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-    }
-
-    .cal-day-body { padding: 0.75rem; }
-
-    .cal-stat {
+      padding: 1.25rem;
+      max-width: 450px;
       display: flex;
-      justify-content: space-between;
-      font-size: 0.8rem;
-      margin-bottom: 0.4rem;
-    }
-
-    .cal-stat-val {
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 700;
-    }
-
-    .cal-stat-val.ok { color: var(--green); }
-    .cal-stat-val.bad { color: var(--red); }
-
-    .cal-review-btn {
-      width: 100%;
-      padding: 0.5rem;
-      background: var(--bg-elevated);
-      border: none;
-      color: var(--text-muted);
-      font-family: inherit;
-      font-size: 0.7rem;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .cal-review-btn:hover { background: var(--accent); color: white; }
-    .cal-review-btn.done { background: var(--green-bg); color: var(--green); }
-    .cal-review-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    /* ==================== CHECKLIST ==================== */
-    .check-list { display: flex; flex-direction: column; gap: 0.5rem; }
-
-    .check-item {
-      display: flex;
-      align-items: center;
+      flex-direction: column;
       gap: 0.75rem;
-      padding: 1rem;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.15s;
+      margin-bottom: 1.25rem;
     }
+    .form-row { display: flex; gap: 0.5rem; }
+    .form-row > * { flex: 1; }
 
-    .check-item:hover { border-color: var(--accent); }
-    .check-item.ok { border-color: var(--green); background: var(--green-bg); }
-
-    .check-box {
-      width: 24px;
-      height: 24px;
-      border: 2px solid var(--border);
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .check-item.ok .check-box { background: var(--green); border-color: var(--green); }
-    .check-box svg { opacity: 0; }
-    .check-item.ok .check-box svg { opacity: 1; }
-
-    .check-text { flex: 1; font-size: 0.9rem; }
-
-    .check-count {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
-      font-weight: 700;
-      padding: 0.25rem 0.75rem;
-      border-radius: 100px;
-    }
-
-    .check-item.ok .check-count { background: rgba(255,255,255,0.2); color: var(--green); }
-    .check-item:not(.ok) .check-count { background: var(--red-bg); color: var(--red); }
-
-    /* ==================== TOAST ==================== */
+    /* TOAST */
     .toast {
       position: fixed;
-      bottom: 1.5rem;
-      right: 1.5rem;
+      bottom: 1.25rem;
+      right: 1.25rem;
       background: var(--bg-card);
       border: 1px solid var(--green);
-      padding: 0.75rem 1.25rem;
-      border-radius: 12px;
+      padding: 0.65rem 1rem;
+      border-radius: 10px;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      font-size: 0.9rem;
+      gap: 0.4rem;
+      font-size: 0.85rem;
       box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-      z-index: 1001;
-      animation: slideUp 0.3s ease;
+      z-index: 1000;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s;
     }
+    .toast.show { transform: translateY(0); opacity: 1; }
 
-    @keyframes slideUp {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    .toast.hidden { display: none; }
-
-    /* ==================== RESPONSIVE ==================== */
-    @media (max-width: 1200px) {
-      .mega-stats { grid-template-columns: repeat(3, 1fr); }
-      .mega-stat.hero { grid-column: span 3; }
-    }
-
+    /* RESPONSIVE */
     @media (max-width: 768px) {
-      .header-content { flex-wrap: wrap; }
-      .nav { overflow-x: auto; width: 100%; order: 3; }
-      .main { padding: 1rem; }
-      .mega-stats { grid-template-columns: repeat(2, 1fr); }
-      .mega-stat.hero { grid-column: span 2; }
-      .admin-grid { grid-template-columns: 1fr; }
-      .table-toolbar { flex-direction: column; }
-      .filter-select { width: 100%; }
+      .header-content { flex-direction: column; }
+      .nav { width: 100%; overflow-x: auto; justify-content: start; }
+      .alerts { grid-template-columns: 1fr; }
     }
 
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: var(--bg-elevated); }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   </style>
 </head>
 <body>
 
-  <!-- LOGIN SCREEN -->
-  <div class="login-screen" id="loginScreen">
-    <div class="login-box">
-      <div class="login-logo">📊</div>
-      <div class="login-brand">ConectMe Uprise</div>
-      <div class="login-subtitle">Social Media Tracker</div>
-      
-      <div class="login-error" id="loginError">
-        E-mail não encontrado. Verifique e tente novamente.
-      </div>
-      
-      <form onsubmit="handleLogin(event)">
-        <div class="login-input-group">
-          <input type="email" class="login-input" id="loginEmail" placeholder="seu@email.digital" required autocomplete="email">
-        </div>
-        <button type="submit" class="login-btn" id="loginBtn">Entrar</button>
-      </form>
-    </div>
+<!-- LOGIN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">📊</div>
+    <div class="login-brand">ConectMe Uprise</div>
+    <div class="login-subtitle">Social Media Tracker</div>
+    <div class="login-error" id="loginError">E-mail não encontrado</div>
+    <input type="email" class="login-input" id="loginEmail" placeholder="seu@conectme.digital">
+    <button class="login-btn" id="loginBtn">Entrar</button>
   </div>
+</div>
 
-  <!-- APP -->
-  <div class="app" id="app">
-    <header class="header">
-      <div class="header-content">
-        <div class="brand">
-          <div class="brand-icon">📊</div>
-          <div class="brand-text">
-            <h1>ConectMe Uprise</h1>
-            <span>Social Media Tracker • 22/12 - 05/01</span>
-          </div>
-        </div>
-
-        <nav class="nav">
-          <button class="nav-btn active" data-tab="dashboard">📈 Dashboard</button>
-          <button class="nav-btn" data-tab="controle">📋 Controle</button>
-          <button class="nav-btn" data-tab="calendario">📅 Calendário</button>
-          <button class="nav-btn" data-tab="checklist">✅ Checklist</button>
-          <button class="nav-btn admin-only" data-tab="admin" id="adminNavBtn">⚙️ Admin</button>
-        </nav>
-
-        <div class="header-right">
-          <div class="sync-indicator">
-            <div class="sync-dot" id="syncDot"></div>
-            <span id="syncText">Sincronizado</span>
-          </div>
-          <div class="user-badge" onclick="logout()">
-            <div class="user-avatar" id="userAvatar">A</div>
-            <div class="user-info">
-              <div class="user-name" id="userName">Alec</div>
-              <div class="user-role" id="userRole">Gestor</div>
-            </div>
-          </div>
+<!-- APP -->
+<div class="app" id="app">
+  <header class="header">
+    <div class="header-content">
+      <div class="brand">
+        <div class="brand-icon">📊</div>
+        <div>
+          <h1>ConectMe Uprise</h1>
+          <span>Tracker • 22/12 - 05/01</span>
         </div>
       </div>
-    </header>
 
-    <main class="main">
-      <!-- Quick Actions -->
-      <div class="quick-actions">
-        <button class="quick-btn urgent" id="qf-urgent" onclick="toggleQuickFilter('urgent')">
-          🚨 Atrasados <span class="badge" id="cnt-urgent">0</span>
-        </button>
-        <button class="quick-btn" id="qf-today" onclick="toggleQuickFilter('today')">
-          📅 Hoje <span class="badge" id="cnt-today">0</span>
-        </button>
-        <button class="quick-btn" id="qf-checkpoints" onclick="toggleQuickFilter('checkpoints')">
-          ⭐ Checkpoints <span class="badge" id="cnt-checkpoints">0</span>
-        </button>
-        <button class="quick-btn" id="qf-pending" onclick="toggleQuickFilter('pending')">
-          ⏳ Pendentes <span class="badge" id="cnt-pending">0</span>
-        </button>
-        <button class="quick-btn" onclick="clearFilters()">✕ Limpar</button>
+      <nav class="nav">
+        <button class="nav-btn active" data-tab="dashboard">📈 Dashboard</button>
+        <button class="nav-btn" data-tab="pre-check" id="navPreCheck">🔍 Verificar Agendamentos <span class="badge" id="preCheckCount">0</span></button>
+        <button class="nav-btn" data-tab="post-check" id="navPostCheck">📱 Verificar Instagram <span class="badge" id="postCheckCount">0</span></button>
+        <button class="nav-btn" data-tab="controle">📋 Controle</button>
+        <button class="nav-btn" data-tab="equipe">👥 Equipe</button>
+        <button class="nav-btn admin-only" data-tab="admin">⚙️ Admin</button>
+      </nav>
+
+      <div class="header-right">
+        <div class="sync">
+          <div class="sync-dot" id="syncDot"></div>
+          <span id="syncText">OK</span>
+        </div>
+        <div class="user-pill" onclick="logout()">
+          <div class="user-avatar" id="userAvatar">A</div>
+          <span class="user-name" id="userName">Alec</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- DASHBOARD -->
+    <section id="tab-dashboard" class="tab-content">
+      <div class="alerts" id="alertsContainer"></div>
+
+      <div class="stats">
+        <div class="stat"><div class="stat-label">Total</div><div class="stat-value" id="sTotal">0</div></div>
+        <div class="stat"><div class="stat-label">Não Agendados</div><div class="stat-value" style="color:var(--red)" id="sNotScheduled">0</div></div>
+        <div class="stat"><div class="stat-label">Agendados</div><div class="stat-value" style="color:var(--blue)" id="sScheduled">0</div></div>
+        <div class="stat"><div class="stat-label">Verificados</div><div class="stat-value" style="color:var(--cyan)" id="sPreChecked">0</div></div>
+        <div class="stat"><div class="stat-label">Publicados OK</div><div class="stat-value" style="color:var(--green)" id="sPostChecked">0</div></div>
       </div>
 
-      <!-- DASHBOARD -->
-      <section id="tab-dashboard" class="tab-content">
-        <div class="mega-stats">
-          <div class="mega-stat hero">
-            <div class="mega-stat-label">Progresso Total</div>
-            <div class="mega-stat-value" id="mega-progress">0%</div>
-          </div>
-          <div class="mega-stat pending">
-            <div class="mega-stat-label">Pendentes</div>
-            <div class="mega-stat-value" id="mega-pending">0</div>
-            <div class="mega-stat-bar"></div>
-          </div>
-          <div class="mega-stat progress">
-            <div class="mega-stat-label">Em Andamento</div>
-            <div class="mega-stat-value" id="mega-progress-count">0</div>
-            <div class="mega-stat-bar"></div>
-          </div>
-          <div class="mega-stat done">
-            <div class="mega-stat-label">Programados</div>
-            <div class="mega-stat-value" id="mega-done">0</div>
-            <div class="mega-stat-bar"></div>
-          </div>
-          <div class="mega-stat published">
-            <div class="mega-stat-label">Publicados</div>
-            <div class="mega-stat-value" id="mega-published">0</div>
-            <div class="mega-stat-bar"></div>
-          </div>
+      <div class="progress-card">
+        <div class="progress-header">
+          <div class="progress-title">Progresso Geral</div>
+          <div class="progress-percent" id="progressPercent">0%</div>
         </div>
-
-        <div class="progress-hero">
-          <div class="progress-hero-header">
-            <div class="progress-hero-title">Barra de Progresso</div>
-            <div class="progress-hero-percent" id="bar-percent">0%</div>
-          </div>
-          <div class="progress-hero-bar">
-            <div class="progress-hero-segment published" id="bar-published" style="width:0%"></div>
-            <div class="progress-hero-segment done" id="bar-done" style="width:0%"></div>
-            <div class="progress-hero-segment progress" id="bar-progress" style="width:0%"></div>
-          </div>
-          <div class="progress-hero-legend">
-            <div class="legend-item"><div class="legend-dot published"></div> Publicados</div>
-            <div class="legend-item"><div class="legend-dot done"></div> Programados</div>
-            <div class="legend-item"><div class="legend-dot progress"></div> Em Andamento</div>
-            <div class="legend-item"><div class="legend-dot pending"></div> Pendentes</div>
-          </div>
+        <div class="progress-bar">
+          <div class="progress-seg done" id="barDone"></div>
+          <div class="progress-seg checked" id="barChecked"></div>
+          <div class="progress-seg scheduled" id="barScheduled"></div>
         </div>
+      </div>
 
-        <h3 class="section-title">👥 Progresso por Responsável</h3>
-        <div class="team-grid" id="teamGrid"></div>
-
-        <h3 class="section-title" style="margin-top:1.5rem">🚨 Itens que Precisam de Atenção</h3>
-        <div class="table-card">
-          <div class="table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th>Cliente</th>
-                  <th>Tipo</th>
-                  <th>Data</th>
-                  <th>Conteúdo</th>
-                  <th>Responsável</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="urgentTableBody"></tbody>
-            </table>
-          </div>
+      <h3 class="section-title">🚨 Precisam de Atenção</h3>
+      <div class="table-card">
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Cliente</th><th>Tipo</th><th>Data</th><th>Conteúdo</th><th>Social Media</th><th>Gestor</th><th>Status</th></tr></thead>
+            <tbody id="urgentTable"></tbody>
+          </table>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- CONTROLE -->
-      <section id="tab-controle" class="tab-content" style="display:none">
-        <div class="table-card">
-          <div class="table-toolbar">
-            <select class="filter-select" id="f-responsible" onchange="applyFilters()">
-              <option value="">Todos Responsáveis</option>
-            </select>
-            <select class="filter-select" id="f-client" onchange="applyFilters()">
-              <option value="">Todos Clientes</option>
-            </select>
-            <select class="filter-select" id="f-type" onchange="applyFilters()">
-              <option value="">Todos Tipos</option>
-              <option value="FEED">Feed</option>
-              <option value="STORY">Story</option>
-            </select>
-            <select class="filter-select" id="f-status" onchange="applyFilters()">
-              <option value="">Todos Status</option>
-              <option value="Pendente">Pendente</option>
-              <option value="Em andamento">Em andamento</option>
-              <option value="Criado">Criado</option>
-              <option value="Aprovado">Aprovado</option>
-              <option value="Programado">Programado</option>
-              <option value="Publicado">Publicado</option>
-            </select>
-            <select class="filter-select" id="f-date" onchange="applyFilters()">
-              <option value="">Todas Datas</option>
-            </select>
-          </div>
-          <div class="table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th style="width:40px"><input type="checkbox" class="row-check" onchange="toggleSelectAll(this)"></th>
-                  <th>Cliente</th>
-                  <th>Tipo</th>
-                  <th>Data</th>
-                  <th>Conteúdo</th>
-                  <th>Resp.</th>
-                  <th>Criação</th>
-                  <th>Aprovação</th>
-                  <th>Programação</th>
-                  <th>Link</th>
-                  <th>Obs</th>
-                  <th>Atualização</th>
-                </tr>
-              </thead>
-              <tbody id="mainTableBody"></tbody>
-            </table>
-          </div>
+    <!-- PRE-CHECK -->
+    <section id="tab-pre-check" class="tab-content" style="display:none">
+      <h3 class="section-title">🔍 Verificar Agendamentos no Ekyte/Meta</h3>
+      <p style="color:var(--text-muted);margin-bottom:1rem;font-size:0.85rem;">
+        Vá no Ekyte ou Meta, confira se está agendado corretamente, e marque os itens abaixo.
+      </p>
+      <div class="table-card">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Tipo</th>
+                <th>Data</th>
+                <th>Plataforma</th>
+                <th>Horário</th>
+                <th>Link Agendamento</th>
+                <th>Verificação</th>
+                <th>Checklist</th>
+                <th>Obs</th>
+              </tr>
+            </thead>
+            <tbody id="preCheckTable"></tbody>
+          </table>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- CALENDARIO -->
-      <section id="tab-calendario" class="tab-content" style="display:none">
-        <h3 class="section-title">📅 Visão por Data</h3>
-        <div class="calendar-grid" id="calendarGrid"></div>
-      </section>
+    <!-- POST-CHECK -->
+    <section id="tab-post-check" class="tab-content" style="display:none">
+      <h3 class="section-title">📱 Verificar se Publicou no Instagram</h3>
+      <p style="color:var(--text-muted);margin-bottom:1rem;font-size:0.85rem;">
+        Estes posts já deviam ter sido publicados. Vá no Instagram do cliente e confirme se está tudo OK.
+      </p>
+      <div class="verify-grid" id="postCheckGrid"></div>
+    </section>
 
-      <!-- CHECKLIST -->
-      <section id="tab-checklist" class="tab-content" style="display:none">
-        <h3 class="section-title">✅ Checklist Final — Regra de Ouro</h3>
-        <div class="check-list" id="checkList"></div>
-      </section>
-
-      <!-- ADMIN -->
-      <section id="tab-admin" class="tab-content admin-section" style="display:none">
-        <h3 class="section-title">⚙️ Painel Administrativo</h3>
-        <div class="admin-grid">
-          <div class="admin-card">
-            <h3>➕ Adicionar Cliente</h3>
-            <form class="admin-form" onsubmit="addClient(event)">
-              <div class="form-group">
-                <label class="form-label">Nome do Cliente</label>
-                <input type="text" class="form-input" id="newClientName" placeholder="Ex: Studio Beauty" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Responsável</label>
-                <select class="form-select" id="newClientResp">
-                  <option value="">Sem responsável (por enquanto)</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Cor do Cliente</label>
-                <input type="color" class="form-input" id="newClientColor" value="#a855f7" style="height:44px;padding:0.25rem;">
-              </div>
-              <button type="submit" class="form-btn">Adicionar Cliente</button>
-            </form>
-          </div>
-
-          <div class="admin-card">
-            <h3>📋 Clientes Cadastrados</h3>
-            <div class="client-list" id="clientList"></div>
-          </div>
+    <!-- CONTROLE -->
+    <section id="tab-controle" class="tab-content" style="display:none">
+      <div class="table-card">
+        <div class="table-toolbar">
+          <select class="filter-select" id="fGestor" onchange="renderMainTable()"><option value="">Todos Gestores</option></select>
+          <select class="filter-select" id="fSocialMedia" onchange="renderMainTable()"><option value="">Todas Social Media</option></select>
+          <select class="filter-select" id="fClient" onchange="renderMainTable()"><option value="">Todos Clientes</option></select>
+          <select class="filter-select" id="fType" onchange="renderMainTable()"><option value="">Todos Tipos</option><option value="FEED">Feed</option><option value="STORY">Story</option></select>
+          <select class="filter-select" id="fDate" onchange="renderMainTable()"><option value="">Todas Datas</option></select>
         </div>
-      </section>
-    </main>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Tipo</th>
+                <th>Data</th>
+                <th>Plataforma</th>
+                <th>Horário</th>
+                <th>Link</th>
+                <th>Pré-Verif.</th>
+                <th>✓</th>
+                <th>Pós-Verif.</th>
+                <th>Obs</th>
+                <th>Atualizado</th>
+              </tr>
+            </thead>
+            <tbody id="mainTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
-    <!-- BATCH BAR -->
-    <div class="batch-bar hidden" id="batchBar">
-      <div class="batch-info">✓ <span id="selCount">0</span> selecionados</div>
-      <button class="batch-btn" onclick="batchUpdate('status_creation','Criado')">Marcar Criado</button>
-      <button class="batch-btn gestor-only" onclick="batchUpdate('status_approval','Aprovado')">Marcar Aprovado</button>
-      <button class="batch-btn" onclick="batchUpdate('status_schedule','Programado')">Marcar Programado</button>
-      <button class="batch-btn" onclick="batchUpdate('status_schedule','Publicado')">Marcar Publicado</button>
-      <button class="batch-btn cancel" onclick="clearSelection()">Cancelar</button>
-    </div>
+    <!-- EQUIPE -->
+    <section id="tab-equipe" class="tab-content" style="display:none">
+      <h3 class="section-title">👥 Desempenho</h3>
+      <div class="team-grid" id="teamGrid"></div>
+    </section>
 
-    <!-- TOAST -->
-    <div class="toast hidden" id="toast">
-      <span>✓</span>
-      <span id="toastMsg">Salvo!</span>
-    </div>
-  </div>
+    <!-- ADMIN -->
+    <section id="tab-admin" class="tab-content admin-only" style="display:none">
+      <h3 class="section-title">⚙️ Adicionar Cliente</h3>
+      <div class="admin-form">
+        <input type="text" class="login-input" id="newClientName" placeholder="Nome do cliente" style="margin:0">
+        <div class="form-row">
+          <select class="filter-select" id="newClientSM" style="padding:0.65rem"><option value="">Social Media</option></select>
+          <select class="filter-select" id="newClientGestor" style="padding:0.65rem"><option value="">Gestor</option></select>
+        </div>
+        <input type="color" id="newClientColor" value="#a855f7" style="height:40px;border:none;border-radius:6px;cursor:pointer;">
+        <button class="login-btn" onclick="addClient()">Adicionar</button>
+      </div>
+      <h3 class="section-title">📋 Clientes</h3>
+      <div class="table-card">
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Cliente</th><th>Social Media</th><th>Gestor</th><th>Itens</th><th></th></tr></thead>
+            <tbody id="clientsTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
 
-  <script>
-    // ==================== CONFIG ====================
-    const SUPABASE_URL = 'https://jxxhypanwiqigtaptrrp.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4eGh5cGFud2lxaWd0YXB0cnJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY1MTgyMzQsImV4cCI6MjA4MjA5NDIzNH0.IKd0n-abux653kQspkE-uyoQwVXV5hvCzF_SA103auw';
-    
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  <div class="toast" id="toast"><span>✓</span><span id="toastMsg">Salvo!</span></div>
+</div>
 
-    // ==================== STATE ====================
-    let items = [];
-    let clients = [];
-    let teamMembers = [];
-    let reviews = [];
-    let currentUser = null;
-    let selectedItems = new Set();
-    let activeFilter = null;
+<script>
+// CONFIG
+const SUPABASE_URL = 'https://jxxhypanwiqigtaptrrp.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4eGh5cGFud2lxaWd0YXB0cnJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY1MTgyMzQsImV4cCI6MjA4MjA5NDIzNH0.IKd0n-abux653kQspkE-uyoQwVXV5hvCzF_SA103auw';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const FEED_DATES = ['22/12', '24/12', '26/12', '31/12', '02/01', '05/01'];
-    const STORY_DATES = ['22/12', '23/12', '25/12', '26/12', '29/12', '30/12', '01/01', '02/01', '05/01'];
+// STATE
+let items = [], clients = [], team = [], currentUser = null;
+const FEED_DATES = ['22/12', '24/12', '26/12', '31/12', '02/01', '05/01'];
+const STORY_DATES = ['22/12', '23/12', '25/12', '26/12', '29/12', '30/12', '01/01', '02/01', '05/01'];
 
-    // ==================== AUTH ====================
-    async function handleLogin(e) {
-      e.preventDefault();
-      const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-      const btn = document.getElementById('loginBtn');
-      const error = document.getElementById('loginError');
-      
-      btn.disabled = true;
-      btn.textContent = 'Verificando...';
-      error.classList.remove('show');
+// LOGIN
+document.getElementById('loginBtn').addEventListener('click', handleLogin);
+document.getElementById('loginEmail').addEventListener('keypress', e => { if (e.key === 'Enter') handleLogin(); });
 
-      try {
-        const { data, error: err } = await supabase
-          .from('team_members')
-          .select('*')
-          .eq('email', email)
-          .eq('active', true)
-          .single();
+async function handleLogin() {
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const btn = document.getElementById('loginBtn');
+  const error = document.getElementById('loginError');
+  if (!email) return;
+  
+  btn.disabled = true; btn.textContent = 'Entrando...'; error.classList.remove('show');
+  
+  try {
+    const { data } = await supabase.from('team_members').select('*').eq('email', email).eq('active', true).maybeSingle();
+    if (!data) { error.classList.add('show'); btn.disabled = false; btn.textContent = 'Entrar'; return; }
+    currentUser = data;
+    localStorage.setItem('smtUser', JSON.stringify(data));
+    showApp();
+  } catch (err) {
+    console.error(err);
+    error.textContent = 'Erro de conexão';
+    error.classList.add('show');
+    btn.disabled = false; btn.textContent = 'Entrar';
+  }
+}
 
-        if (err || !data) {
-          error.classList.add('show');
-          btn.disabled = false;
-          btn.textContent = 'Entrar';
-          return;
-        }
+function checkAuth() {
+  const saved = localStorage.getItem('smtUser');
+  if (saved) { try { currentUser = JSON.parse(saved); showApp(); } catch { localStorage.removeItem('smtUser'); } }
+}
 
-        currentUser = data;
-        localStorage.setItem('user', JSON.stringify(data));
-        showApp();
-      } catch (err) {
-        console.error(err);
-        error.classList.add('show');
-        btn.disabled = false;
-        btn.textContent = 'Entrar';
-      }
-    }
+function logout() { if (confirm('Sair?')) { localStorage.removeItem('smtUser'); location.reload(); } }
 
-    function checkAuth() {
-      const saved = localStorage.getItem('user');
-      if (saved) {
-        currentUser = JSON.parse(saved);
-        showApp();
-      }
-    }
+function showApp() {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('app').classList.add('visible');
+  document.getElementById('userName').textContent = currentUser.name;
+  document.getElementById('userAvatar').textContent = currentUser.name[0];
+  document.getElementById('userAvatar').style.background = currentUser.color;
+  if (currentUser.role === 'social_media') document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+  init();
+}
 
-    function logout() {
-      if (confirm('Deseja sair?')) {
-        localStorage.removeItem('user');
-        currentUser = null;
-        document.getElementById('app').classList.remove('visible');
-        document.getElementById('loginScreen').classList.remove('hidden');
-      }
-    }
+function isGestor() { return ['supervisor', 'gestor'].includes(currentUser.role); }
 
-    function showApp() {
-      document.getElementById('loginScreen').classList.add('hidden');
-      document.getElementById('app').classList.add('visible');
-      
-      document.getElementById('userName').textContent = currentUser.name;
-      document.getElementById('userRole').textContent = currentUser.role === 'gestor' ? 'Gestor' : 'Social Media';
-      document.getElementById('userAvatar').textContent = currentUser.name[0];
-      document.getElementById('userAvatar').style.background = currentUser.color;
+// DATA
+async function loadAll() {
+  try {
+    const [i, c, t] = await Promise.all([
+      supabase.from('items').select('*').order('id'),
+      supabase.from('clients').select('*').order('name'),
+      supabase.from('team_members').select('*').eq('active', true)
+    ]);
+    items = i.data || []; clients = c.data || []; team = t.data || [];
+    document.getElementById('syncDot').style.background = 'var(--green)';
+    populateFilters(); renderAll();
+  } catch (err) { console.error(err); document.getElementById('syncDot').style.background = 'var(--red)'; }
+}
 
-      // Show/hide admin
-      const adminBtn = document.getElementById('adminNavBtn');
-      if (currentUser.role !== 'gestor') {
-        adminBtn.style.display = 'none';
-      }
-
-      // Hide gestor-only buttons
-      document.querySelectorAll('.gestor-only').forEach(el => {
-        if (currentUser.role !== 'gestor') el.style.display = 'none';
-      });
-
-      init();
-    }
-
-    function isGestor() {
-      return currentUser && currentUser.role === 'gestor';
-    }
-
-    // ==================== DATA ====================
-    async function loadAll() {
-      try {
-        const [itemsRes, clientsRes, teamRes, reviewsRes] = await Promise.all([
-          supabase.from('items').select('*').order('id'),
-          supabase.from('clients').select('*').order('name'),
-          supabase.from('team_members').select('*').eq('active', true),
-          supabase.from('daily_reviews').select('*')
-        ]);
-
-        items = itemsRes.data || [];
-        clients = clientsRes.data || [];
-        teamMembers = teamRes.data || [];
-        reviews = reviewsRes.data || [];
-
-        updateSyncStatus(true);
-        populateFilters();
-        renderAll();
-      } catch (err) {
-        console.error('Load error:', err);
-        updateSyncStatus(false);
-      }
-    }
-
-    function setupRealtime() {
-      supabase.channel('changes')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'items' }, payload => {
-          if (payload.eventType === 'UPDATE') {
-            const idx = items.findIndex(i => i.id === payload.new.id);
-            if (idx !== -1) {
-              items[idx] = payload.new;
-              renderAll();
-              if (payload.new.last_updated_by !== currentUser.name) {
-                toast(`${payload.new.last_updated_by} atualizou ${payload.new.client}`);
-              }
-            }
-          } else if (payload.eventType === 'INSERT') {
-            items.push(payload.new);
-            renderAll();
-          }
-        })
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'clients' }, () => {
-          loadAll();
-        })
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_reviews' }, () => {
-          supabase.from('daily_reviews').select('*').then(r => {
-            reviews = r.data || [];
-            renderCalendar();
-          });
-        })
-        .subscribe();
-    }
-
-    // ==================== UPDATES ====================
-    async function updateItem(id, field, value) {
-      // Check permissions for approval
-      if (field === 'status_approval' && value === 'Aprovado' && !isGestor()) {
-        toast('Apenas gestores podem aprovar');
-        return;
-      }
-
-      try {
-        const updateData = {
-          [field]: value,
-          last_updated_by: currentUser.name,
-          last_updated_at: new Date().toISOString()
-        };
-
-        if (field === 'status_approval' && value === 'Aprovado') {
-          updateData.approved_by = currentUser.name;
-          updateData.approved_at = new Date().toISOString();
-        }
-
-        await supabase.from('items').update(updateData).eq('id', id);
-
-        const item = items.find(i => i.id === id);
-        if (item) Object.assign(item, updateData);
-
-        renderAll();
-        toast('Atualizado!');
-      } catch (err) {
-        console.error(err);
-        toast('Erro ao salvar');
-      }
-    }
-
-    async function batchUpdate(field, value) {
-      if (selectedItems.size === 0) return;
-      if (field === 'status_approval' && value === 'Aprovado' && !isGestor()) {
-        toast('Apenas gestores podem aprovar');
-        return;
-      }
-
-      const ids = Array.from(selectedItems);
-      try {
-        const updateData = {
-          [field]: value,
-          last_updated_by: currentUser.name,
-          last_updated_at: new Date().toISOString()
-        };
-
-        if (field === 'status_approval' && value === 'Aprovado') {
-          updateData.approved_by = currentUser.name;
-          updateData.approved_at = new Date().toISOString();
-        }
-
-        await supabase.from('items').update(updateData).in('id', ids);
-
-        items.forEach(item => {
-          if (selectedItems.has(item.id)) Object.assign(item, updateData);
-        });
-
-        clearSelection();
-        renderAll();
-        toast(`${ids.length} itens atualizados!`);
-      } catch (err) {
-        console.error(err);
-        toast('Erro');
-      }
-    }
-
-    // ==================== REVIEWS ====================
-    async function toggleReview(date) {
-      if (!isGestor()) {
-        toast('Apenas gestores podem marcar como revisado');
-        return;
-      }
-
-      const existing = reviews.find(r => r.review_date === date && r.reviewed_by === currentUser.name);
-      
-      try {
-        if (existing) {
-          await supabase.from('daily_reviews').delete().eq('id', existing.id);
-          reviews = reviews.filter(r => r.id !== existing.id);
-          toast('Revisão removida');
-        } else {
-          const { data } = await supabase.from('daily_reviews').insert({
-            review_date: date,
-            reviewed_by: currentUser.name
-          }).select().single();
-          reviews.push(data);
-          toast('Dia revisado ✓');
-        }
-        renderCalendar();
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    // ==================== CLIENT MANAGEMENT ====================
-    async function addClient(e) {
-      e.preventDefault();
-      const name = document.getElementById('newClientName').value.trim();
-      const responsible = document.getElementById('newClientResp').value || null;
-      const color = document.getElementById('newClientColor').value;
-
-      if (!name) return;
-
-      try {
-        // Add client
-        const { data: newClient, error } = await supabase.from('clients').insert({
-          name, responsible, color, active: true
-        }).select().single();
-
-        if (error) throw error;
-
-        // Generate items for this client
-        const newItems = [];
-        
-        FEED_DATES.forEach(date => {
-          let content = 'Post Serviço';
-          let isCheck = false;
-          if (date === '24/12') { content = 'Happy Holidays 🎄'; isCheck = true; }
-          if (date === '31/12') { content = 'Happy New Year 🎆'; isCheck = true; }
-          if (date === '02/01') { content = 'Primeira postagem do ano'; }
-
-          newItems.push({
-            client_id: newClient.id,
-            client: name,
-            responsible,
-            type: 'FEED',
-            date,
-            content_type: content,
-            is_checkpoint: isCheck
-          });
-        });
-
-        STORY_DATES.forEach(date => {
-          let content = 'Story';
-          let isCheck = false;
-          if (date === '25/12') { content = 'Happy Holidays (diferente do feed) 🎄'; isCheck = true; }
-          if (date === '01/01') { content = 'Mensagem Motivacional ✨'; isCheck = true; }
-
-          newItems.push({
-            client_id: newClient.id,
-            client: name,
-            responsible,
-            type: 'STORY',
-            date,
-            content_type: content,
-            is_checkpoint: isCheck
-          });
-        });
-
-        await supabase.from('items').insert(newItems);
-
-        document.getElementById('newClientName').value = '';
-        toast(`Cliente "${name}" adicionado!`);
-        loadAll();
-      } catch (err) {
-        console.error(err);
-        toast('Erro ao adicionar cliente');
-      }
-    }
-
-    async function deleteClient(id, name) {
-      if (!confirm(`Excluir "${name}" e todos os itens associados?`)) return;
-
-      try {
-        await supabase.from('clients').delete().eq('id', id);
-        toast(`"${name}" removido`);
-        loadAll();
-      } catch (err) {
-        console.error(err);
-        toast('Erro');
-      }
-    }
-
-    // ==================== HELPERS ====================
-    function updateSyncStatus(ok) {
-      document.getElementById('syncDot').style.background = ok ? 'var(--green)' : 'var(--red)';
-      document.getElementById('syncText').textContent = ok ? 'Sincronizado' : 'Sem conexão';
-    }
-
-    function getDateStatus(d) {
-      const [day, month] = d.split('/');
-      const year = month === '01' ? 2025 : 2024;
-      const itemDate = new Date(year, parseInt(month) - 1, parseInt(day));
-      const today = new Date();
-      today.setHours(0,0,0,0);
-      itemDate.setHours(0,0,0,0);
-      if (itemDate.getTime() === today.getTime()) return 'today';
-      if (itemDate < today) return 'past';
-      return 'future';
-    }
-
-    function isDone(i) { return i.status_schedule === 'Programado' || i.status_schedule === 'Publicado'; }
-    function isInProgress(i) {
-      return ['Em andamento', 'Criado'].includes(i.status_creation) ||
-             ['Em revisão', 'Aprovado'].includes(i.status_approval);
-    }
-
-    function getStatusClass(s) {
-      const map = {
-        'Pendente': 'pending', 'Aguardando': 'pending', 'Não programado': 'pending',
-        'Em andamento': 'em-andamento', 'Em revisão': 'em-andamento', 'Ajustes solicitados': 'em-andamento',
-        'Criado': 'criado', 'Aprovado': 'aprovado', 'Programado': 'programado', 'Publicado': 'publicado'
-      };
-      return map[s] || 'pending';
-    }
-
-    function getClientColor(name) {
-      const c = clients.find(x => x.name === name);
-      return c ? c.color : '#666';
-    }
-
-    function toast(msg) {
-      const t = document.getElementById('toast');
-      document.getElementById('toastMsg').textContent = msg;
-      t.classList.remove('hidden');
-      setTimeout(() => t.classList.add('hidden'), 2500);
-    }
-
-    // ==================== SELECTION ====================
-    function toggleSelectAll(checkbox) {
-      const filtered = getFilteredItems();
-      if (checkbox.checked) {
-        filtered.forEach(i => selectedItems.add(i.id));
-      } else {
-        selectedItems.clear();
-      }
-      updateBatchBar();
-      renderMainTable();
-    }
-
-    function toggleSelect(id) {
-      if (selectedItems.has(id)) selectedItems.delete(id);
-      else selectedItems.add(id);
-      updateBatchBar();
-      renderMainTable();
-    }
-
-    function clearSelection() {
-      selectedItems.clear();
-      updateBatchBar();
-      renderMainTable();
-    }
-
-    function updateBatchBar() {
-      const bar = document.getElementById('batchBar');
-      document.getElementById('selCount').textContent = selectedItems.size;
-      bar.classList.toggle('hidden', selectedItems.size === 0);
-    }
-
-    // ==================== QUICK FILTERS ====================
-    function toggleQuickFilter(f) {
-      activeFilter = activeFilter === f ? null : f;
-      document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active'));
-      if (activeFilter) document.getElementById(`qf-${activeFilter}`).classList.add('active');
+function setupRealtime() {
+  supabase.channel('changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'items' }, p => {
+      if (p.eventType === 'UPDATE') { const idx = items.findIndex(x => x.id === p.new.id); if (idx !== -1) items[idx] = p.new; }
+      else if (p.eventType === 'INSERT') items.push(p.new);
       renderAll();
-    }
+      if (p.new?.last_updated_by && p.new.last_updated_by !== currentUser.name) toast(`${p.new.last_updated_by} atualizou ${p.new.client}`);
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'clients' }, () => loadAll())
+    .subscribe();
+}
 
-    function clearFilters() {
-      activeFilter = null;
-      document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('f-responsible').value = '';
-      document.getElementById('f-client').value = '';
-      document.getElementById('f-type').value = '';
-      document.getElementById('f-status').value = '';
-      document.getElementById('f-date').value = '';
-      renderAll();
-    }
+// UPDATE
+async function updateItem(id, field, value) {
+  try {
+    const upd = { [field]: value, last_updated_by: currentUser.name, last_updated_at: new Date().toISOString() };
+    if (field === 'pre_check_status' && value === 'Tudo OK') { upd.pre_check_by = currentUser.name; upd.pre_check_at = new Date().toISOString(); }
+    if (field === 'post_check_status' && value === 'Publicado OK') { upd.post_check_by = currentUser.name; upd.post_check_at = new Date().toISOString(); }
+    await supabase.from('items').update(upd).eq('id', id);
+    const item = items.find(x => x.id === id); if (item) Object.assign(item, upd);
+    renderAll(); toast('Salvo!');
+  } catch (err) { console.error(err); toast('Erro'); }
+}
 
-    function updateQuickCounts() {
-      const urgent = items.filter(i => !isDone(i) && getDateStatus(i.date) === 'past').length;
-      const today = items.filter(i => getDateStatus(i.date) === 'today').length;
-      const checks = items.filter(i => i.is_checkpoint && !isDone(i)).length;
-      const pending = items.filter(i => i.status_schedule === 'Não programado' && i.status_creation === 'Pendente').length;
+async function toggleCheck(id, field) {
+  const item = items.find(x => x.id === id);
+  if (!item) return;
+  await updateItem(id, field, !item[field]);
+}
 
-      document.getElementById('cnt-urgent').textContent = urgent;
-      document.getElementById('cnt-today').textContent = today;
-      document.getElementById('cnt-checkpoints').textContent = checks;
-      document.getElementById('cnt-pending').textContent = pending;
-    }
-
-    // ==================== FILTERS ====================
-    function populateFilters() {
-      // Responsible filter
-      const resps = [...new Set(items.map(i => i.responsible).filter(Boolean))].sort();
-      document.getElementById('f-responsible').innerHTML = '<option value="">Todos Responsáveis</option>' +
-        resps.map(r => `<option value="${r}">${r}</option>`).join('');
-
-      // Client filter
-      const cls = [...new Set(items.map(i => i.client))].sort();
-      document.getElementById('f-client').innerHTML = '<option value="">Todos Clientes</option>' +
-        cls.map(c => `<option value="${c}">${c}</option>`).join('');
-
-      // Date filter
-      const dates = [...new Set([...FEED_DATES, ...STORY_DATES])].sort((a, b) => {
-        const [dA, mA] = a.split('/'); const [dB, mB] = b.split('/');
-        if (mA !== mB) return parseInt(mA) - parseInt(mB);
-        return parseInt(dA) - parseInt(dB);
-      });
-      document.getElementById('f-date').innerHTML = '<option value="">Todas Datas</option>' +
-        dates.map(d => `<option value="${d}">${d}</option>`).join('');
-
-      // Admin responsible select
-      const socialMedias = teamMembers.filter(t => t.role === 'social_media');
-      document.getElementById('newClientResp').innerHTML = '<option value="">Sem responsável</option>' +
-        socialMedias.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
-    }
-
-    function getFilteredItems() {
-      let filtered = [...items];
-
-      if (activeFilter === 'urgent') filtered = filtered.filter(i => !isDone(i) && getDateStatus(i.date) === 'past');
-      else if (activeFilter === 'today') filtered = filtered.filter(i => getDateStatus(i.date) === 'today');
-      else if (activeFilter === 'checkpoints') filtered = filtered.filter(i => i.is_checkpoint);
-      else if (activeFilter === 'pending') filtered = filtered.filter(i => i.status_schedule === 'Não programado' && i.status_creation === 'Pendente');
-
-      const fResp = document.getElementById('f-responsible').value;
-      const fClient = document.getElementById('f-client').value;
-      const fType = document.getElementById('f-type').value;
-      const fStatus = document.getElementById('f-status').value;
-      const fDate = document.getElementById('f-date').value;
-
-      if (fResp) filtered = filtered.filter(i => i.responsible === fResp);
-      if (fClient) filtered = filtered.filter(i => i.client === fClient);
-      if (fType) filtered = filtered.filter(i => i.type === fType);
-      if (fDate) filtered = filtered.filter(i => i.date === fDate);
-      if (fStatus) filtered = filtered.filter(i => [i.status_creation, i.status_approval, i.status_schedule].includes(fStatus));
-
-      return filtered;
-    }
-
-    function applyFilters() { renderMainTable(); }
-
-    // ==================== RENDERING ====================
-    function renderAll() {
-      updateQuickCounts();
-      renderStats();
-      renderTeamGrid();
-      renderUrgentTable();
-      renderMainTable();
-      renderCalendar();
-      renderChecklist();
-      renderClientList();
-    }
-
-    function renderStats() {
-      const total = items.length;
-      const pending = items.filter(i => i.status_schedule === 'Não programado' && i.status_creation === 'Pendente').length;
-      const progress = items.filter(i => isInProgress(i) && !isDone(i)).length;
-      const done = items.filter(i => i.status_schedule === 'Programado').length;
-      const published = items.filter(i => i.status_schedule === 'Publicado').length;
-
-      const percent = total > 0 ? Math.round(((done + published) / total) * 100) : 0;
-
-      document.getElementById('mega-progress').textContent = percent + '%';
-      document.getElementById('mega-pending').textContent = pending;
-      document.getElementById('mega-progress-count').textContent = progress;
-      document.getElementById('mega-done').textContent = done;
-      document.getElementById('mega-published').textContent = published;
-
-      document.getElementById('bar-percent').textContent = percent + '%';
-      document.getElementById('bar-published').style.width = (published / total * 100) + '%';
-      document.getElementById('bar-done').style.width = (done / total * 100) + '%';
-      document.getElementById('bar-progress').style.width = (progress / total * 100) + '%';
-    }
-
-    function renderTeamGrid() {
-      const container = document.getElementById('teamGrid');
-      const socialMedias = teamMembers.filter(t => t.role === 'social_media');
-
-      container.innerHTML = socialMedias.map(member => {
-        const memberItems = items.filter(i => i.responsible === member.name);
-        const doneCount = memberItems.filter(i => isDone(i)).length;
-        const percent = memberItems.length > 0 ? Math.round((doneCount / memberItems.length) * 100) : 0;
-
-        return `
-          <div class="team-card">
-            <div class="team-card-header">
-              <div class="team-avatar" style="background:${member.color}">${member.name[0]}</div>
-              <div>
-                <div class="team-name">${member.name}</div>
-                <div class="team-role">${memberItems.length} itens</div>
-              </div>
-            </div>
-            <div class="team-progress">
-              <div class="team-bar">
-                <div class="team-bar-fill" style="width:${percent}%;background:${percent === 100 ? 'var(--green)' : percent > 50 ? 'var(--orange)' : 'var(--red)'}"></div>
-              </div>
-              <div class="team-percent" style="color:${percent === 100 ? 'var(--green)' : percent > 50 ? 'var(--orange)' : 'var(--red)'}">${percent}%</div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderUrgentTable() {
-      const tbody = document.getElementById('urgentTableBody');
-      
-      const urgentItems = items.filter(i => {
-        if (isDone(i)) return false;
-        const ds = getDateStatus(i.date);
-        return ds === 'past' || ds === 'today' || i.is_checkpoint;
-      }).sort((a, b) => {
-        if (getDateStatus(a.date) === 'past' && getDateStatus(b.date) !== 'past') return -1;
-        if (getDateStatus(b.date) === 'past' && getDateStatus(a.date) !== 'past') return 1;
-        return 0;
-      }).slice(0, 15);
-
-      if (urgentItems.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted)">🎉 Nenhuma pendência urgente!</td></tr>';
-        return;
-      }
-
-      tbody.innerHTML = urgentItems.map(i => {
-        const ds = getDateStatus(i.date);
-        return `
-          <tr class="${i.is_checkpoint ? 'checkpoint' : ''} ${ds === 'past' ? 'overdue' : ''}">
-            <td><div class="client-cell"><div class="client-dot" style="background:${getClientColor(i.client)}"></div><span class="client-text">${i.client}</span></div></td>
-            <td><span class="type-pill ${i.type.toLowerCase()}">${i.type}</span>${i.is_checkpoint ? '<span class="checkpoint-icon">⭐</span>' : ''}</td>
-            <td><span class="date-text ${ds}">${i.date}</span></td>
-            <td style="color:${i.is_checkpoint ? 'var(--yellow)' : 'var(--text-muted)'}">${i.content_type}</td>
-            <td><span class="responsible-pill" style="background:${getClientColor(i.responsible + ' ') || 'var(--purple-bg)'}; color:var(--text)">${i.responsible || '-'}</span></td>
-            <td><span class="status-select ${getStatusClass(i.status_schedule)}" style="padding:0.3rem 0.6rem">${i.status_schedule}</span></td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function renderMainTable() {
-      const tbody = document.getElementById('mainTableBody');
-      const filtered = getFilteredItems();
-
-      if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:2rem;color:var(--text-muted)">Nenhum item encontrado</td></tr>';
-        return;
-      }
-
-      const approvalDisabled = !isGestor() ? 'disabled' : '';
-
-      tbody.innerHTML = filtered.map(i => {
-        const ds = getDateStatus(i.date);
-        const isOverdue = !isDone(i) && ds === 'past';
-        const isSel = selectedItems.has(i.id);
-        const updateInfo = i.last_updated_by ? `<strong>${i.last_updated_by}</strong> ${new Date(i.last_updated_at).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}` : '';
-
-        return `
-          <tr class="${i.is_checkpoint ? 'checkpoint' : ''} ${isOverdue ? 'overdue' : ''} ${isSel ? 'selected' : ''}">
-            <td><input type="checkbox" class="row-check" ${isSel ? 'checked' : ''} onchange="toggleSelect(${i.id})"></td>
-            <td><div class="client-cell"><div class="client-dot" style="background:${getClientColor(i.client)}"></div><span class="client-text">${i.client}</span></div></td>
-            <td><span class="type-pill ${i.type.toLowerCase()}">${i.type}</span>${i.is_checkpoint ? '<span class="checkpoint-icon">⭐</span>' : ''}</td>
-            <td><span class="date-text ${ds}">${i.date}</span></td>
-            <td style="font-size:0.8rem;color:${i.is_checkpoint ? 'var(--yellow)' : 'var(--text-muted)'}">${i.content_type}</td>
-            <td><span class="responsible-pill" style="background:var(--bg-elevated)">${i.responsible ? i.responsible[0] : '-'}</span></td>
-            <td>
-              <select class="status-select ${getStatusClass(i.status_creation)}" onchange="updateItem(${i.id},'status_creation',this.value)">
-                <option value="Pendente" ${i.status_creation === 'Pendente' ? 'selected' : ''}>Pendente</option>
-                <option value="Em andamento" ${i.status_creation === 'Em andamento' ? 'selected' : ''}>Em andamento</option>
-                <option value="Criado" ${i.status_creation === 'Criado' ? 'selected' : ''}>Criado</option>
-              </select>
-            </td>
-            <td>
-              <select class="status-select ${getStatusClass(i.status_approval)}" onchange="updateItem(${i.id},'status_approval',this.value)" ${approvalDisabled}>
-                <option value="Aguardando" ${i.status_approval === 'Aguardando' ? 'selected' : ''}>Aguardando</option>
-                <option value="Em revisão" ${i.status_approval === 'Em revisão' ? 'selected' : ''}>Em revisão</option>
-                <option value="Ajustes solicitados" ${i.status_approval === 'Ajustes solicitados' ? 'selected' : ''}>Ajustes</option>
-                <option value="Aprovado" ${i.status_approval === 'Aprovado' ? 'selected' : ''}>Aprovado</option>
-              </select>
-            </td>
-            <td>
-              <select class="status-select ${getStatusClass(i.status_schedule)}" onchange="updateItem(${i.id},'status_schedule',this.value)">
-                <option value="Não programado" ${i.status_schedule === 'Não programado' ? 'selected' : ''}>Não prog.</option>
-                <option value="Programado" ${i.status_schedule === 'Programado' ? 'selected' : ''}>Programado</option>
-                <option value="Publicado" ${i.status_schedule === 'Publicado' ? 'selected' : ''}>Publicado</option>
-              </select>
-            </td>
-            <td><input type="text" class="mini-input ${i.material_link ? 'has-value' : ''}" value="${i.material_link || ''}" placeholder="Link..." onclick="if(this.value)window.open(this.value,'_blank')" onchange="updateItem(${i.id},'material_link',this.value)"></td>
-            <td><input type="text" class="mini-input" value="${i.observations || ''}" placeholder="Obs..." onchange="updateItem(${i.id},'observations',this.value)"></td>
-            <td class="update-info">${updateInfo}</td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function renderCalendar() {
-      const grid = document.getElementById('calendarGrid');
-      const allDates = [...new Set([...FEED_DATES, ...STORY_DATES])].sort((a, b) => {
-        const [dA, mA] = a.split('/'); const [dB, mB] = b.split('/');
-        if (mA !== mB) return parseInt(mA) - parseInt(mB);
-        return parseInt(dA) - parseInt(dB);
-      });
-
-      const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-
-      grid.innerHTML = allDates.map(date => {
-        const [day, month] = date.split('/');
-        const year = month === '01' ? 2025 : 2024;
-        const dateObj = new Date(year, parseInt(month) - 1, parseInt(day));
-        const dayName = dayNames[dateObj.getDay()];
-        
-        const dateItems = items.filter(i => i.date === date);
-        const totalFeeds = dateItems.filter(i => i.type === 'FEED').length;
-        const totalStories = dateItems.filter(i => i.type === 'STORY').length;
-        const doneFeeds = dateItems.filter(i => i.type === 'FEED' && isDone(i)).length;
-        const doneStories = dateItems.filter(i => i.type === 'STORY' && isDone(i)).length;
-        
-        const isCheck = ['24/12', '25/12', '31/12', '01/01'].includes(date);
-        const isReviewed = reviews.some(r => r.review_date === date);
-        const reviewBtnDisabled = !isGestor() ? 'disabled' : '';
-
-        return `
-          <div class="cal-day ${isCheck ? 'checkpoint' : ''} ${isReviewed ? 'reviewed' : ''}">
-            <div class="cal-day-head">
-              <div class="cal-day-num">${day}</div>
-              <div class="cal-day-name">${dayName} ${month === '01' ? 'Jan' : 'Dez'}</div>
-            </div>
-            <div class="cal-day-body">
-              <div class="cal-stat"><span>Feed</span><span class="cal-stat-val ${doneFeeds === totalFeeds ? 'ok' : 'bad'}">${doneFeeds}/${totalFeeds}</span></div>
-              <div class="cal-stat"><span>Story</span><span class="cal-stat-val ${doneStories === totalStories ? 'ok' : 'bad'}">${doneStories}/${totalStories}</span></div>
-            </div>
-            <button class="cal-review-btn ${isReviewed ? 'done' : ''}" onclick="toggleReview('${date}')" ${reviewBtnDisabled}>
-              ${isReviewed ? '✓ Revisado' : 'Marcar revisado'}
-            </button>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderChecklist() {
-      const list = document.getElementById('checkList');
-      
-      const checks = [
-        { text: 'Feeds de 24/12 (Happy Holidays) programados?', filter: i => i.date === '24/12' && i.type === 'FEED' },
-        { text: 'Stories de 25/12 (Happy Holidays) programados?', filter: i => i.date === '25/12' && i.type === 'STORY' },
-        { text: 'Feeds de 31/12 (Happy New Year) programados?', filter: i => i.date === '31/12' && i.type === 'FEED' },
-        { text: 'Stories de 01/01 (Motivacional) programados?', filter: i => i.date === '01/01' && i.type === 'STORY' },
-        { text: 'Feeds de 05/01 programados antes de 31/12?', filter: i => i.date === '05/01' && i.type === 'FEED' },
-        { text: 'Todos os clientes da Priscila 100% concluídos?', filter: i => i.responsible === 'Priscila' },
-        { text: 'Todos os clientes da Marcela 100% concluídos?', filter: i => i.responsible === 'Marcela' },
-        { text: 'TUDO concluído — 100%?', filter: () => true }
-      ];
-
-      list.innerHTML = checks.map(c => {
-        const filtered = items.filter(c.filter);
-        const done = filtered.filter(i => isDone(i)).length;
-        const isOk = done === filtered.length && filtered.length > 0;
-
-        return `
-          <div class="check-item ${isOk ? 'ok' : ''}">
-            <div class="check-box"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-            <div class="check-text">${c.text}</div>
-            <div class="check-count">${done}/${filtered.length}</div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderClientList() {
-      const list = document.getElementById('clientList');
-      
-      list.innerHTML = clients.map(c => `
-        <div class="client-item">
-          <div class="client-item-info">
-            <div class="client-item-dot" style="background:${c.color}"></div>
-            <div>
-              <div class="client-item-name">${c.name}</div>
-              <div class="client-item-resp">${c.responsible || 'Sem responsável'}</div>
-            </div>
-          </div>
-          <div class="client-item-actions">
-            <button class="client-item-btn danger" onclick="deleteClient(${c.id}, '${c.name}')">Excluir</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    // ==================== NAVIGATION ====================
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-        document.getElementById('tab-' + btn.dataset.tab).style.display = 'block';
-      });
+// CLIENTS
+async function addClient() {
+  const name = document.getElementById('newClientName').value.trim();
+  const sm = document.getElementById('newClientSM').value || null;
+  const gestor = document.getElementById('newClientGestor').value || null;
+  const color = document.getElementById('newClientColor').value;
+  if (!name) { toast('Digite o nome'); return; }
+  
+  try {
+    const { data: nc } = await supabase.from('clients').insert({ name, social_media: sm, gestor, color }).select().single();
+    const newItems = [];
+    FEED_DATES.forEach(d => {
+      let ct = 'Post Serviço', cp = false;
+      if (d === '24/12') { ct = 'Happy Holidays 🎄'; cp = true; }
+      if (d === '31/12') { ct = 'Happy New Year 🎆'; cp = true; }
+      if (d === '02/01') ct = 'Primeira postagem do ano';
+      newItems.push({ client_id: nc.id, client: name, social_media: sm, gestor, type: 'FEED', date: d, content_type: ct, is_checkpoint: cp });
     });
+    STORY_DATES.forEach(d => {
+      let ct = 'Story', cp = false;
+      if (d === '25/12') { ct = 'Happy Holidays (diferente do feed) 🎄'; cp = true; }
+      if (d === '01/01') { ct = 'Mensagem Motivacional ✨'; cp = true; }
+      newItems.push({ client_id: nc.id, client: name, social_media: sm, gestor, type: 'STORY', date: d, content_type: ct, is_checkpoint: cp });
+    });
+    await supabase.from('items').insert(newItems);
+    document.getElementById('newClientName').value = '';
+    toast(`"${name}" adicionado!`); loadAll();
+  } catch (err) { console.error(err); toast('Erro'); }
+}
 
-    // ==================== INIT ====================
-    async function init() {
-      await loadAll();
-      setupRealtime();
-    }
+async function deleteClient(id, name) {
+  if (!confirm(`Excluir "${name}"?`)) return;
+  await supabase.from('clients').delete().eq('id', id);
+  toast('Removido'); loadAll();
+}
 
-    checkAuth();
-  </script>
+// HELPERS
+function getDateStatus(d) {
+  const [day, month] = d.split('/');
+  const year = month === '01' ? 2025 : 2024;
+  const dt = new Date(year, parseInt(month) - 1, parseInt(day));
+  const today = new Date(); today.setHours(0,0,0,0); dt.setHours(0,0,0,0);
+  if (dt.getTime() === today.getTime()) return 'today';
+  if (dt < today) return 'past';
+  return 'future';
+}
+
+function isScheduled(i) { return i.platform !== 'Não agendado'; }
+function isPreChecked(i) { return i.pre_check_status === 'Tudo OK'; }
+function isPostChecked(i) { return i.post_check_status === 'Publicado OK'; }
+function needsPreCheck(i) { return isScheduled(i) && i.pre_check_status === 'Não verificado'; }
+function needsPostCheck(i) {
+  if (i.post_check_status !== 'Aguardando') return false;
+  const ds = getDateStatus(i.date);
+  return ds === 'past' || ds === 'today';
+}
+function getClientColor(name) { const c = clients.find(x => x.name === name); return c?.color || '#666'; }
+function toast(msg) { const t = document.getElementById('toast'); document.getElementById('toastMsg').textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
+function formatUpdate(i) { if (!i.last_updated_by) return ''; const d = new Date(i.last_updated_at); return `<strong>${i.last_updated_by}</strong><br>${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`; }
+
+// FILTERS
+function populateFilters() {
+  const gestores = team.filter(t => t.role === 'gestor');
+  const sms = team.filter(t => t.role === 'social_media');
+  const cls = clients.map(c => c.name).sort();
+  const dates = [...new Set([...FEED_DATES, ...STORY_DATES])].sort((a,b) => { const [dA,mA]=a.split('/');const [dB,mB]=b.split('/'); return mA!==mB?parseInt(mA)-parseInt(mB):parseInt(dA)-parseInt(dB); });
+
+  document.getElementById('fGestor').innerHTML = '<option value="">Todos Gestores</option>' + gestores.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
+  document.getElementById('fSocialMedia').innerHTML = '<option value="">Todas Social Media</option>' + sms.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
+  document.getElementById('fClient').innerHTML = '<option value="">Todos Clientes</option>' + cls.map(c => `<option value="${c}">${c}</option>`).join('');
+  document.getElementById('fDate').innerHTML = '<option value="">Todas Datas</option>' + dates.map(d => `<option value="${d}">${d}</option>`).join('');
+  document.getElementById('newClientSM').innerHTML = '<option value="">Social Media</option>' + sms.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
+  document.getElementById('newClientGestor').innerHTML = '<option value="">Gestor</option>' + gestores.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
+}
+
+function getMyItems() {
+  if (currentUser.role === 'gestor') return items.filter(i => i.gestor === currentUser.name);
+  if (currentUser.role === 'social_media') return items.filter(i => i.social_media === currentUser.name);
+  return items;
+}
+
+function getFilteredItems() {
+  let f = [...items];
+  const fG = document.getElementById('fGestor').value;
+  const fS = document.getElementById('fSocialMedia').value;
+  const fC = document.getElementById('fClient').value;
+  const fT = document.getElementById('fType').value;
+  const fD = document.getElementById('fDate').value;
+  if (fG) f = f.filter(i => i.gestor === fG);
+  if (fS) f = f.filter(i => i.social_media === fS);
+  if (fC) f = f.filter(i => i.client === fC);
+  if (fT) f = f.filter(i => i.type === fT);
+  if (fD) f = f.filter(i => i.date === fD);
+  return f;
+}
+
+// RENDER
+function renderAll() {
+  renderAlerts(); renderStats(); renderProgress(); renderUrgent();
+  renderPreCheck(); renderPostCheck(); renderMainTable(); renderTeam(); renderClients();
+}
+
+function renderAlerts() {
+  const my = getMyItems();
+  const notScheduled = my.filter(i => !isScheduled(i)).length;
+  const needsPre = my.filter(i => needsPreCheck(i)).length;
+  const needsPost = my.filter(i => needsPostCheck(i)).length;
+  const overdue = my.filter(i => !isPostChecked(i) && getDateStatus(i.date) === 'past').length;
+  
+  document.getElementById('preCheckCount').textContent = needsPre;
+  document.getElementById('postCheckCount').textContent = needsPost;
+
+  const c = document.getElementById('alertsContainer');
+  c.innerHTML = `
+    ${overdue > 0 ? `<div class="alert red"><div class="alert-icon">🚨</div><div class="alert-info"><div class="alert-title">Atrasados</div><div class="alert-desc">Posts passados não concluídos</div></div><div class="alert-count">${overdue}</div></div>` : ''}
+    ${needsPost > 0 ? `<div class="alert cyan" onclick="switchTab('post-check')"><div class="alert-icon">📱</div><div class="alert-info"><div class="alert-title">Verificar Instagram</div><div class="alert-desc">Checar se publicou</div></div><div class="alert-count">${needsPost}</div></div>` : ''}
+    ${needsPre > 0 ? `<div class="alert orange" onclick="switchTab('pre-check')"><div class="alert-icon">🔍</div><div class="alert-info"><div class="alert-title">Verificar Agendamentos</div><div class="alert-desc">Conferir no Ekyte/Meta</div></div><div class="alert-count">${needsPre}</div></div>` : ''}
+    ${notScheduled > 0 ? `<div class="alert red"><div class="alert-icon">⏳</div><div class="alert-info"><div class="alert-title">Não Agendados</div><div class="alert-desc">Social Media precisa agendar</div></div><div class="alert-count">${notScheduled}</div></div>` : ''}
+    ${overdue === 0 && needsPost === 0 && needsPre === 0 && notScheduled === 0 ? `<div class="alert green"><div class="alert-icon">🎉</div><div class="alert-info"><div class="alert-title">Tudo em dia!</div><div class="alert-desc">Nenhuma pendência</div></div></div>` : ''}
+  `;
+}
+
+function renderStats() {
+  const my = getMyItems();
+  document.getElementById('sTotal').textContent = my.length;
+  document.getElementById('sNotScheduled').textContent = my.filter(i => !isScheduled(i)).length;
+  document.getElementById('sScheduled').textContent = my.filter(i => isScheduled(i)).length;
+  document.getElementById('sPreChecked').textContent = my.filter(i => isPreChecked(i)).length;
+  document.getElementById('sPostChecked').textContent = my.filter(i => isPostChecked(i)).length;
+}
+
+function renderProgress() {
+  const my = getMyItems();
+  const total = my.length;
+  const done = my.filter(i => isPostChecked(i)).length;
+  const checked = my.filter(i => isPreChecked(i) && !isPostChecked(i)).length;
+  const scheduled = my.filter(i => isScheduled(i) && !isPreChecked(i)).length;
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  
+  document.getElementById('progressPercent').textContent = pct + '%';
+  document.getElementById('barDone').style.width = (done / total * 100) + '%';
+  document.getElementById('barChecked').style.width = (checked / total * 100) + '%';
+  document.getElementById('barScheduled').style.width = (scheduled / total * 100) + '%';
+}
+
+function renderUrgent() {
+  const my = getMyItems();
+  const urgent = my.filter(i => {
+    if (isPostChecked(i)) return false;
+    const ds = getDateStatus(i.date);
+    return ds === 'past' || ds === 'today' || i.is_checkpoint || needsPreCheck(i) || needsPostCheck(i);
+  }).sort((a, b) => {
+    if (getDateStatus(a.date) === 'past' && getDateStatus(b.date) !== 'past') return -1;
+    return 0;
+  }).slice(0, 12);
+
+  const tb = document.getElementById('urgentTable');
+  if (urgent.length === 0) { tb.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:var(--text-muted)">🎉 Nenhuma pendência!</td></tr>'; return; }
+
+  tb.innerHTML = urgent.map(i => {
+    const ds = getDateStatus(i.date);
+    let status = 'Não agendado';
+    if (isScheduled(i)) status = 'Agendado';
+    if (isPreChecked(i)) status = 'Verificado';
+    if (needsPostCheck(i)) status = '📱 Checar Instagram';
+    if (isPostChecked(i)) status = '✓ OK';
+    
+    return `<tr class="${i.is_checkpoint ? 'checkpoint' : ''} ${ds === 'past' && !isPostChecked(i) ? 'overdue' : ''} ${needsPostCheck(i) ? 'verify-now' : ''}">
+      <td><div class="client-cell"><div class="client-dot" style="background:${getClientColor(i.client)}"></div><span class="client-name">${i.client}</span></div></td>
+      <td><span class="pill ${i.type.toLowerCase()}">${i.type}</span>${i.is_checkpoint ? '<span class="pill cp">⭐</span>' : ''}</td>
+      <td><span class="date-text ${ds}">${i.date}</span></td>
+      <td style="font-size:0.7rem;color:var(--text-muted)">${i.content_type}</td>
+      <td style="font-size:0.7rem">${i.social_media || '-'}</td>
+      <td style="font-size:0.7rem">${i.gestor || '-'}</td>
+      <td><span class="pill" style="background:var(--bg-elevated)">${status}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderPreCheck() {
+  const my = getMyItems().filter(i => isScheduled(i));
+  const tb = document.getElementById('preCheckTable');
+  
+  if (my.length === 0) { tb.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Nenhum agendamento para verificar</td></tr>'; return; }
+
+  tb.innerHTML = my.map(i => {
+    const preClass = i.pre_check_status === 'Não verificado' ? 'orange' : i.pre_check_status === 'Tudo OK' ? 'green' : 'red';
+    const platformClass = i.platform === 'Ekyte' ? 'blue' : i.platform === 'Meta Business' ? 'purple' : 'cyan';
+    
+    return `<tr class="${i.pre_check_status === 'Não verificado' ? '' : ''} ${i.is_checkpoint ? 'checkpoint' : ''}">
+      <td><div class="client-cell"><div class="client-dot" style="background:${getClientColor(i.client)}"></div><span class="client-name">${i.client}</span></div></td>
+      <td><span class="pill ${i.type.toLowerCase()}">${i.type}</span></td>
+      <td><span class="date-text ${getDateStatus(i.date)}">${i.date}</span></td>
+      <td><select class="mini-select ${platformClass}" onchange="updateItem(${i.id},'platform',this.value)">
+        <option value="Ekyte" ${i.platform==='Ekyte'?'selected':''}>Ekyte</option>
+        <option value="Meta Business" ${i.platform==='Meta Business'?'selected':''}>Meta</option>
+        <option value="Agendado direto" ${i.platform==='Agendado direto'?'selected':''}>Direto</option>
+      </select></td>
+      <td><input type="text" class="mini-input" value="${i.scheduled_time||''}" placeholder="00:00" onchange="updateItem(${i.id},'scheduled_time',this.value)" style="width:45px"></td>
+      <td><input type="text" class="mini-input link" value="${i.scheduling_link||''}" placeholder="Link..." onclick="if(this.value)window.open(this.value,'_blank')" onchange="updateItem(${i.id},'scheduling_link',this.value)"></td>
+      <td><select class="mini-select ${preClass}" onchange="updateItem(${i.id},'pre_check_status',this.value)" ${isGestor()?'':'disabled'}>
+        <option value="Não verificado" ${i.pre_check_status==='Não verificado'?'selected':''}>Não verificado</option>
+        <option value="Tudo OK" ${i.pre_check_status==='Tudo OK'?'selected':''}>Tudo OK</option>
+        <option value="Problemas" ${i.pre_check_status==='Problemas'?'selected':''}>Problemas</option>
+      </select></td>
+      <td><div class="check-group">
+        <button class="check-btn ${i.pre_check_time_ok?'checked':''}" title="Horário OK" onclick="toggleCheck(${i.id},'pre_check_time_ok')" ${isGestor()?'':'disabled'}>🕐</button>
+        <button class="check-btn ${i.pre_check_visual_ok?'checked':''}" title="Visual OK" onclick="toggleCheck(${i.id},'pre_check_visual_ok')" ${isGestor()?'':'disabled'}>🎨</button>
+        <button class="check-btn ${i.pre_check_text_ok?'checked':''}" title="Texto OK" onclick="toggleCheck(${i.id},'pre_check_text_ok')" ${isGestor()?'':'disabled'}>📝</button>
+        <button class="check-btn ${i.pre_check_hashtags_ok?'checked':''}" title="Hashtags OK" onclick="toggleCheck(${i.id},'pre_check_hashtags_ok')" ${isGestor()?'':'disabled'}>#</button>
+      </div></td>
+      <td><input type="text" class="mini-input" value="${i.pre_check_notes||''}" placeholder="..." onchange="updateItem(${i.id},'pre_check_notes',this.value)" style="width:70px"></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderPostCheck() {
+  const toCheck = getMyItems().filter(i => needsPostCheck(i));
+  const grid = document.getElementById('postCheckGrid');
+  
+  if (toCheck.length === 0) {
+    grid.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--text-muted);grid-column:1/-1"><div style="font-size:3rem;margin-bottom:0.5rem">🎉</div>Nenhum post para verificar agora!</div>';
+    return;
+  }
+
+  grid.innerHTML = toCheck.map(i => {
+    const ds = getDateStatus(i.date);
+    return `<div class="verify-card ${ds === 'past' ? 'urgent' : ''}">
+      <div class="verify-card-header">
+        <div>
+          <div class="verify-client">${i.client}</div>
+          <div class="verify-meta">${i.social_media || ''} • ${i.gestor || ''}</div>
+        </div>
+        <div class="verify-type">
+          <span class="pill ${i.type.toLowerCase()}">${i.type}</span>
+          <span class="verify-time">${i.scheduled_time || i.date}</span>
+        </div>
+      </div>
+      <div class="verify-content">${i.content_type}</div>
+      <div class="verify-actions">
+        <button class="verify-btn ok" onclick="updateItem(${i.id},'post_check_status','Publicado OK')" ${isGestor()?'':'disabled'}>✓ Publicado OK</button>
+        <button class="verify-btn problem" onclick="updateItem(${i.id},'post_check_status','Não publicou')" ${isGestor()?'':'disabled'}>✕ Problema</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderMainTable() {
+  const filtered = getFilteredItems();
+  const tb = document.getElementById('mainTable');
+  
+  if (filtered.length === 0) { tb.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Nenhum item</td></tr>'; return; }
+
+  tb.innerHTML = filtered.map(i => {
+    const ds = getDateStatus(i.date);
+    const platformClass = i.platform === 'Não agendado' ? 'red' : i.platform === 'Ekyte' ? 'blue' : i.platform === 'Meta Business' ? 'purple' : 'cyan';
+    const preClass = i.pre_check_status === 'Não verificado' ? 'gray' : i.pre_check_status === 'Tudo OK' ? 'green' : 'red';
+    const postClass = i.post_check_status === 'Aguardando' ? 'gray' : i.post_check_status === 'Publicado OK' ? 'green' : 'red';
+    const checks = [i.pre_check_time_ok, i.pre_check_visual_ok, i.pre_check_text_ok, i.pre_check_hashtags_ok].filter(Boolean).length;
+
+    return `<tr class="${i.is_checkpoint ? 'checkpoint' : ''} ${ds === 'past' && !isPostChecked(i) ? 'overdue' : ''} ${needsPostCheck(i) ? 'verify-now' : ''}">
+      <td><div class="client-cell"><div class="client-dot" style="background:${getClientColor(i.client)}"></div><span class="client-name">${i.client}</span></div></td>
+      <td><span class="pill ${i.type.toLowerCase()}">${i.type}</span>${i.is_checkpoint?'<span class="pill cp">⭐</span>':''}</td>
+      <td><span class="date-text ${ds}">${i.date}</span></td>
+      <td><select class="mini-select ${platformClass}" onchange="updateItem(${i.id},'platform',this.value)">
+        <option value="Não agendado" ${i.platform==='Não agendado'?'selected':''}>Não agend.</option>
+        <option value="Ekyte" ${i.platform==='Ekyte'?'selected':''}>Ekyte</option>
+        <option value="Meta Business" ${i.platform==='Meta Business'?'selected':''}>Meta</option>
+        <option value="Agendado direto" ${i.platform==='Agendado direto'?'selected':''}>Direto</option>
+      </select></td>
+      <td><input type="text" class="mini-input" value="${i.scheduled_time||''}" placeholder="00:00" onchange="updateItem(${i.id},'scheduled_time',this.value)" style="width:45px"></td>
+      <td><input type="text" class="mini-input ${i.scheduling_link?'link':''}" value="${i.scheduling_link||''}" placeholder="Link" onclick="if(this.value)window.open(this.value,'_blank')" onchange="updateItem(${i.id},'scheduling_link',this.value)" style="width:60px"></td>
+      <td><select class="mini-select ${preClass}" onchange="updateItem(${i.id},'pre_check_status',this.value)" ${isGestor()?'':'disabled'}>
+        <option value="Não verificado" ${i.pre_check_status==='Não verificado'?'selected':''}>Não verif.</option>
+        <option value="Tudo OK" ${i.pre_check_status==='Tudo OK'?'selected':''}>OK</option>
+        <option value="Problemas" ${i.pre_check_status==='Problemas'?'selected':''}>Problemas</option>
+      </select></td>
+      <td style="font-size:0.7rem;color:${checks===4?'var(--green)':'var(--text-muted)'}">${checks}/4</td>
+      <td><select class="mini-select ${postClass}" onchange="updateItem(${i.id},'post_check_status',this.value)" ${isGestor()?'':'disabled'}>
+        <option value="Aguardando" ${i.post_check_status==='Aguardando'?'selected':''}>Aguard.</option>
+        <option value="Publicado OK" ${i.post_check_status==='Publicado OK'?'selected':''}>OK</option>
+        <option value="Não publicou" ${i.post_check_status==='Não publicou'?'selected':''}>Não pub.</option>
+        <option value="Publicou com erro" ${i.post_check_status==='Publicou com erro'?'selected':''}>Erro</option>
+      </select></td>
+      <td><input type="text" class="mini-input" value="${i.observations||''}" placeholder="..." onchange="updateItem(${i.id},'observations',this.value)" style="width:60px"></td>
+      <td class="update-cell">${formatUpdate(i)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderTeam() {
+  const grid = document.getElementById('teamGrid');
+  const roles = { supervisor: 'Supervisora', gestor: 'Gestor', social_media: 'Social Media' };
+  
+  grid.innerHTML = team.map(m => {
+    let mi = [];
+    if (m.role === 'gestor') mi = items.filter(i => i.gestor === m.name);
+    else if (m.role === 'social_media') mi = items.filter(i => i.social_media === m.name);
+    else mi = items;
+    
+    const total = mi.length;
+    const pending = mi.filter(i => !isScheduled(i)).length;
+    const preChecked = mi.filter(i => isPreChecked(i)).length;
+    const done = mi.filter(i => isPostChecked(i)).length;
+    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+    return `<div class="team-card">
+      <div class="team-header">
+        <div class="team-avatar" style="background:${m.color}">${m.name[0]}</div>
+        <div><div class="team-name">${m.name}</div><div class="team-role">${roles[m.role]}</div></div>
+      </div>
+      <div class="team-stats">
+        <div class="team-stat"><div class="team-stat-value" style="color:var(--red)">${pending}</div><div class="team-stat-label">Pendente</div></div>
+        <div class="team-stat"><div class="team-stat-value" style="color:var(--cyan)">${preChecked}</div><div class="team-stat-label">Verificado</div></div>
+        <div class="team-stat"><div class="team-stat-value" style="color:var(--green)">${done}</div><div class="team-stat-label">Concluído</div></div>
+      </div>
+      <div class="team-bar"><div class="team-bar-fill" style="width:${pct}%"></div></div>
+      <div style="text-align:center;margin-top:0.4rem;font-family:'JetBrains Mono';font-weight:700;font-size:0.9rem;color:${pct===100?'var(--green)':'var(--text-muted)'}">${pct}%</div>
+    </div>`;
+  }).join('');
+}
+
+function renderClients() {
+  const tb = document.getElementById('clientsTable');
+  tb.innerHTML = clients.map(c => {
+    const cnt = items.filter(i => i.client === c.name).length;
+    return `<tr>
+      <td><div class="client-cell"><div class="client-dot" style="background:${c.color}"></div><span class="client-name">${c.name}</span></div></td>
+      <td style="font-size:0.75rem">${c.social_media || '-'}</td>
+      <td style="font-size:0.75rem">${c.gestor || '-'}</td>
+      <td style="font-size:0.75rem">${cnt}</td>
+      <td><button class="mini-select red" style="cursor:pointer;border:none" onclick="deleteClient(${c.id},'${c.name}')">Excluir</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// NAV
+function switchTab(t) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`[data-tab="${t}"]`).classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(s => s.style.display = 'none');
+  document.getElementById('tab-' + t).style.display = 'block';
+}
+document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
+
+// INIT
+async function init() { await loadAll(); setupRealtime(); }
+checkAuth();
+</script>
 </body>
 </html>
