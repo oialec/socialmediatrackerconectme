@@ -705,16 +705,49 @@
 // CONFIG
 const SUPABASE_URL = 'https://jxxhypanwiqigtaptrrp.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4eGh5cGFud2lxaWd0YXB0cnJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY1MTgyMzQsImV4cCI6MjA4MjA5NDIzNH0.IKd0n-abux653kQspkE-uyoQwVXV5hvCzF_SA103auw';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let supabaseClient = null;
+
+// Inicializar Supabase com verificação
+try {
+  if (window.supabase && window.supabase.createClient) {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log('Supabase conectado!');
+  } else {
+    console.error('Supabase não carregou');
+    alert('Erro ao carregar. Recarregue a página.');
+  }
+} catch (e) {
+  console.error('Erro Supabase:', e);
+}
+
+// Alias para manter compatibilidade
+const supabase = supabaseClient;
 
 // STATE
 let items = [], clients = [], team = [], currentUser = null;
 const FEED_DATES = ['22/12', '24/12', '26/12', '31/12', '02/01', '05/01'];
 const STORY_DATES = ['22/12', '23/12', '25/12', '26/12', '29/12', '30/12', '01/01', '02/01', '05/01'];
 
-// LOGIN
-document.getElementById('loginBtn').addEventListener('click', handleLogin);
-document.getElementById('loginEmail').addEventListener('keypress', e => { if (e.key === 'Enter') handleLogin(); });
+// LOGIN - Event Listeners
+document.addEventListener('DOMContentLoaded', function() {
+  const loginBtn = document.getElementById('loginBtn');
+  const loginEmail = document.getElementById('loginEmail');
+  
+  if (loginBtn) {
+    loginBtn.addEventListener('click', handleLogin);
+    console.log('Botão login configurado');
+  }
+  
+  if (loginEmail) {
+    loginEmail.addEventListener('keypress', function(e) { 
+      if (e.key === 'Enter') handleLogin(); 
+    });
+  }
+  
+  // Verificar auth ao carregar
+  checkAuth();
+});
 
 async function handleLogin() {
   const email = document.getElementById('loginEmail').value.trim().toLowerCase();
@@ -1144,11 +1177,14 @@ function switchTab(t) {
   document.querySelectorAll('.tab-content').forEach(s => s.style.display = 'none');
   document.getElementById('tab-' + t).style.display = 'block';
 }
-document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
+
+// Configurar navegação após DOM carregar
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
+});
 
 // INIT
 async function init() { await loadAll(); setupRealtime(); }
-checkAuth();
 </script>
 </body>
 </html>
