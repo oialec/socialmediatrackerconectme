@@ -1396,10 +1396,13 @@ function renderIssues() {
   
   // Filters
   let html = `
-    <div style="display:flex;gap:0.5rem;margin-bottom:1.25rem;overflow-x:auto;padding-bottom:0.25rem">
-      <button class="btn ${issueFilter === 'all' ? 'btn-primary' : 'btn-outline'}" onclick="setIssueFilter('all')">Todos (${total})</button>
-      <button class="btn ${issueFilter === 'client' ? 'btn-primary' : 'btn-outline'}" onclick="setIssueFilter('client')">Por Cliente</button>
-      <button class="btn ${issueFilter === 'type' ? 'btn-primary' : 'btn-outline'}" onclick="setIssueFilter('type')">Por Tipo</button>
+    <div style="display:flex;gap:0.5rem;margin-bottom:1.5rem;overflow-x:auto;padding-bottom:0.5rem;flex-wrap:wrap">
+      <button class="btn ${issueFilter === 'all' ? 'btn-primary' : 'btn-outline'}" onclick="setIssueFilter('all')">
+        📋 Todos <span style="opacity:0.7">(${total})</span>
+      </button>
+      <button class="btn ${issueFilter === 'client' ? 'btn-primary' : 'btn-outline'}" onclick="setIssueFilter('client')">
+        🏢 Por Cliente
+      </button>
     </div>
   `;
   
@@ -1411,46 +1414,37 @@ function renderIssues() {
       byClient[item.client].push(item);
     });
     
-    Object.entries(byClient).forEach(([clientName, clientIssues]) => {
+    html += '<div style="display:flex;flex-direction:column;gap:1.5rem">';
+    Object.entries(byClient).sort((a, b) => b[1].length - a[1].length).forEach(([clientName, clientIssues]) => {
       const client = clients.find(c => c.name === clientName);
       html += `
-        <div class="issues-section">
-          <div class="issues-title">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+          <div style="padding:1rem 1.25rem;background:var(--bg-subtle);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.75rem">
             <div class="client-dot" style="background:${client?.color || '#666'}"></div>
-            ${clientName}
-            <span class="issues-count">${clientIssues.length}</span>
+            <span style="font-weight:600;flex:1">${clientName}</span>
+            <span style="background:var(--danger);color:white;font-size:0.75rem;padding:0.125rem 0.5rem;border-radius:10px;font-weight:600">${clientIssues.length}</span>
           </div>
-          <div class="issues-list">
-            ${clientIssues.map(item => renderIssueItem(item)).join('')}
+          <div style="padding:0.5rem">
+            ${clientIssues.map(item => renderIssueCard(item)).join('')}
           </div>
         </div>
       `;
     });
+    html += '</div>';
   } else {
     // Group by type (default)
+    html += '<div style="display:flex;flex-direction:column;gap:2rem">';
+    
     if (urgente.length > 0) {
       html += `
-        <div class="issues-section">
-          <div class="issues-title">
-            🚨 Urgente: Agendar até 31/12
-            <span class="issues-count">${urgente.length}</span>
+        <div>
+          <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem">
+            <span style="font-size:1.5rem">🚨</span>
+            <span style="font-weight:600;font-size:1rem">Urgente: Agendar até 31/12</span>
+            <span style="background:var(--danger);color:white;font-size:0.75rem;padding:0.125rem 0.5rem;border-radius:10px;font-weight:600">${urgente.length}</span>
           </div>
-          <div class="issues-list">
-            ${urgente.map(item => renderIssueItem(item, 'urgente')).join('')}
-          </div>
-        </div>
-      `;
-    }
-    
-    if (naoAgendou.length > 0) {
-      html += `
-        <div class="issues-section">
-          <div class="issues-title">
-            ❌ Não agendou
-            <span class="issues-count">${naoAgendou.length}</span>
-          </div>
-          <div class="issues-list">
-            ${naoAgendou.map(item => renderIssueItem(item, 'nao-agendou')).join('')}
+          <div style="display:flex;flex-direction:column;gap:0.75rem">
+            ${urgente.map(item => renderIssueCard(item, 'urgente')).join('')}
           </div>
         </div>
       `;
@@ -1458,13 +1452,29 @@ function renderIssues() {
     
     if (apontamentos.length > 0) {
       html += `
-        <div class="issues-section">
-          <div class="issues-title">
-            ⚡ Apontamentos
-            <span class="issues-count">${apontamentos.length}</span>
+        <div>
+          <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem">
+            <span style="font-size:1.5rem">⚡</span>
+            <span style="font-weight:600;font-size:1rem">Apontamentos para Corrigir</span>
+            <span style="background:var(--warning);color:#000;font-size:0.75rem;padding:0.125rem 0.5rem;border-radius:10px;font-weight:600">${apontamentos.length}</span>
           </div>
-          <div class="issues-list">
-            ${apontamentos.map(item => renderIssueItem(item, 'apontamento')).join('')}
+          <div style="display:flex;flex-direction:column;gap:0.75rem">
+            ${apontamentos.map(item => renderIssueCard(item, 'apontamento')).join('')}
+          </div>
+        </div>
+      `;
+    }
+    
+    if (naoAgendou.length > 0) {
+      html += `
+        <div>
+          <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem">
+            <span style="font-size:1.5rem">❌</span>
+            <span style="font-weight:600;font-size:1rem">Não Agendou</span>
+            <span style="background:var(--danger-bg);color:var(--danger);font-size:0.75rem;padding:0.125rem 0.5rem;border-radius:10px;font-weight:600">${naoAgendou.length}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:0.75rem">
+            ${naoAgendou.map(item => renderIssueCard(item, 'nao_agendou')).join('')}
           </div>
         </div>
       `;
@@ -1472,49 +1482,98 @@ function renderIssues() {
     
     if (problemas.length > 0) {
       html += `
-        <div class="issues-section">
-          <div class="issues-title">
-            ⚠️ Problemas na publicação
-            <span class="issues-count">${problemas.length}</span>
+        <div>
+          <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem">
+            <span style="font-size:1.5rem">⚠️</span>
+            <span style="font-weight:600;font-size:1rem">Problemas na Publicação</span>
+            <span style="background:var(--warning-bg);color:var(--warning);font-size:0.75rem;padding:0.125rem 0.5rem;border-radius:10px;font-weight:600">${problemas.length}</span>
           </div>
-          <div class="issues-list">
-            ${problemas.map(item => renderIssueItem(item, 'problema')).join('')}
+          <div style="display:flex;flex-direction:column;gap:0.75rem">
+            ${problemas.map(item => renderIssueCard(item, 'problema')).join('')}
           </div>
         </div>
       `;
     }
+    
+    html += '</div>';
   }
   
   content.innerHTML = html;
 }
 
+function renderIssueCard(item, type) {
+  const client = clients.find(c => c.name === item.client);
+  
+  // Determinar cor e ação baseado no tipo
+  let borderColor = 'var(--border)';
+  let actionText = 'Resolver';
+  let actionColor = 'btn-primary';
+  
+  if (type === 'urgente') {
+    borderColor = 'var(--danger)';
+    actionText = 'Verificar Agora';
+    actionColor = 'btn-danger';
+  } else if (type === 'apontamento') {
+    borderColor = 'var(--warning)';
+    actionText = 'Marcar Resolvido';
+    actionColor = 'btn-warning';
+  } else if (type === 'nao_agendou') {
+    borderColor = 'var(--danger)';
+    actionText = 'Agendar Agora';
+    actionColor = 'btn-primary';
+  } else if (type === 'problema') {
+    borderColor = 'var(--warning)';
+    actionText = 'Resolver Problema';
+    actionColor = 'btn-warning';
+  }
+  
+  return `
+    <div style="background:var(--surface);border:2px solid ${borderColor};border-radius:12px;padding:1rem 1.25rem">
+      <div style="display:flex;align-items:flex-start;gap:1rem;flex-wrap:wrap">
+        <!-- Info do Post -->
+        <div style="flex:1;min-width:200px">
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem">
+            <div class="client-dot" style="background:${client?.color || '#666'}"></div>
+            <span style="font-weight:600">${item.client}</span>
+            <span style="font-size:0.625rem;font-weight:600;padding:0.125rem 0.5rem;border-radius:4px;text-transform:uppercase;
+              background:${item.type === 'FEED' ? 'rgba(99,102,241,0.15)' : 'rgba(168,85,247,0.15)'};
+              color:${item.type === 'FEED' ? '#818cf8' : '#c084fc'}">${item.type}</span>
+          </div>
+          <div style="font-size:0.9375rem;margin-bottom:0.25rem">${item.description}</div>
+          <div style="font-size:0.8125rem;color:var(--text-muted)">📅 ${item.scheduled_date} ${item.scheduled_time ? '• 🕐 ' + item.scheduled_time : ''}</div>
+          
+          ${item.apontamento_descricao ? `
+            <div style="margin-top:0.75rem;padding:0.75rem;background:var(--warning-bg);border-radius:8px;border-left:3px solid var(--warning)">
+              <div style="font-size:0.6875rem;color:var(--warning);text-transform:uppercase;font-weight:600;margin-bottom:0.25rem">Apontamento: ${item.apontamento_tipo}</div>
+              <div style="font-size:0.8125rem;color:var(--text)">${item.apontamento_descricao}</div>
+            </div>
+          ` : ''}
+          
+          ${item.problema_descricao ? `
+            <div style="margin-top:0.75rem;padding:0.75rem;background:var(--danger-bg);border-radius:8px;border-left:3px solid var(--danger)">
+              <div style="font-size:0.6875rem;color:var(--danger);text-transform:uppercase;font-weight:600;margin-bottom:0.25rem">Problema</div>
+              <div style="font-size:0.8125rem;color:var(--text)">${item.problema_descricao}</div>
+            </div>
+          ` : ''}
+        </div>
+        
+        <!-- Ação -->
+        <div style="display:flex;flex-direction:column;gap:0.5rem;min-width:140px">
+          <button class="btn ${actionColor}" style="width:100%" onclick="${type === 'urgente' ? `openVerifyModal(${item.id})` : `resolveIssue(${item.id})`}">
+            ${actionText}
+          </button>
+          <button class="btn btn-outline" style="width:100%" onclick="openEditModal(${item.id})">
+            Editar
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function setIssueFilter(filter) {
   issueFilter = filter;
   renderIssues();
-}
-
-function renderIssueItem(item, badgeType) {
-  const badge = {
-    'urgente': { class: 'urgente', text: 'URGENTE' },
-    'nao-agendou': { class: 'nao-agendou', text: 'Não agendou' },
-    'apontamento': { class: 'apontamento', text: item.apontamento_tipo || 'Apontamento' },
-    'problema': { class: 'problema', text: 'Problema' }
-  }[badgeType] || { class: 'problema', text: 'Pendência' };
-  
-  return `
-    <div class="issue-item ${badgeType === 'urgente' ? 'urgent' : ''}">
-      <div class="issue-info">
-        <div class="issue-client">${item.client}</div>
-        <div class="issue-detail">${item.type} • ${item.description} • ${item.scheduled_date}</div>
-        ${item.problema_descricao ? `<div class="issue-detail" style="color:var(--danger)">→ ${item.problema_descricao}</div>` : ''}
-        ${item.apontamento_descricao ? `<div class="issue-detail" style="color:var(--warning)">→ ${item.apontamento_descricao}</div>` : ''}
-      </div>
-      <span class="issue-badge ${badge.class}">${badge.text}</span>
-      <button class="btn btn-primary" onclick="${badgeType === 'urgente' ? `openVerifyModal(${item.id})` : `resolveIssue(${item.id})`}">
-        ${badgeType === 'urgente' ? 'Verificar' : 'Resolver'}
-      </button>
-    </div>
-  `;
 }
 
 // ==================== RENDER: REPORT ====================
@@ -1640,7 +1699,12 @@ function openVerifyModal(id) {
   currentItem = items.find(i => i.id === id);
   if (!currentItem) return;
   
-  const client = clients.find(c => c.name === currentItem.client);
+  // Reset checks
+  modalChecks = {
+    horario: currentItem.check_horario || false,
+    visual: currentItem.check_visual || false,
+    texto: currentItem.check_texto || false
+  };
   
   document.getElementById('modalTitle').textContent = 'Verificar Agendamento';
   
@@ -1655,7 +1719,7 @@ function openVerifyModal(id) {
       <div class="modal-inputs">
         <div class="modal-row">
           <div class="input-group">
-            <label class="input-label">Plataforma</label>
+            <label class="input-label">Plataforma *</label>
             <select class="input-field" id="modalPlatform">
               <option value="">Selecione</option>
               <option value="ekyte" ${currentItem.platform === 'ekyte' ? 'selected' : ''}>Ekyte</option>
@@ -1669,7 +1733,7 @@ function openVerifyModal(id) {
           </div>
         </div>
         <div class="input-group">
-          <label class="input-label">Data (se diferente)</label>
+          <label class="input-label">Data</label>
           <input type="text" class="input-field" id="modalDate" value="${currentItem.scheduled_date}" placeholder="dd/mm">
         </div>
       </div>
@@ -1677,18 +1741,37 @@ function openVerifyModal(id) {
     
     <div class="modal-section">
       <div class="modal-section-title">Checklist de Verificação</div>
-      <div class="checklist">
-        <div class="check-item ${currentItem.check_horario ? 'checked' : ''}" onclick="toggleModalCheck(this, 'horario')">
-          <div class="check-box">${currentItem.check_horario ? '✓' : ''}</div>
-          <span class="check-label">🕐 Horário correto</span>
+      <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.75rem">Clique para marcar como OK. Se tiver problema, deixe desmarcado e descreva.</p>
+      
+      <div class="checklist" id="verifyChecklist">
+        <!-- Horário -->
+        <div class="check-item ${modalChecks.horario ? 'checked' : ''}" id="check-horario">
+          <div class="check-box" onclick="toggleModalCheck('horario')">${modalChecks.horario ? '✓' : ''}</div>
+          <div style="flex:1">
+            <div class="check-label" onclick="toggleModalCheck('horario')" style="cursor:pointer">🕐 Horário correto</div>
+            <input type="text" class="input-field" id="apontamento_horario" placeholder="Qual o problema com o horário?" 
+              style="margin-top:0.5rem;display:${modalChecks.horario ? 'none' : 'block'};font-size:0.8125rem">
+          </div>
         </div>
-        <div class="check-item ${currentItem.check_visual ? 'checked' : ''}" onclick="toggleModalCheck(this, 'visual')">
-          <div class="check-box">${currentItem.check_visual ? '✓' : ''}</div>
-          <span class="check-label">🎨 Identidade visual OK</span>
+        
+        <!-- Visual -->
+        <div class="check-item ${modalChecks.visual ? 'checked' : ''}" id="check-visual">
+          <div class="check-box" onclick="toggleModalCheck('visual')">${modalChecks.visual ? '✓' : ''}</div>
+          <div style="flex:1">
+            <div class="check-label" onclick="toggleModalCheck('visual')" style="cursor:pointer">🎨 Identidade visual OK</div>
+            <input type="text" class="input-field" id="apontamento_visual" placeholder="Qual o problema visual?" 
+              style="margin-top:0.5rem;display:${modalChecks.visual ? 'none' : 'block'};font-size:0.8125rem">
+          </div>
         </div>
-        <div class="check-item ${currentItem.check_texto ? 'checked' : ''}" onclick="toggleModalCheck(this, 'texto')">
-          <div class="check-box">${currentItem.check_texto ? '✓' : ''}</div>
-          <span class="check-label">📝 Texto/legenda OK</span>
+        
+        <!-- Texto/Copy -->
+        <div class="check-item ${modalChecks.texto ? 'checked' : ''}" id="check-texto">
+          <div class="check-box" onclick="toggleModalCheck('texto')">${modalChecks.texto ? '✓' : ''}</div>
+          <div style="flex:1">
+            <div class="check-label" onclick="toggleModalCheck('texto')" style="cursor:pointer">📝 Texto/Copy OK</div>
+            <input type="text" class="input-field" id="apontamento_texto" placeholder="Qual o problema no texto?" 
+              style="margin-top:0.5rem;display:${modalChecks.texto ? 'none' : 'block'};font-size:0.8125rem">
+          </div>
         </div>
       </div>
     </div>
@@ -1710,14 +1793,22 @@ function openVerifyModal(id) {
 
 let modalChecks = { horario: false, visual: false, texto: false };
 
-function toggleCheck(el) {
-  el.classList.toggle('checked');
-  const isChecked = el.classList.contains('checked');
-  el.querySelector('.check-box').textContent = isChecked ? '✓' : '';
-  const input = el.querySelector('input');
-  if (input) {
-    input.style.display = isChecked ? 'none' : 'block';
-    if (isChecked) input.value = '';
+function toggleModalCheck(field) {
+  modalChecks[field] = !modalChecks[field];
+  const el = document.getElementById(`check-${field}`);
+  const input = document.getElementById(`apontamento_${field}`);
+  
+  if (modalChecks[field]) {
+    el.classList.add('checked');
+    el.querySelector('.check-box').textContent = '✓';
+    if (input) {
+      input.style.display = 'none';
+      input.value = '';
+    }
+  } else {
+    el.classList.remove('checked');
+    el.querySelector('.check-box').textContent = '';
+    if (input) input.style.display = 'block';
   }
 }
 
@@ -1727,14 +1818,15 @@ async function saveVerification() {
   const date = document.getElementById('modalDate').value;
   const obs = document.getElementById('modalObs').value;
   
-  const horario = document.querySelector('.check-item[data-field="horario"]')?.classList.contains('checked') || document.querySelector('.check-item:nth-child(1)').classList.contains('checked');
-  const visual = document.querySelector('.check-item[data-field="visual"]')?.classList.contains('checked') || document.querySelector('.check-item:nth-child(2)').classList.contains('checked');
-  const texto = document.querySelector('.check-item[data-field="texto"]')?.classList.contains('checked') || document.querySelector('.check-item:nth-child(3)').classList.contains('checked');
-  
   if (!platform) {
     alert('Selecione a plataforma');
     return;
   }
+  
+  // Usar o estado dos checks
+  const horario = modalChecks.horario;
+  const visual = modalChecks.visual;
+  const texto = modalChecks.texto;
   
   // Coletar apontamentos
   const apontamentos = [];
