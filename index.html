@@ -2,7 +2,10 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#09090b">
   <title>ConectMe Tracker</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
@@ -34,6 +37,9 @@
       --info-bg: rgba(59, 130, 246, 0.1);
       --purple: #a855f7;
       --purple-bg: rgba(168, 85, 247, 0.1);
+      --cyan: #06b6d4;
+      --cyan-bg: rgba(6, 182, 212, 0.1);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
 
     body {
@@ -399,6 +405,7 @@
     .post-status.verificar_ig { background: var(--warning-bg); color: var(--warning); }
     .post-status.publicado { background: var(--success-bg); color: var(--success); }
     .post-status.problema { background: var(--danger-bg); color: var(--danger); }
+    .post-status.apontamento { background: var(--cyan-bg); color: var(--cyan); }
     
     .post-actions { display: flex; gap: 0.5rem; }
     .btn {
@@ -510,6 +517,7 @@
     .issue-badge.nao-agendou { background: var(--danger-bg); color: var(--danger); }
     .issue-badge.problema { background: var(--warning-bg); color: var(--warning); }
     .issue-badge.urgente { background: var(--danger); color: white; }
+    .issue-badge.apontamento { background: var(--cyan-bg); color: var(--cyan); }
 
     /* ==================== REPORT PAGE ==================== */
     .report-grid {
@@ -799,9 +807,12 @@
     
     <!-- DASHBOARD PAGE -->
     <div class="page" id="page-dashboard">
-      <div class="page-header">
-        <h1 class="page-title">Dashboard</h1>
-        <p class="page-subtitle">Visão geral de todos os clientes</p>
+      <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem">
+        <div>
+          <h1 class="page-title">Dashboard</h1>
+          <p class="page-subtitle">Visão geral de todos os clientes</p>
+        </div>
+        <button class="btn btn-primary" onclick="navigateTo('add')">+ Adicionar Post</button>
       </div>
       <div class="dashboard-grid" id="dashboardGrid"></div>
     </div>
@@ -851,6 +862,18 @@
       <div class="report-grid" id="reportGrid"></div>
     </div>
 
+    <!-- ADD PAGE -->
+    <div class="page" id="page-add" style="display:none">
+      <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem">
+        <div>
+          <h1 class="page-title">Adicionar Publicação</h1>
+          <p class="page-subtitle">Criar novo post ou story</p>
+        </div>
+        <button class="btn btn-outline" onclick="navigateTo('dashboard')">← Cancelar</button>
+      </div>
+      <div class="form-card" id="addForm" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;max-width:600px"></div>
+    </div>
+
   </main>
 
   <!-- MOBILE NAV -->
@@ -860,6 +883,7 @@
       <button class="mobile-nav-item" data-page="alerts"><span>🔔</span><span>Alertas</span></button>
       <button class="mobile-nav-item" data-page="issues"><span>⚠️</span><span>Pendências</span></button>
       <button class="mobile-nav-item" data-page="report"><span>📊</span><span>Relatório</span></button>
+      <button class="mobile-nav-item" data-page="add"><span>➕</span><span>Adicionar</span></button>
     </div>
   </div>
 </div>
@@ -894,6 +918,8 @@ let currentUser = null;
 let currentPage = 'dashboard';
 let currentClient = null;
 let currentItem = null;
+let activityExpanded = false;
+let issueFilter = 'all';
 
 // ==================== INIT ====================
 document.addEventListener('DOMContentLoaded', () => {
@@ -1074,6 +1100,9 @@ function navigateTo(page, data = null) {
     currentClient = data;
     document.getElementById('page-client').style.display = 'block';
     renderClientPage();
+  } else if (page === 'add') {
+    document.getElementById('page-add').style.display = 'block';
+    renderAddPage();
   } else {
     document.getElementById(`page-${page}`).style.display = 'block';
     document.querySelectorAll(`[data-page="${page}"]`).forEach(n => n.classList.add('active'));
@@ -1088,14 +1117,27 @@ function renderCurrentPage() {
     case 'issues': renderIssues(); break;
     case 'report': renderReport(); break;
     case 'client': renderClientPage(); break;
+    case 'add': renderAddPage(); break;
   }
 }
 
 function updateBadges() {
   const my = getMyItems();
   const alerts = my.filter(i => i.status === 'verificar_ig').length;
-  const issues = my.filter(i => ['nao_agendou', 'problema'].includes(i.status) || 
-    (i.scheduled_date === '05/01' && i.status === 'pendente')).length;
+  
+  // Pendências: não agendou, problema, apontamento
+  // Urgente só aparece em 30/12 ou 31/12 para posts de 05/01
+  const now = getNow();
+  const day = now.getDate();
+  const month = now.getMonth() + 1;
+  const isUrgentDate = (month === 12 && day >= 30);
+  
+  let issues = my.filter(i => ['nao_agendou', 'problema'].includes(i.status) || 
+    (i.apontamento_tipo && !i.apontamento_resolvido)).length;
+  
+  if (isUrgentDate) {
+    issues += my.filter(i => i.scheduled_date === '05/01' && i.status === 'pendente').length;
+  }
   
   const alertsBadge = document.getElementById('alertsBadge');
   const issuesBadge = document.getElementById('issuesBadge');
@@ -1117,11 +1159,18 @@ function renderDashboard() {
     const feeds = clientItems.filter(i => i.type === 'FEED');
     const stories = clientItems.filter(i => i.type === 'STORY');
     
+    // Verificados/Agendados (qualquer status após verificação)
+    const feedsVerified = feeds.filter(i => ['agendado', 'apontamento', 'verificar_ig', 'publicado'].includes(i.status)).length;
+    const storiesVerified = stories.filter(i => ['agendado', 'apontamento', 'verificar_ig', 'publicado'].includes(i.status)).length;
+    
+    // Publicados
     const feedsDone = feeds.filter(i => i.status === 'publicado').length;
     const storiesDone = stories.filter(i => i.status === 'publicado').length;
+    const totalDone = feedsDone + storiesDone;
+    const totalItems = clientItems.length;
     
     const pendingVerify = clientItems.filter(i => i.status === 'verificar_ig').length;
-    const problems = clientItems.filter(i => ['nao_agendou', 'problema'].includes(i.status)).length;
+    const problems = clientItems.filter(i => ['nao_agendou', 'problema'].includes(i.status) || (i.apontamento_tipo && !i.apontamento_resolvido)).length;
     const allDone = feedsDone === feeds.length && storiesDone === stories.length;
     
     return `
@@ -1136,23 +1185,32 @@ function renderDashboard() {
         <div class="client-progress">
           <div class="progress-row">
             <span class="progress-label">Feed</span>
-            <span class="progress-value">${feedsDone}/${feeds.length}</span>
+            <span class="progress-value">${feedsVerified}/${feeds.length} verificados</span>
           </div>
           <div class="progress-bar">
-            <div class="progress-fill feed" style="width:${(feedsDone/feeds.length)*100}%"></div>
+            <div class="progress-fill feed" style="width:${(feedsVerified/feeds.length)*100}%"></div>
           </div>
         </div>
         <div class="client-progress">
           <div class="progress-row">
             <span class="progress-label">Story</span>
-            <span class="progress-value">${storiesDone}/${stories.length}</span>
+            <span class="progress-value">${storiesVerified}/${stories.length} verificados</span>
           </div>
           <div class="progress-bar">
-            <div class="progress-fill story" style="width:${(storiesDone/stories.length)*100}%"></div>
+            <div class="progress-fill story" style="width:${(storiesVerified/stories.length)*100}%"></div>
+          </div>
+        </div>
+        <div class="client-progress" style="margin-top:0.5rem">
+          <div class="progress-row">
+            <span class="progress-label">Publicados</span>
+            <span class="progress-value" style="color:var(--success)">${totalDone}/${totalItems}</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:${(totalDone/totalItems)*100}%;background:var(--success)"></div>
           </div>
         </div>
         <div class="client-alerts">
-          ${pendingVerify > 0 ? `<span class="client-alert pending">${pendingVerify} para verificar</span>` : ''}
+          ${pendingVerify > 0 ? `<span class="client-alert pending">${pendingVerify} para verificar IG</span>` : ''}
           ${problems > 0 ? `<span class="client-alert danger">${problems} pendência${problems > 1 ? 's' : ''}</span>` : ''}
           ${allDone ? `<span class="client-alert success">✓ Completo</span>` : ''}
         </div>
@@ -1214,15 +1272,17 @@ function renderPostItem(item) {
     'pendente': { text: 'Pendente', icon: '○' },
     'nao_agendou': { text: 'Não agendou', icon: '✗' },
     'agendado': { text: 'Agendado', icon: '◐' },
+    'apontamento': { text: 'Apontamento', icon: '⚡' },
     'verificar_ig': { text: 'Verificar IG', icon: '🔔' },
     'publicado': { text: 'Publicado', icon: '✓' },
     'problema': { text: 'Problema', icon: '!' }
   };
   
-  const status = statusLabels[item.status];
+  const status = statusLabels[item.status] || statusLabels['pendente'];
   const meta = [];
   if (item.platform) meta.push(item.platform.charAt(0).toUpperCase() + item.platform.slice(1));
   if (item.scheduled_time) meta.push(item.scheduled_time);
+  if (item.verificado_por) meta.push(`por ${item.verificado_por}`);
   
   return `
     <div class="post-item">
@@ -1246,7 +1306,9 @@ function getActionButton(item) {
     case 'pendente':
       return `<button class="btn btn-primary" onclick="openVerifyModal(${item.id})">Verificar</button>`;
     case 'agendado':
-      return `<button class="btn btn-outline" onclick="openVerifyModal(${item.id})">Editar</button>`;
+      return `<button class="btn btn-outline" onclick="openEditModal(${item.id})">Editar</button>`;
+    case 'apontamento':
+      return `<button class="btn btn-outline" onclick="openEditModal(${item.id})">Editar</button>`;
     case 'verificar_ig':
       return `
         <button class="btn btn-success" onclick="markPublished(${item.id}, true)">OK</button>
@@ -1255,8 +1317,10 @@ function getActionButton(item) {
     case 'nao_agendou':
     case 'problema':
       return `<button class="btn btn-primary" onclick="resolveIssue(${item.id})">Resolver</button>`;
+    case 'publicado':
+      return `<button class="btn btn-outline" onclick="openEditModal(${item.id})">Editar</button>`;
     default:
-      return `<button class="btn btn-outline" disabled>Concluído</button>`;
+      return `<button class="btn btn-outline" disabled>—</button>`;
   }
 }
 
@@ -1281,12 +1345,17 @@ function renderAlerts() {
           <div class="alert-client">
             <div class="client-dot" style="background:${client?.color || '#666'}"></div>
             <span>${item.client}</span>
+            <span style="font-size:0.6875rem;background:${item.type === 'FEED' ? 'rgba(99,102,241,0.15)' : 'rgba(168,85,247,0.15)'};color:${item.type === 'FEED' ? '#818cf8' : '#c084fc'};padding:0.125rem 0.5rem;border-radius:4px;font-weight:600">${item.type}</span>
           </div>
           <span class="alert-time">${item.scheduled_time || item.scheduled_date}</span>
         </div>
         <div class="alert-content">
-          <div class="alert-type">${item.type}</div>
           <div class="alert-desc">${item.description}</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.375rem;display:flex;flex-wrap:wrap;gap:0.5rem 1rem">
+            ${item.platform ? `<span>Plataforma: ${item.platform.charAt(0).toUpperCase() + item.platform.slice(1)}</span>` : ''}
+            ${item.verificado_por ? `<span>Verificado por: ${item.verificado_por}</span>` : ''}
+            <span>Data: ${item.scheduled_date}</span>
+          </div>
         </div>
         <div class="alert-actions">
           <button class="btn btn-success" onclick="markPublished(${item.id}, true)">✓ Publicado OK</button>
@@ -1303,11 +1372,19 @@ function renderIssues() {
   const content = document.getElementById('issuesContent');
   const empty = document.getElementById('issuesEmpty');
   
+  // Check if urgent date (30 or 31/12)
+  const now = getNow();
+  const day = now.getDate();
+  const month = now.getMonth() + 1;
+  const isUrgentDate = (month === 12 && day >= 30);
+  
   const naoAgendou = my.filter(i => i.status === 'nao_agendou');
   const problemas = my.filter(i => i.status === 'problema');
-  const urgente = my.filter(i => i.scheduled_date === '05/01' && i.status === 'pendente');
+  const apontamentos = my.filter(i => i.apontamento_tipo && !i.apontamento_resolvido);
+  const urgente = isUrgentDate ? my.filter(i => i.scheduled_date === '05/01' && i.status === 'pendente') : [];
   
-  const total = naoAgendou.length + problemas.length + urgente.length;
+  const allIssues = [...naoAgendou, ...problemas, ...apontamentos, ...urgente];
+  const total = allIssues.length;
   
   if (total === 0) {
     content.innerHTML = '';
@@ -1317,79 +1394,127 @@ function renderIssues() {
   
   empty.style.display = 'none';
   
-  let html = '';
+  // Filters
+  let html = `
+    <div style="display:flex;gap:0.5rem;margin-bottom:1.25rem;overflow-x:auto;padding-bottom:0.25rem">
+      <button class="btn ${issueFilter === 'all' ? 'btn-primary' : 'btn-outline'}" onclick="setIssueFilter('all')">Todos (${total})</button>
+      <button class="btn ${issueFilter === 'client' ? 'btn-primary' : 'btn-outline'}" onclick="setIssueFilter('client')">Por Cliente</button>
+      <button class="btn ${issueFilter === 'type' ? 'btn-primary' : 'btn-outline'}" onclick="setIssueFilter('type')">Por Tipo</button>
+    </div>
+  `;
   
-  if (urgente.length > 0) {
-    html += `
-      <div class="issues-section">
-        <div class="issues-title">
-          🚨 Agendar até 31/12
-          <span class="issues-count">${urgente.length}</span>
+  if (issueFilter === 'client') {
+    // Group by client
+    const byClient = {};
+    allIssues.forEach(item => {
+      if (!byClient[item.client]) byClient[item.client] = [];
+      byClient[item.client].push(item);
+    });
+    
+    Object.entries(byClient).forEach(([clientName, clientIssues]) => {
+      const client = clients.find(c => c.name === clientName);
+      html += `
+        <div class="issues-section">
+          <div class="issues-title">
+            <div class="client-dot" style="background:${client?.color || '#666'}"></div>
+            ${clientName}
+            <span class="issues-count">${clientIssues.length}</span>
+          </div>
+          <div class="issues-list">
+            ${clientIssues.map(item => renderIssueItem(item)).join('')}
+          </div>
         </div>
-        <div class="issues-list">
-          ${urgente.map(item => `
-            <div class="issue-item urgent">
-              <div class="issue-info">
-                <div class="issue-client">${item.client}</div>
-                <div class="issue-detail">${item.type} • ${item.description} • 05/01</div>
-              </div>
-              <span class="issue-badge urgente">URGENTE</span>
-              <button class="btn btn-primary" onclick="openVerifyModal(${item.id})">Verificar</button>
-            </div>
-          `).join('')}
+      `;
+    });
+  } else {
+    // Group by type (default)
+    if (urgente.length > 0) {
+      html += `
+        <div class="issues-section">
+          <div class="issues-title">
+            🚨 Urgente: Agendar até 31/12
+            <span class="issues-count">${urgente.length}</span>
+          </div>
+          <div class="issues-list">
+            ${urgente.map(item => renderIssueItem(item, 'urgente')).join('')}
+          </div>
         </div>
-      </div>
-    `;
-  }
-  
-  if (naoAgendou.length > 0) {
-    html += `
-      <div class="issues-section">
-        <div class="issues-title">
-          ❌ Não agendou
-          <span class="issues-count">${naoAgendou.length}</span>
+      `;
+    }
+    
+    if (naoAgendou.length > 0) {
+      html += `
+        <div class="issues-section">
+          <div class="issues-title">
+            ❌ Não agendou
+            <span class="issues-count">${naoAgendou.length}</span>
+          </div>
+          <div class="issues-list">
+            ${naoAgendou.map(item => renderIssueItem(item, 'nao-agendou')).join('')}
+          </div>
         </div>
-        <div class="issues-list">
-          ${naoAgendou.map(item => `
-            <div class="issue-item">
-              <div class="issue-info">
-                <div class="issue-client">${item.client}</div>
-                <div class="issue-detail">${item.type} • ${item.description} • ${item.scheduled_date}</div>
-              </div>
-              <span class="issue-badge nao-agendou">Não agendou</span>
-              <button class="btn btn-primary" onclick="resolveIssue(${item.id})">Resolver</button>
-            </div>
-          `).join('')}
+      `;
+    }
+    
+    if (apontamentos.length > 0) {
+      html += `
+        <div class="issues-section">
+          <div class="issues-title">
+            ⚡ Apontamentos
+            <span class="issues-count">${apontamentos.length}</span>
+          </div>
+          <div class="issues-list">
+            ${apontamentos.map(item => renderIssueItem(item, 'apontamento')).join('')}
+          </div>
         </div>
-      </div>
-    `;
-  }
-  
-  if (problemas.length > 0) {
-    html += `
-      <div class="issues-section">
-        <div class="issues-title">
-          ⚠️ Problemas na publicação
-          <span class="issues-count">${problemas.length}</span>
+      `;
+    }
+    
+    if (problemas.length > 0) {
+      html += `
+        <div class="issues-section">
+          <div class="issues-title">
+            ⚠️ Problemas na publicação
+            <span class="issues-count">${problemas.length}</span>
+          </div>
+          <div class="issues-list">
+            ${problemas.map(item => renderIssueItem(item, 'problema')).join('')}
+          </div>
         </div>
-        <div class="issues-list">
-          ${problemas.map(item => `
-            <div class="issue-item">
-              <div class="issue-info">
-                <div class="issue-client">${item.client}</div>
-                <div class="issue-detail">${item.type} • ${item.description} • ${item.scheduled_date}</div>
-                ${item.problema_descricao ? `<div class="issue-detail" style="color:var(--danger)">→ ${item.problema_descricao}</div>` : ''}
-              </div>
-              <span class="issue-badge problema">Problema</span>
-              <button class="btn btn-primary" onclick="resolveIssue(${item.id})">Resolver</button>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    `;
+      `;
+    }
   }
   
   content.innerHTML = html;
+}
+
+function setIssueFilter(filter) {
+  issueFilter = filter;
+  renderIssues();
+}
+
+function renderIssueItem(item, badgeType) {
+  const badge = {
+    'urgente': { class: 'urgente', text: 'URGENTE' },
+    'nao-agendou': { class: 'nao-agendou', text: 'Não agendou' },
+    'apontamento': { class: 'apontamento', text: item.apontamento_tipo || 'Apontamento' },
+    'problema': { class: 'problema', text: 'Problema' }
+  }[badgeType] || { class: 'problema', text: 'Pendência' };
+  
+  return `
+    <div class="issue-item ${badgeType === 'urgente' ? 'urgent' : ''}">
+      <div class="issue-info">
+        <div class="issue-client">${item.client}</div>
+        <div class="issue-detail">${item.type} • ${item.description} • ${item.scheduled_date}</div>
+        ${item.problema_descricao ? `<div class="issue-detail" style="color:var(--danger)">→ ${item.problema_descricao}</div>` : ''}
+        ${item.apontamento_descricao ? `<div class="issue-detail" style="color:var(--warning)">→ ${item.apontamento_descricao}</div>` : ''}
+      </div>
+      <span class="issue-badge ${badge.class}">${badge.text}</span>
+      <button class="btn btn-primary" onclick="${badgeType === 'urgente' ? `openVerifyModal(${item.id})` : `resolveIssue(${item.id})`}">
+        ${badgeType === 'urgente' ? 'Verificar' : 'Resolver'}
+      </button>
+    </div>
+  `;
 }
 
 // ==================== RENDER: REPORT ====================
@@ -1399,16 +1524,24 @@ function renderReport() {
   
   const totalItems = my.length;
   const published = my.filter(i => i.status === 'publicado').length;
+  const scheduled = my.filter(i => ['agendado', 'verificar_ig'].includes(i.status)).length;
   const pending = my.filter(i => i.status === 'pendente').length;
-  const issues = my.filter(i => ['nao_agendou', 'problema'].includes(i.status)).length;
+  const problems = my.filter(i => ['nao_agendou', 'problema'].includes(i.status) || (i.apontamento_tipo && !i.apontamento_resolvido)).length;
   
-  const feedTotal = my.filter(i => i.type === 'FEED').length;
-  const feedDone = my.filter(i => i.type === 'FEED' && i.status === 'publicado').length;
-  const storyTotal = my.filter(i => i.type === 'STORY').length;
-  const storyDone = my.filter(i => i.type === 'STORY' && i.status === 'publicado').length;
+  const feeds = my.filter(i => i.type === 'FEED');
+  const stories = my.filter(i => i.type === 'STORY');
+  
+  // By social media
+  const bySM = {};
+  my.forEach(i => {
+    if (!bySM[i.social_media]) bySM[i.social_media] = { total: 0, done: 0 };
+    bySM[i.social_media].total++;
+    if (i.status === 'publicado') bySM[i.social_media].done++;
+  });
+  
+  const displayActivities = activityExpanded ? activities : activities.slice(0, 15);
   
   const grid = document.getElementById('reportGrid');
-  
   grid.innerHTML = `
     <div class="report-card">
       <div class="report-card-title">📈 Resumo Geral</div>
@@ -1422,16 +1555,16 @@ function renderReport() {
           <span class="report-item-value" style="color:var(--success)">${published}</span>
         </div>
         <div class="report-item">
+          <span class="report-item-label">Agendados</span>
+          <span class="report-item-value" style="color:var(--info)">${scheduled}</span>
+        </div>
+        <div class="report-item">
           <span class="report-item-label">Pendentes</span>
-          <span class="report-item-value" style="color:var(--warning)">${pending}</span>
+          <span class="report-item-value">${pending}</span>
         </div>
         <div class="report-item">
-          <span class="report-item-label">Problemas</span>
-          <span class="report-item-value" style="color:var(--danger)">${issues}</span>
-        </div>
-        <div class="report-item">
-          <span class="report-item-label">Progresso</span>
-          <span class="report-item-value">${Math.round((published/totalItems)*100)}%</span>
+          <span class="report-item-label">Com Problemas</span>
+          <span class="report-item-value" style="color:var(--danger)">${problems}</span>
         </div>
       </div>
     </div>
@@ -1441,11 +1574,11 @@ function renderReport() {
       <div class="report-list">
         <div class="report-item">
           <span class="report-item-label">Feed</span>
-          <span class="report-item-value">${feedDone}/${feedTotal}</span>
+          <span class="report-item-value">${feeds.filter(i => i.status === 'publicado').length}/${feeds.length}</span>
         </div>
         <div class="report-item">
           <span class="report-item-label">Story</span>
-          <span class="report-item-value">${storyDone}/${storyTotal}</span>
+          <span class="report-item-value">${stories.filter(i => i.status === 'publicado').length}/${stories.length}</span>
         </div>
       </div>
     </div>
@@ -1453,24 +1586,20 @@ function renderReport() {
     <div class="report-card">
       <div class="report-card-title">👥 Por Social Media</div>
       <div class="report-list">
-        ${['Priscila', 'Marcela'].map(sm => {
-          const smItems = items.filter(i => i.social_media === sm);
-          const smDone = smItems.filter(i => i.status === 'publicado').length;
-          return `
-            <div class="report-item">
-              <span class="report-item-label">${sm}</span>
-              <span class="report-item-value">${smDone}/${smItems.length}</span>
-            </div>
-          `;
-        }).join('')}
+        ${Object.entries(bySM).map(([name, data]) => `
+          <div class="report-item">
+            <span class="report-item-label">${name}</span>
+            <span class="report-item-value">${data.done}/${data.total}</span>
+          </div>
+        `).join('')}
       </div>
     </div>
     
     <div class="report-card">
       <div class="report-card-title">🏢 Por Cliente</div>
-      <div class="report-list" style="max-height:250px;overflow-y:auto">
+      <div class="report-list" style="max-height:200px;overflow-y:auto">
         ${myClients.map(c => {
-          const cItems = items.filter(i => i.client === c.name);
+          const cItems = my.filter(i => i.client === c.name);
           const cDone = cItems.filter(i => i.status === 'publicado').length;
           return `
             <div class="report-item">
@@ -1483,17 +1612,27 @@ function renderReport() {
     </div>
     
     <div class="report-card" style="grid-column: span 2">
-      <div class="report-card-title">📝 Histórico de Atividades</div>
-      <div class="activity-list">
-        ${activities.slice(0, 20).map(a => `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <div class="report-card-title">📝 Histórico de Atividades</div>
+        <button class="btn btn-outline" style="font-size:0.75rem;padding:0.25rem 0.75rem" onclick="toggleActivityExpand()">
+          ${activityExpanded ? 'Ver menos' : 'Ver tudo'}
+        </button>
+      </div>
+      <div class="activity-list" style="${activityExpanded ? '' : 'max-height:300px;overflow-y:auto'}">
+        ${displayActivities.map(a => `
           <div class="activity-item">
-            <span class="activity-time">${new Date(a.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
+            <span class="activity-time">${new Date(a.created_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
             <span class="activity-text"><strong>${a.user_name}</strong> ${a.action} ${a.client ? `• ${a.client}` : ''} ${a.details ? `• ${a.details}` : ''}</span>
           </div>
         `).join('') || '<div class="activity-item"><span class="activity-text">Nenhuma atividade ainda</span></div>'}
       </div>
     </div>
   `;
+}
+
+function toggleActivityExpand() {
+  activityExpanded = !activityExpanded;
+  renderReport();
 }
 
 // ==================== MODAL ====================
@@ -1571,10 +1710,15 @@ function openVerifyModal(id) {
 
 let modalChecks = { horario: false, visual: false, texto: false };
 
-function toggleModalCheck(el, field) {
+function toggleCheck(el) {
   el.classList.toggle('checked');
-  modalChecks[field] = el.classList.contains('checked');
-  el.querySelector('.check-box').textContent = el.classList.contains('checked') ? '✓' : '';
+  const isChecked = el.classList.contains('checked');
+  el.querySelector('.check-box').textContent = isChecked ? '✓' : '';
+  const input = el.querySelector('input');
+  if (input) {
+    input.style.display = isChecked ? 'none' : 'block';
+    if (isChecked) input.value = '';
+  }
 }
 
 async function saveVerification() {
@@ -1583,14 +1727,26 @@ async function saveVerification() {
   const date = document.getElementById('modalDate').value;
   const obs = document.getElementById('modalObs').value;
   
-  const horario = document.querySelector('.check-item:nth-child(1)').classList.contains('checked');
-  const visual = document.querySelector('.check-item:nth-child(2)').classList.contains('checked');
-  const texto = document.querySelector('.check-item:nth-child(3)').classList.contains('checked');
+  const horario = document.querySelector('.check-item[data-field="horario"]')?.classList.contains('checked') || document.querySelector('.check-item:nth-child(1)').classList.contains('checked');
+  const visual = document.querySelector('.check-item[data-field="visual"]')?.classList.contains('checked') || document.querySelector('.check-item:nth-child(2)').classList.contains('checked');
+  const texto = document.querySelector('.check-item[data-field="texto"]')?.classList.contains('checked') || document.querySelector('.check-item:nth-child(3)').classList.contains('checked');
   
   if (!platform) {
     alert('Selecione a plataforma');
     return;
   }
+  
+  // Coletar apontamentos
+  const apontamentos = [];
+  const apontHorario = document.getElementById('apontamento_horario');
+  const apontVisual = document.getElementById('apontamento_visual');
+  const apontTexto = document.getElementById('apontamento_texto');
+  
+  if (!horario && apontHorario?.value) apontamentos.push({ tipo: 'Horário', desc: apontHorario.value });
+  if (!visual && apontVisual?.value) apontamentos.push({ tipo: 'Visual', desc: apontVisual.value });
+  if (!texto && apontTexto?.value) apontamentos.push({ tipo: 'Copy', desc: apontTexto.value });
+  
+  const hasApontamento = apontamentos.length > 0;
   
   const updates = {
     platform,
@@ -1600,18 +1756,26 @@ async function saveVerification() {
     check_horario: horario,
     check_visual: visual,
     check_texto: texto,
-    status: 'agendado',
+    status: hasApontamento ? 'apontamento' : 'agendado',
     verificado_por: currentUser.name,
     verificado_em: new Date().toISOString(),
     updated_by: currentUser.name,
     updated_at: new Date().toISOString()
   };
   
+  if (hasApontamento) {
+    updates.apontamento_tipo = apontamentos.map(a => a.tipo).join(', ');
+    updates.apontamento_descricao = apontamentos.map(a => `${a.tipo}: ${a.desc}`).join(' | ');
+    updates.apontamento_resolvido = false;
+  }
+  
   await db.from('items').update(updates).eq('id', currentItem.id);
-  await logActivity(currentItem.id, currentItem.client, currentItem.type, 'verificou agendamento', `${platform} ${time || ''}`);
+  await logActivity(currentItem.id, currentItem.client, currentItem.type, 
+    hasApontamento ? 'verificou com apontamento' : 'verificou agendamento', 
+    `${platform} ${time || ''}${hasApontamento ? ' - ' + updates.apontamento_tipo : ''}`);
   
   closeModal();
-  toast('Verificação salva!');
+  toast(hasApontamento ? 'Salvo com apontamento!' : 'Verificação salva!');
   loadData();
 }
 
@@ -1690,7 +1854,276 @@ async function resolveIssue(id) {
       toast('Problema resolvido!');
       loadData();
     }
+  } else if (item.apontamento_tipo && !item.apontamento_resolvido) {
+    const what = prompt(`Apontamento: ${item.apontamento_tipo}\n\nO que foi resolvido/corrigido?`);
+    if (!what) return;
+    
+    await db.from('items').update({
+      status: 'agendado',
+      apontamento_resolvido: true,
+      apontamento_resolvido_por: currentUser.name,
+      apontamento_resolvido_em: new Date().toISOString(),
+      updated_by: currentUser.name,
+      updated_at: new Date().toISOString()
+    }).eq('id', id);
+    
+    await logActivity(id, item.client, item.type, 'resolveu apontamento', what);
+    
+    toast('Apontamento resolvido!');
+    loadData();
   }
+}
+
+// ==================== ADD PAGE ====================
+function renderAddPage() {
+  const myClients = getMyClients();
+  
+  document.getElementById('addForm').innerHTML = `
+    <h3 style="font-size:1.125rem;font-weight:600;margin-bottom:1.5rem">Nova Publicação</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div class="input-group">
+        <label class="input-label">Cliente *</label>
+        <select class="input-field" id="addClient">
+          <option value="">Selecione...</option>
+          ${myClients.map(c => `<option value="${c.name}">${c.name}</option>`).join('')}
+        </select>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Tipo *</label>
+        <select class="input-field" id="addType">
+          <option value="">Selecione...</option>
+          <option value="FEED">Feed</option>
+          <option value="STORY">Story</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Data *</label>
+        <input type="text" class="input-field" id="addDate" placeholder="dd/mm">
+      </div>
+      <div class="input-group">
+        <label class="input-label">Horário</label>
+        <input type="time" class="input-field" id="addTime">
+      </div>
+      <div class="input-group" style="grid-column:span 2">
+        <label class="input-label">Descrição *</label>
+        <input type="text" class="input-field" id="addDesc" placeholder="Ex: Post Serviço, Happy Holidays...">
+      </div>
+      <div class="input-group">
+        <label class="input-label">Plataforma</label>
+        <select class="input-field" id="addPlatform">
+          <option value="">Selecione...</option>
+          <option value="ekyte">Ekyte</option>
+          <option value="meta">Meta Business</option>
+          <option value="direto">Direto</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Especial?</label>
+        <select class="input-field" id="addSpecial">
+          <option value="false">Não</option>
+          <option value="true">Sim (data comemorativa)</option>
+        </select>
+      </div>
+      <div class="input-group" style="grid-column:span 2">
+        <label class="input-label">Observações</label>
+        <textarea class="input-field" id="addObs" rows="2" placeholder="Opcional..."></textarea>
+      </div>
+    </div>
+    <div style="display:flex;gap:0.75rem;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)">
+      <button class="btn btn-outline" style="flex:1" onclick="navigateTo('dashboard')">Cancelar</button>
+      <button class="btn btn-primary" style="flex:1" onclick="saveNewPost()">Salvar Publicação</button>
+    </div>
+  `;
+}
+
+async function saveNewPost() {
+  const clientName = document.getElementById('addClient').value;
+  const type = document.getElementById('addType').value;
+  const date = document.getElementById('addDate').value;
+  const time = document.getElementById('addTime').value;
+  const desc = document.getElementById('addDesc').value;
+  const platform = document.getElementById('addPlatform').value;
+  const special = document.getElementById('addSpecial').value === 'true';
+  const obs = document.getElementById('addObs').value;
+  
+  if (!clientName || !type || !date || !desc) {
+    toast('Preencha todos os campos obrigatórios');
+    return;
+  }
+  
+  const client = clients.find(c => c.name === clientName);
+  if (!client) {
+    toast('Cliente não encontrado');
+    return;
+  }
+  
+  const newItem = {
+    client: clientName,
+    type,
+    description: desc,
+    scheduled_date: date,
+    scheduled_time: time || null,
+    platform: platform || null,
+    is_special: special,
+    observacoes: obs || null,
+    social_media: client.social_media,
+    gestor: client.gestor,
+    status: platform ? 'agendado' : 'pendente',
+    created_by: currentUser.name,
+    updated_by: currentUser.name
+  };
+  
+  if (platform) {
+    newItem.verificado_por = currentUser.name;
+    newItem.verificado_em = new Date().toISOString();
+  }
+  
+  const { error } = await db.from('items').insert(newItem);
+  
+  if (error) {
+    console.error(error);
+    toast('Erro ao salvar');
+    return;
+  }
+  
+  await logActivity(null, clientName, type, 'adicionou publicação', `${desc} - ${date}`);
+  
+  toast('Publicação adicionada!');
+  navigateTo('dashboard');
+  loadData();
+}
+
+// ==================== EDIT MODAL ====================
+function openEditModal(id) {
+  currentItem = items.find(i => i.id === id);
+  if (!currentItem) return;
+  
+  const myClients = getMyClients();
+  
+  document.getElementById('modalTitle').textContent = 'Editar Publicação';
+  
+  document.getElementById('modalBody').innerHTML = `
+    <div class="modal-section">
+      <div class="modal-section-title">Informações Básicas</div>
+      <div class="modal-inputs">
+        <div class="input-group">
+          <label class="input-label">Cliente</label>
+          <select class="input-field" id="editClient">
+            ${myClients.map(c => `<option value="${c.name}" ${currentItem.client === c.name ? 'selected' : ''}>${c.name}</option>`).join('')}
+          </select>
+        </div>
+        <div class="modal-row">
+          <div class="input-group">
+            <label class="input-label">Tipo</label>
+            <select class="input-field" id="editType">
+              <option value="FEED" ${currentItem.type === 'FEED' ? 'selected' : ''}>Feed</option>
+              <option value="STORY" ${currentItem.type === 'STORY' ? 'selected' : ''}>Story</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Especial?</label>
+            <select class="input-field" id="editSpecial">
+              <option value="false" ${!currentItem.is_special ? 'selected' : ''}>Não</option>
+              <option value="true" ${currentItem.is_special ? 'selected' : ''}>Sim</option>
+            </select>
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Descrição</label>
+          <input type="text" class="input-field" id="editDesc" value="${currentItem.description}">
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-section">
+      <div class="modal-section-title">Agendamento</div>
+      <div class="modal-inputs">
+        <div class="modal-row">
+          <div class="input-group">
+            <label class="input-label">Data</label>
+            <input type="text" class="input-field" id="editDate" value="${currentItem.scheduled_date}" placeholder="dd/mm">
+          </div>
+          <div class="input-group">
+            <label class="input-label">Horário</label>
+            <input type="time" class="input-field" id="editTime" value="${currentItem.scheduled_time || ''}">
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Plataforma</label>
+          <select class="input-field" id="editPlatform">
+            <option value="">Selecione</option>
+            <option value="ekyte" ${currentItem.platform === 'ekyte' ? 'selected' : ''}>Ekyte</option>
+            <option value="meta" ${currentItem.platform === 'meta' ? 'selected' : ''}>Meta Business</option>
+            <option value="direto" ${currentItem.platform === 'direto' ? 'selected' : ''}>Direto</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Status</label>
+          <select class="input-field" id="editStatus">
+            <option value="pendente" ${currentItem.status === 'pendente' ? 'selected' : ''}>Pendente</option>
+            <option value="agendado" ${currentItem.status === 'agendado' ? 'selected' : ''}>Agendado</option>
+            <option value="apontamento" ${currentItem.status === 'apontamento' ? 'selected' : ''}>Com Apontamento</option>
+            <option value="verificar_ig" ${currentItem.status === 'verificar_ig' ? 'selected' : ''}>Verificar IG</option>
+            <option value="publicado" ${currentItem.status === 'publicado' ? 'selected' : ''}>Publicado</option>
+            <option value="nao_agendou" ${currentItem.status === 'nao_agendou' ? 'selected' : ''}>Não Agendou</option>
+            <option value="problema" ${currentItem.status === 'problema' ? 'selected' : ''}>Problema</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-section">
+      <div class="modal-section-title">Observações</div>
+      <textarea class="input-field" id="editObs" rows="2">${currentItem.observacoes || ''}</textarea>
+    </div>
+  `;
+  
+  document.getElementById('modalFooter').innerHTML = `
+    <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+    <button class="btn btn-danger" onclick="deletePost()">Excluir</button>
+    <button class="btn btn-primary" onclick="saveEdit()">Salvar</button>
+  `;
+  
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+async function saveEdit() {
+  const clientName = document.getElementById('editClient').value;
+  const client = clients.find(c => c.name === clientName);
+  
+  const updates = {
+    client: clientName,
+    type: document.getElementById('editType').value,
+    description: document.getElementById('editDesc').value,
+    scheduled_date: document.getElementById('editDate').value,
+    scheduled_time: document.getElementById('editTime').value || null,
+    platform: document.getElementById('editPlatform').value || null,
+    is_special: document.getElementById('editSpecial').value === 'true',
+    status: document.getElementById('editStatus').value,
+    observacoes: document.getElementById('editObs').value || null,
+    social_media: client?.social_media || currentItem.social_media,
+    gestor: client?.gestor || currentItem.gestor,
+    updated_by: currentUser.name,
+    updated_at: new Date().toISOString()
+  };
+  
+  await db.from('items').update(updates).eq('id', currentItem.id);
+  await logActivity(currentItem.id, clientName, updates.type, 'editou publicação');
+  
+  closeModal();
+  toast('Alterações salvas!');
+  loadData();
+}
+
+async function deletePost() {
+  if (!confirm('Tem certeza que deseja excluir esta publicação?')) return;
+  
+  await db.from('items').delete().eq('id', currentItem.id);
+  await logActivity(currentItem.id, currentItem.client, currentItem.type, 'excluiu publicação', currentItem.description);
+  
+  closeModal();
+  toast('Publicação excluída');
+  loadData();
 }
 
 function closeModal() {
